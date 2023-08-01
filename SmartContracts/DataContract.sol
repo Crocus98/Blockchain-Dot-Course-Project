@@ -3,23 +3,25 @@ pragma solidity >=0.7.0 <0.9.0;
 
 //Contract that gives data about trains
 contract TrainsOracle{
-    address payable public trainCompany;
+    address payable public trainCompanyAddress;
     string public trainCompanyName = "ItalyTrains";
 
     //event mttq o signalR
     struct Station {
         string _stationName;
         bool _stationState;
+        bool _isSet;
     }
-    mapping (uint32 => Station) stations;
+    mapping (string => Station) stations;
 
     struct Train {
         string _trainName;
         uint16 _passengersNumber;
         bool _trainState;
-        uint32 [] _stationsId;
+        string [] _stationIds;
+        bool _isSet;
     }
-    mapping (uint32 => Train) trains;
+    mapping (string => Train) trains;
 
     struct Segment {
         uint32 _trainId;
@@ -31,25 +33,27 @@ contract TrainsOracle{
 
         uint256 _segmentStartingTime;
         uint256 _segmentEndingTime;
-    }
-    mapping (uint256 => Segment) segments;
 
-    struct Ticket {
+        bool _isSet;
+    }
+    mapping (string => Segment) segments;
+
+    struct Path {
         uint256 _segmentId;
         uint256 _segmentActualEndingTime;
-        bool valid;
+        bool _valid;
+
+        bool _isSet;
     }
-    mapping (uint256 => Ticket) tickets;
+    mapping (string => Path) paths;
+    mapping(uint256 => address[]) customers;
 
     struct Trip {
-        uint256 [] _ticketIds;
-    }
-    mapping (address=>Trip) trips;
+        uint32 _tripId;
+        uint256 [] _pathIds;
 
-
-    constructor() {
-        trainCompany = payable(msg.sender);
     }
+    mapping (address=>Trip[]) trips;
 
     event TrainArrivalEvent(
         uint _trainId,
@@ -58,5 +62,27 @@ contract TrainsOracle{
         address _sender
     );
 
+    constructor() {
+        trainCompanyAddress = payable(msg.sender);
+    }
+
+    modifier onlyOwner {
+        require(msg.sender == trainCompanyAddress, string.concat(string.concat("Only ",trainCompanyName)," can call this function"));
+        _;
+    }
+
+    function addStation(string calldata stationId, string calldata stationName, bool stationState) public onlyOwner {
+        stations[stationId] = Station(stationName, stationState,true);
+    }
+
+    function addTrain(string calldata trainId, string memory trainName, uint16 passengersNumber, bool trainState) public onlyOwner {
+        trains[trainId] = Train(trainName, passengersNumber, trainState, new string[](0),true);
+    }
+
+    function addTrainStations(string calldata trainId, string calldata stationId) public onlyOwner{
+        require(trains[trainId]._isSet, "Trains does not exist");
+        require(stations[stationId]._isSet,"Station does not exists");
+        trains[trainId]._stationIds.push(stationId);
+    }
 
 }
