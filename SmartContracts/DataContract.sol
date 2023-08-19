@@ -9,16 +9,16 @@ contract TrainsOracle{
     //event mttq o signalR
 
     //for blaclisting bad passengers
-    mapping(address => bool) blackList;
+    mapping(address => bool) public blackList;
 
     struct Train {
         string _trainName;
         uint16 _maxPassengersNumber;
         bool _isSet;
     }
-    mapping (string => Train) trains;
+    mapping (string => Train) public trains;
 
-    mapping (string => bool) stations;
+    mapping (string => bool) public stations;
 
     struct ConsecutiveSegment{
         string _trainId;
@@ -32,7 +32,7 @@ contract TrainsOracle{
         
         bool _isSet;
     }
-    mapping (string => ConsecutiveSegment) consecutiveSegments;
+    mapping (string => ConsecutiveSegment) public consecutiveSegments;
 
     struct DynamicConsecutiveSegment{
         string _consecutiveSegmentId;
@@ -43,9 +43,9 @@ contract TrainsOracle{
 
         bool _isSet;
     }
-    mapping (string => DynamicConsecutiveSegment) dynamicConsecutiveSegments;
+    mapping (string => DynamicConsecutiveSegment) public dynamicConsecutiveSegments;
     //It maps to the consecutive segments ids all the dynamic segmentsc ids that have the specific consecutive segment as last. 
-    mapping(string => string[]) lastDynamicConsecutiveSegmentIdToDynamicSegmentIds;
+    mapping(string => string[]) public lastDynamicConsecutiveSegmentIdToDynamicSegmentIds;
 
     struct DynamicSegment{
         string [] _dynamicConsecutiveSegmentIds;
@@ -54,14 +54,14 @@ contract TrainsOracle{
 
         bool _isSet;
     }
-    mapping (string => DynamicSegment) dynamicSegments;
+    mapping (string => DynamicSegment) public dynamicSegments;
 
     struct DynamicTicket {
         string [] _dynamicSegmentIds;
 
         bool _isSet;
     }
-    mapping (string => DynamicTicket) dynamicTickets;
+    mapping (string => DynamicTicket) public dynamicTickets;
 
     modifier onlyOwner {
         require(msg.sender == trainCompanyAddress, string.concat(string.concat("Only ",trainCompanyName)," can call this function"));
