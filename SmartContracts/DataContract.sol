@@ -160,22 +160,46 @@ contract TrainsOracle{
     }
 
     function setArrivalTimeAndCheckRequiredRefunds(string calldata dynamicConsecutiveSegmentId, uint256 actualArrivalTime) public onlyOwner{
-        //require dynamicConsecutivesegmentId exists
-
-        //Set dynamicConsecutiveSegemens[dynamicConsecutiveSegmentId] with actualArrivalTime
-
-
-        //Check that the corresponding non dynamic consecutive segment arrival time is consistent with the actuallArrivalTime
-        //If the train is on time end the function otherwise continue...
-
-        //Find all addresses of people that have that dynamicconsecutivesegment as last of a dynamic segment and check for the refund...
-        //If the train is late for less than 10 min refund 20% of the segment.
-        //If the train is late for more than 10 and less than 30 min refund 50% of the segment.
-        //If the train is late for more than 30 min refunt 100% of the segment.
+        require(dynamicConsecutiveSegments[dynamicConsecutiveSegmentId]._isSet, "DynamicConsecutiveSegment does not exist");
         
-        //Check if those people have some other dynamic segments and refund them if the train delay does not allow them to catch the following train.
-        //In that case give full refund of all following dynamic segments included into the ticket
+        dynamicConsecutiveSegments[dynamicConsecutiveSegmentId]._actualArrivalTime = actualArrivalTime;
+        
+        ConsecutiveSegment memory segment = consecutiveSegments[dynamicConsecutiveSegments[dynamicConsecutiveSegmentId]._consecutiveSegmentId];
+        
+        uint256 delay = 0;
+        if (actualArrivalTime > segment._arrivalTime) {
+            delay = actualArrivalTime - segment._arrivalTime;
+        }
+        
+        if (delay == 0) {
+            return; // If the train is on time, end the function
+        }
+        
+        uint8 refundPercentage;
+        if (delay <= 600) { // 10 minutes in seconds
+            refundPercentage = 20;
+        } else if (delay <= 1800) { // 30 minutes in seconds
+            refundPercentage = 50;
+        } else {
+            refundPercentage = 100;
+        }
+        
+        string[] memory affectedDynamicSegmentIds = lastDynamicConsecutiveSegmentIdToDynamicSegmentIds[dynamicConsecutiveSegmentId];
+        for (uint i = 0; i < affectedDynamicSegmentIds.length; i++) {
+            DynamicSegment memory dynamicSegment = dynamicSegments[affectedDynamicSegmentIds[i]];
+            for (uint j = 0; j < dynamicSegment._passengerAddresses.length; j++) {
+                address passenger = dynamicSegment._passengerAddresses[j];
+                uint32 segmentPrice = consecutiveSegments[dynamicConsecutiveSegments[dynamicSegments[affectedDynamicSegmentIds[i]]._dynamicConsecutiveSegmentIds[0]]._consecutiveSegmentId]._price;
+                uint256 refundAmount = (segmentPrice * refundPercentage) / 100;
+                payable(passenger).transfer(refundAmount);
+            }
+        }
 
     }
+
+    function owner() public view returns (address payable) {
+    return trainCompanyAddress;
+    }
+   
 
 }

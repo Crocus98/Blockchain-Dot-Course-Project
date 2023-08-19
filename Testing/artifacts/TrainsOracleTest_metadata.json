@@ -1,0 +1,90 @@
+{
+	"compiler": {
+		"version": "0.8.18+commit.87f61d96"
+	},
+	"language": "Solidity",
+	"output": {
+		"abi": [
+			{
+				"inputs": [],
+				"name": "beforeEach",
+				"outputs": [],
+				"stateMutability": "nonpayable",
+				"type": "function"
+			},
+			{
+				"inputs": [],
+				"name": "testAddDynamicConsecutiveSegment",
+				"outputs": [],
+				"stateMutability": "nonpayable",
+				"type": "function"
+			},
+			{
+				"inputs": [],
+				"name": "testCannotAddConsecutiveSegmentWithNonExistentStations",
+				"outputs": [],
+				"stateMutability": "nonpayable",
+				"type": "function"
+			},
+			{
+				"inputs": [],
+				"name": "testOnlyOwnerCanAddConsecutiveSegment",
+				"outputs": [],
+				"stateMutability": "nonpayable",
+				"type": "function"
+			}
+		],
+		"devdoc": {
+			"kind": "dev",
+			"methods": {},
+			"version": 1
+		},
+		"userdoc": {
+			"kind": "user",
+			"methods": {},
+			"version": 1
+		}
+	},
+	"settings": {
+		"compilationTarget": {
+			"Testing/DataContractTest3.sol": "TrainsOracleTest"
+		},
+		"evmVersion": "paris",
+		"libraries": {},
+		"metadata": {
+			"bytecodeHash": "ipfs"
+		},
+		"optimizer": {
+			"enabled": false,
+			"runs": 200
+		},
+		"remappings": []
+	},
+	"sources": {
+		"SmartContracts/DataContract.sol": {
+			"keccak256": "0x1976d2d139a45a403867b013cd05359148b60a2160e39e8499372f030d7e49cd",
+			"license": "GPL-3.0",
+			"urls": [
+				"bzz-raw://fcad56059856e35b5a8676778de5ed7db2679294aaa00c3652ca4b1e4b6c8b3e",
+				"dweb:/ipfs/QmSdMC2AaBZ2apQ1e2XqNjkjz6vNkaMs7xQ2TsG9gSHGkP"
+			]
+		},
+		"Testing/DataContractTest3.sol": {
+			"keccak256": "0x1227913a35b8c0f928cfa3f1278ba882d330f264984fa9933bb30b6d1dcc6dfb",
+			"license": "GPL-3.0",
+			"urls": [
+				"bzz-raw://4f6e19bc68166a0a7ace886c87c203992de7be89bce6843407414994f63bbd2e",
+				"dweb:/ipfs/QmVLf7G8CAEVCBE4PmgQTDzvDrcbWqi5m2FXa57XgV782E"
+			]
+		},
+		"remix_tests.sol": {
+			"keccak256": "0xe2783cdc204cba8c72494119339f1d90f9022b15d6c718c668b7f097d8e29787",
+			"license": "GPL-3.0",
+			"urls": [
+				"bzz-raw://bb6a22e64c7f16bcaab63b1c1a1b269d5be8a6d37bdd9dec1718477ab916b18e",
+				"dweb:/ipfs/QmdkW1tT5iadBvaHMCoskhDGZKnfdg8o1D9CcoQYtdJet7"
+			]
+		}
+	},
+	"version": 1
+}
