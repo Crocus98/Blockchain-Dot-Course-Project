@@ -2,13 +2,22 @@ from web3 import Web3
 import json
 import time
 import random
+from dotenv import load_dotenv
+
 
 # Connetti al nodo Ethereum
 w3 = Web3(Web3.HTTPProvider('http://localhost:8545'))
 
 # Indirizzo del contratto e ABI
-contract_address = "0xYourContractAddressHere"
-contract_abi = json.loads('YourContractABIHere')
+contract_address = "0x5B38Da6a701c568545dCfcB03FcB875f56beddC4"
+# Load environment variables from .env file
+load_dotenv()
+
+# Get the ABI from the environment variables
+contract_abi_json = os.getenv("CONTRACT_ABI")
+
+# Parse the JSON string to get the ABI
+contract_abi = json.loads('ABI.json')
 
 # Crea un oggetto contratto
 contract = w3.eth.contract(address=contract_address, abi=contract_abi)
