@@ -39,16 +39,18 @@ contract TrainsOracle{
 
         uint16 _passengersNumber;
 
+        uint256 _actualArrivalTime;
+
         bool _isSet;
     }
     mapping (string => DynamicConsecutiveSegment) dynamicConsecutiveSegments;
+    //It maps to the consecutive segments ids all the dynamic segmentsc ids that have the specific consecutive segment as last. 
+    mapping(string => string[]) lastDynamicConsecutiveSegmentIdToDynamicSegmentIds;
 
     struct DynamicSegment{
         string [] _dynamicConsecutiveSegmentIds;
 
         address [] _passengerAddresses;
-
-        uint256 _actualArrivalTime;
 
         bool _isSet;
     }
@@ -98,17 +100,20 @@ contract TrainsOracle{
 
     function addDynamicConsecutiveSegment(string calldata dynamicConsecutiveSegmentId, string calldata consecutiveSegmentId) public onlyOwner {
         require(consecutiveSegments[consecutiveSegmentId]._isSet, "Consecutive segment does not exist");
-        dynamicConsecutiveSegments[dynamicConsecutiveSegmentId] = DynamicConsecutiveSegment(consecutiveSegmentId,0,true);
+        dynamicConsecutiveSegments[dynamicConsecutiveSegmentId] = DynamicConsecutiveSegment(consecutiveSegmentId,0, 0, true);
     }
 
     function addDynamicSegment(string calldata dynamicSegmentId) public onlyOwner {
-        dynamicSegments[dynamicSegmentId] = DynamicSegment(new string[](0), new address[](0), 0, true);
+        dynamicSegments[dynamicSegmentId] = DynamicSegment(new string[](0), new address[](0), true);
     }
 
-    function addDynamicConsecutiveSegmentToDynamicSegment(string calldata dynamicSegmentId, string calldata dynamicConsecutiveSegmentId)public onlyOwner{
+    function addDynamicConsecutiveSegmentToDynamicSegment(string calldata dynamicSegmentId, string calldata dynamicConsecutiveSegmentId, bool lastSegmentStop)public onlyOwner{
         require(dynamicSegments[dynamicSegmentId]._isSet, "Dynamic segment does not exist");
         require(dynamicConsecutiveSegments[dynamicConsecutiveSegmentId]._isSet, "Dynamic consecutive segment does not exist");
         dynamicSegments[dynamicSegmentId]._dynamicConsecutiveSegmentIds.push(dynamicConsecutiveSegmentId);
+        if(lastSegmentStop){
+            lastDynamicConsecutiveSegmentIdToDynamicSegmentIds[dynamicConsecutiveSegmentId].push(dynamicSegmentId);
+        }
     }
 
 
@@ -153,4 +158,24 @@ contract TrainsOracle{
         }
         require(msg.value >= totalPrice, "Not enought money");
     }
+
+    function setArrivalTimeAndCheckRequiredRefunds(string calldata dynamicConsecutiveSegmentId, uint256 actualArrivalTime) public onlyOwner{
+        //require dynamicConsecutivesegmentId exists
+
+        //Set dynamicConsecutiveSegemens[dynamicConsecutiveSegmentId] with actualArrivalTime
+
+
+        //Check that the corresponding non dynamic consecutive segment arrival time is consistent with the actuallArrivalTime
+        //If the train is on time end the function otherwise continue...
+
+        //Find all addresses of people that have that dynamicconsecutivesegment as last of a dynamic segment and check for the refund...
+        //If the train is late for less than 10 min refund 20% of the segment.
+        //If the train is late for more than 10 and less than 30 min refund 50% of the segment.
+        //If the train is late for more than 30 min refunt 100% of the segment.
+        
+        //Check if those people have some other dynamic segments and refund them if the train delay does not allow them to catch the following train.
+        //In that case give full refund of all following dynamic segments included into the ticket
+
+    }
+
 }
