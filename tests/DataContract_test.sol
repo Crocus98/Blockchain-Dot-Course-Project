@@ -9,7 +9,7 @@ import "remix_tests.sol";
 // Although it may fail compilation in 'Solidity Compiler' plugin
 // But it will work fine in 'Solidity Unit Testing' plugin
 import "remix_accounts.sol";
-import "../Tests/DataContractTest.sol";
+import "../Tests/DataContract_test.sol";
 import "SmartContracts/DataContract.sol"; // Assicurati che il percorso sia corretto
 
 // File name has to end with '_test.sol', this file can contain more than one testSuite contracts
