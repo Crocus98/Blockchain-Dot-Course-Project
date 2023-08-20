@@ -172,13 +172,13 @@ contract TrainsOracle{
         }
         
         if (delay == 0) {
-            return; // If the train is on time, end the function
+            return;
         }
         
         uint8 refundPercentage;
-        if (delay <= 600) { // 10 minutes in seconds
+        if (delay <= 600) { 
             refundPercentage = 20;
-        } else if (delay <= 1800) { // 30 minutes in seconds
+        } else if (delay <= 1800) {
             refundPercentage = 50;
         } else {
             refundPercentage = 100;
