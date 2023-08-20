@@ -72,6 +72,12 @@ contract TrainsOracle{
         trainCompanyAddress = payable(msg.sender);
     }
 
+    function setOwner(address newOwner) public {
+    require(msg.sender == trainCompanyAddress, "Only the current owner can change the owner");
+    trainCompanyAddress = payable(newOwner);
+}
+
+
     function addToBlacklist (address toBlackList) public onlyOwner {
         blackList[toBlackList] = true;
     }
