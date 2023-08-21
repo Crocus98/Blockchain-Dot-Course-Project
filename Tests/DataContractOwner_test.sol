@@ -11,18 +11,22 @@ import "SmartContracts/DataContract.sol";
 
 //Run Owner - User1 - User2 in this order to properly test the contract
 
-contract testOwner {
-    address trainOracleAddress; //set this only
+contract TestOwner {
+    address public owner; //set this only
+    address public trainsOracleAddress;
     TrainsOracle trainsContract;
-    address owner;
 
     function beforeAll() public {
-        owner = TestsAccounts.getAccount(0);
-
-        trainsContract = TrainsOracle(address(trainOracleAddress));
+        owner = address(this);
+        trainsContract = new TrainsOracle();
+        trainsOracleAddress = address(trainsContract);
     }
 
     function beforeEach() public {}
+
+    function getTrainsOracleAddress() public view returns (address) {
+        return trainsOracleAddress;
+    }
 
     function testOwnerPermissions() public {
         bool success = true;

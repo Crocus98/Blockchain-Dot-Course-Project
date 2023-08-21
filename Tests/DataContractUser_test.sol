@@ -8,18 +8,22 @@ import "@accounts";
 //import "remix_tests.sol";
 
 import "SmartContracts/DataContract.sol";
+import "Tests/DataContractOwner_test.sol";
 
 //Run Owner - User1 - User2 in this order to properly test the contract
 
-contract testUser1 {
-    address trainOracleAddress; //set only this
+contract TestUser1 {
+    address testOwnerAddress; //and this
+    address trainsOracleAddress;
     TrainsOracle trainsContract;
     address user;
 
     function beforeAll() public {
-        user = TestsAccounts.getAccount(1);
+        user = address(this);
+        TestOwner testOwner = TestOwner(testOwnerAddress);
+        trainsOracleAddress = address(testOwner.getTrainsOracleAddress());
 
-        trainsContract = TrainsOracle(address(trainOracleAddress));
+        trainsContract = TrainsOracle(trainsOracleAddress);
     }
 
     function beforeEach() public {}
@@ -207,22 +211,25 @@ contract testUser1 {
     }
 }
 
-contract testUser2 {
-    address trainOracleAddress; //set only this
+contract TestUser2 {
+    address testOwnerAddress; //and this
+    address trainsOracleAddress;
     TrainsOracle trainsContract;
     address user;
+
+    function beforeAll() public {
+        user = address(this);
+        TestOwner testOwner = TestOwner(testOwnerAddress);
+        trainsOracleAddress = address(testOwner.getTrainsOracleAddress());
+
+        trainsContract = TrainsOracle(trainsOracleAddress);
+    }
+
+    function beforeEach() public {}
 
     //Could be useful for debugging
     //event LogAccount(string description, address account);
     //emit LogAccount("User: ", user);
-
-    function beforeAll() public {
-        user = TestsAccounts.getAccount(2);
-
-        trainsContract = TrainsOracle(address(trainOracleAddress));
-    }
-
-    function beforeEach() public {}
 
     function testUserInBlacklistCannotBuyTicket() public {
         bool success = true;
