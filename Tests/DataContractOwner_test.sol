@@ -84,7 +84,7 @@ contract testOwner {
             "Owner should be able to add a dynamic consecutive segment"
         );
 
-        try trainsContract.addDynamicSegment("DS001") {
+        try trainsContract.addDynamicSegment("DS1") {
             success = true;
         } catch {
             success = false;

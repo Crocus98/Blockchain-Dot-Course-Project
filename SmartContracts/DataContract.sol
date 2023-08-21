@@ -106,6 +106,10 @@ contract TrainsOracle {
         require(trains[trainId]._isSet, "Train does not exist");
         require(stations[startingStationId], "Starting station does not exist");
         require(stations[arrivingStationId], "Arriving station does not exist");
+        require(
+            stations[startingStationId] != stations[arrivingStationId],
+            "Starting station and arriving station cannot be the same"
+        );
         require(price > 0, "Price cannot be negative or null");
         require(
             arrivalTime > block.timestamp,
