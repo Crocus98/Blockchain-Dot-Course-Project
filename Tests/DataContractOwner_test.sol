@@ -9,19 +9,20 @@ import "SmartContracts/DataContract.sol";
 
 //Run Owner - User1 - User2 in this order to properly test the contract
 contract testOwner {
-    address trainOracleAddress = "";
+    string trainOracleAddressString = ""; //set this only
+    address trainOracleAddress;
     TrainsOracle trainsContract;
     address owner;
 
     function beforeAll() public {
         owner = TestsAccounts.getAccount(0);
-
-        string trainOracleAddressString = "" + trainOracleAddress;
-        if (trainOracleAddressString.length == 0) {
+        if (bytes(trainOracleAddressString).length < 20) {
             trainsContract = new TrainsOracle();
             trainOracleAddress = address(trainsContract);
         } else {
-            //fromStringToAddress = address(bytes20(bytes(trainOracleAddressString)));
+            trainOracleAddress = address(
+                bytes20(bytes(trainOracleAddressString))
+            );
             trainsContract = TrainsOracle(address(trainOracleAddress));
         }
     }
@@ -337,8 +338,8 @@ contract testOwner {
     //Leave as last function since it transfer ownership of the contract
     function testOwnershipTransfer() public {
         address newOwner = TestsAccounts.getAccount(10);
-        trainsContract.setOwner(newOwner);
-        address contractOwner = trainsContract.trainCompanyAddress;
+        trainsContract.setNewOwner(newOwner);
+        address contractOwner = trainsContract.trainCompanyAddress();
         Assert.equal(
             newOwner,
             contractOwner,
@@ -348,7 +349,7 @@ contract testOwner {
 }
 
 contract testUser1 {
-    address trainOracleAddress = "";
+    address trainOracleAddress; //set only this
     TrainsOracle trainsContract;
     address user;
 
@@ -451,8 +452,7 @@ contract testUser1 {
             "Non-owner should not be able to add a dynamic consecutive segment to a dynamic segment"
         );
 
-        address newOwner = user;
-        try trainsContract.setOwner(user) {
+        try trainsContract.setNewOwner(user) {
             success = true;
         } catch {
             success = false;
@@ -464,7 +464,7 @@ contract testUser1 {
         );
     }
 
-    //TODO
+    /*//TODO
     function testCalculateTotalTicketPrice() public {
         uint32 calculatedPrice = trainsContract.buyTicketStep("ticket1", "DS1"); //buyticketstep is internal not callable
 
@@ -475,7 +475,7 @@ contract testUser1 {
             expectedPrice,
             "Total ticket price calculated is incorrect"
         );
-    }
+    }*/
 
     function testUserShouldNotAddOrRemoveFromBlacklist() public {
         bool success = true;
@@ -545,7 +545,7 @@ contract testUser1 {
 }
 
 contract testUser2 {
-    address trainOracleAddress = "";
+    address trainOracleAddress; //set only this
     TrainsOracle trainsContract;
     address user;
 

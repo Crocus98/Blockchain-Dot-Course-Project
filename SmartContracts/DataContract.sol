@@ -1,9 +1,8 @@
 // SPDX-License-Identifier: GPL-3.0
 pragma solidity >=0.7.0 <0.9.0;
-pragma experimental ABIEncoderV2;
 
 contract TrainsOracle {
-    address payable public trainCompanyAddress;
+    address public trainCompanyAddress;
     string public trainCompanyName = "ItalyTrains";
 
     mapping(address => bool) public blackList;
@@ -69,11 +68,11 @@ contract TrainsOracle {
     }
 
     constructor() {
-        trainCompanyAddress = payable(msg.sender);
+        trainCompanyAddress = msg.sender;
     }
 
     function setNewOwner(address newOwner) public onlyOwner {
-        trainCompanyAddress = payable(newOwner);
+        trainCompanyAddress = newOwner;
     }
 
     function addToBlacklist(address toBlackList) public onlyOwner {
