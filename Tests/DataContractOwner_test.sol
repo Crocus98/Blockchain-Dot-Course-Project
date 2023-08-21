@@ -8,17 +8,22 @@ import "@accounts";
 //import "remix_tests.sol";
 
 import "SmartContracts/DataContract.sol";
+import "Tests/DataContractUser_test.sol";
 
 //Run Owner - User1 - User2 in this order to properly test the contract
 
 contract TestOwner {
     address public owner; //set this only
     address public trainsOracleAddress;
+    TestUser1 testUser1;
+    TestUser2 testUser2;
     TrainsOracle trainsContract;
 
     function beforeAll() public {
         owner = address(this);
         trainsContract = new TrainsOracle();
+        testUser1 = new TestUser1();
+        testUser2 = new TestUser2(trainsOracleAddress);
         trainsOracleAddress = address(trainsContract);
     }
 

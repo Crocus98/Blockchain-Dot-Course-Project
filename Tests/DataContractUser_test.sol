@@ -8,7 +8,6 @@ import "@accounts";
 //import "remix_tests.sol";
 
 import "SmartContracts/DataContract.sol";
-import "Tests/DataContractOwner_test.sol";
 
 //Run Owner - User1 - User2 in this order to properly test the contract
 
@@ -20,8 +19,6 @@ contract TestUser1 {
 
     function beforeAll() public {
         user = address(this);
-        TestOwner testOwner = TestOwner(testOwnerAddress);
-        trainsOracleAddress = address(testOwner.getTrainsOracleAddress());
 
         trainsContract = TrainsOracle(trainsOracleAddress);
     }
@@ -213,19 +210,21 @@ contract TestUser1 {
 
 contract TestUser2 {
     address testOwnerAddress; //and this
-    address trainsOracleAddress;
     TrainsOracle trainsContract;
     address user;
 
-    function beforeAll() public {
+    constructor(address trainsOracleAddress) {
         user = address(this);
-        TestOwner testOwner = TestOwner(testOwnerAddress);
-        trainsOracleAddress = address(testOwner.getTrainsOracleAddress());
 
         trainsContract = TrainsOracle(trainsOracleAddress);
     }
 
-    function beforeEach() public {}
+    /*function beforeAll() public {
+        user = address(this);
+        trainsContract = TrainsOracle(trainsOracleAddress);
+    }
+
+    function beforeEach() public {}*/
 
     //Could be useful for debugging
     //event LogAccount(string description, address account);
