@@ -10,6 +10,7 @@ import "@accounts";
 import "SmartContracts/DataContract.sol";
 
 //Run Owner - User1 - User2 in this order to properly test the contract
+
 contract testOwner {
     string trainOracleAddressString = ""; //set this only
     address trainOracleAddress;
