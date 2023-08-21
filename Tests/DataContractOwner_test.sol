@@ -8,7 +8,7 @@ import "@accounts";
 //import "remix_tests.sol";
 
 import "SmartContracts/DataContract.sol";
-import "Tests/DataContractUser_test.sol";
+import "Tests/DataContractUser.sol";
 
 //Run Owner - User1 - User2 in this order to properly test the contract
 
@@ -28,10 +28,6 @@ contract TestOwner {
     }
 
     function beforeEach() public {}
-
-    function getTrainsOracleAddress() public view returns (address) {
-        return trainsOracleAddress;
-    }
 
     function testOwnerPermissions() public {
         bool success = true;
@@ -202,11 +198,7 @@ contract TestOwner {
 
     function testAddOrRemoveFromBlacklist() public {
         bool success = true;
-        try
-            trainsContract.addToBlacklist(
-                0xAb8483F64d9C6d1EcF9b849Ae677dD3315835cb2
-            )
-        {
+        try trainsContract.addToBlacklist(address(testUser1)) {
             success = true;
         } catch {
             success = false;
@@ -216,11 +208,7 @@ contract TestOwner {
             true,
             "The owner should be able to add or remove a user from the blacklist"
         );
-        try
-            trainsContract.removeFromBlacklist(
-                0xAb8483F64d9C6d1EcF9b849Ae677dD3315835cb2
-            )
-        {
+        try trainsContract.removeFromBlacklist(address(testUser1)) {
             success = true;
         } catch {
             success = false;
@@ -230,11 +218,7 @@ contract TestOwner {
             true,
             "The owner should be able to add or remove a user from the blacklist"
         );
-        try
-            trainsContract.removeFromBlacklist(
-                0x4B20993Bc481177ec7E8f571ceCaE8A9e22C02db
-            )
-        {
+        try trainsContract.addToBlacklist(address(testUser2)) {
             success = true;
         } catch {
             success = false;
