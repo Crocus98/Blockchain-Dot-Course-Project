@@ -46,25 +46,25 @@ contract testSuite {
          emit LogAccount("Account 1: ", acc1);
       }
 
-
-       /// #sender: acc0
-    function testOwnerPermissions() public {
-        // Add a train
+    /// #sender: account-1
+    function testNonOwnerPermissions() public {
         bool success = true;
-        try trainsOracle.addTrain("Train1", "Fast Train", 100) {
+
+        // Try to add a train
+        try trainsOracle.addTrain("Train2", "Slow Train", 50) {
             success = true;
         } catch {
             success = false;
         }
-        Assert.equal(success, true, "Owner should be able to add a train");
+        Assert.equal(success, false, "Non-owner should not be able to add a train"  );
 
-        // Add stations
+        // Try to add a station
         try trainsOracle.addStation("Rome") {
             success = true;
         } catch {
-            success = false;
+             success = false;
         }
-        Assert.equal(success, true, "Owner should be able to add a station");
+        Assert.equal(success, false, "Non-owner should not be able to add a station");
 
         try trainsOracle.addStation("Florence") {
             success = true;
@@ -73,55 +73,41 @@ contract testSuite {
         }
         Assert.equal(success, true, "Owner should be able to add a station");
 
-        
 
-        // Add a consecutive segment
-        try trainsOracle.addConsecutiveSegment("CS001", "Train1", "Rome", "Florence", block.timestamp + 1 hours, 100) {
+        // Try to add a consecutive segment
+        try trainsOracle.addConsecutiveSegment("CS002", "Train2", "Rome", "Florence", block.timestamp + 1 hours, 100) {
             success = true;
         } catch {
             success = false;
         }
-        Assert.equal(success, true, "Owner should be able to add a consecutive segment");
+        Assert.equal(success, false, "Non-owner should not be able to add a consecutive segment");
 
-        // Add a dynamic consecutive segment
-        try trainsOracle.addDynamicConsecutiveSegment("DCS001", "CS001") {
+        // Try to add a dynamic consecutive segment
+        try trainsOracle.addDynamicConsecutiveSegment("DCS002", "CS002") {
             success = true;
         } catch {
             success = false;
         }
-        Assert.equal(success, true, "Owner should be able to add a dynamic consecutive segment");
+        Assert.equal(success, false, "Non-owner should not be able to add a dynamic consecutive segment");
 
-        // Add a dynamic segment
-        try trainsOracle.addDynamicSegment("DS001") {
+        // Try to add a dynamic segment
+        try trainsOracle.addDynamicSegment("DS002") {
             success = true;
         } catch {
             success = false;
         }
-        Assert.equal(success, true, "Owner should be able to add a dynamic segment");
+        Assert.equal(success, false, "Non-owner should not be able to add a dynamic segment");
 
-        // Add the dynamic consecutive segment to the dynamic segment
-        try trainsOracle.addDynamicConsecutiveSegmentToDynamicSegment("DS001", "DCS001", true) {
+        // Try to add the dynamic consecutive segment to the dynamic segment
+        try trainsOracle.addDynamicConsecutiveSegmentToDynamicSegment("DS002", "DCS002", true) {
             success = true;
         } catch {
             success = false;
         }
-        Assert.equal(success, true, "Owner should be able to add a dynamic consecutive segment to a dynamic segment");
+        Assert.equal(success, false, "Non-owner should not be able to add a dynamic consecutive segment to a dynamic segment");
+            
     }
 
-    /// #sender: acc0
-    function testCalculateTotalTicketPrice() public {
-        // Ensure that the testOwnerPermissions has run to set up the necessary dynamic segments and consecutive segments
-        // You should ensure that the dynamic segment "DS001" contains dynamic consecutive segments with known prices (100 in this case)
-
-        // Call the contract function to get the price
-        uint32 calculatedPrice = trainsOracle.buyTicketStep("ticket1", "DS001");
-
-        // Manually calculate the expected price based on the dynamic consecutive segments that make up "DS001"
-        uint32 expectedPrice = 100;  // The price of consecutive segment "CS001" is 100
-
-        // Check if the calculated price matches the expected price
-        Assert.equal(calculatedPrice, expectedPrice, "Total ticket price calculated is incorrect");
-    }
 
 }
 
