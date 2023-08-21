@@ -64,8 +64,16 @@ contract TrainsOracle{
     }
     mapping (string => DynamicTicket) public dynamicTickets;
 
+    function concatenateStrings(string memory a, string memory b) internal pure returns (string memory) {
+        return string(abi.encodePacked(a, b));
+    }
+
+
     modifier onlyOwner {
-        require(msg.sender == trainCompanyAddress, string.concat(string.concat("Only ",trainCompanyName)," can call this function"));
+        require(
+            msg.sender == trainCompanyAddress, 
+            concatenateStrings(concatenateStrings("Only ", trainCompanyName), " can call this function")
+        );
         _;
     }
 
