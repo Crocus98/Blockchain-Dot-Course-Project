@@ -2,34 +2,28 @@
 
 pragma solidity >=0.7.0 <0.9.0;
 
-import "remix_tests.sol";
-import "remix_accounts.sol";
+import "@tests";
+import "@accounts";
 
 import "SmartContracts/DataContract.sol";
 
-//Run Owner - User - User2 in this order to properly test the contract
-
+//Run Owner - User1 - User2 in this order to properly test the contract
 contract testOwner {
-    string trainOracleAddressString = "";
+    address trainOracleAddress = "";
     TrainsOracle trainsContract;
     address owner;
 
-    event LogAccount(string description, address account);
-
     function beforeAll() public {
         owner = TestsAccounts.getAccount(0);
-        emit LogAccount("Owner: ", owner);
 
+        string trainOracleAddressString = "" + trainOracleAddress;
         if (trainOracleAddressString.length == 0) {
             trainsContract = new TrainsOracle();
-            trainOracleAddress = address(trainsHandlerContract);
+            trainOracleAddress = address(trainsContract);
         } else {
-            address trainOracleAddress = address(
-                bytes20(bytes(trainOracleAddressString))
-            );
+            //fromStringToAddress = address(bytes20(bytes(trainOracleAddressString)));
             trainsContract = TrainsOracle(address(trainOracleAddress));
         }
-        emit LogAccount("TrainsOracle: ", address(trainsOracle));
     }
 
     function beforeEach() public {}
@@ -65,7 +59,7 @@ contract testOwner {
                 "S1",
                 "S2",
                 block.timestamp + 1 hours,
-                100
+                10
             )
         {
             success = true;
@@ -126,7 +120,7 @@ contract testOwner {
                 "S2",
                 "S1",
                 block.timestamp + 20,
-                90
+                15
             )
         {
             success = true;
@@ -146,7 +140,7 @@ contract testOwner {
                 "S1",
                 "S2",
                 block.timestamp + 20,
-                100
+                10
             )
         {
             success = true;
@@ -246,40 +240,6 @@ contract testOwner {
     }
 
     //TODO
-    function testCannotBuyTicketIfTrainIsFull() public {
-        (bool success, ) = address(trainsOracle).call(
-            abi.encodeWithSignature(
-                "buyDynamicTicket(string,string[])",
-                "ticket2",
-                new string[](1)
-            )
-        );
-        Assert.equal(
-            success,
-            false,
-            "User could buy a ticket even though train is full"
-        );
-    }
-
-    //TODO
-    function testBuyDynamicTicketWithSufficientEther() public {
-        string[] memory segments = new string[](1);
-        segments[0] = "segment1";
-        (bool success, ) = address(trainsOracle).call{value: 50}(
-            abi.encodeWithSignature(
-                "buyDynamicTicket(string,string[])",
-                "ticket1",
-                segments
-            )
-        );
-        Assert.equal(
-            success,
-            true,
-            "Couldn't buy a ticket with sufficient Ether"
-        );
-    }
-
-    //TODO
     function testRefundsCalculatedCorrectlyBasedOnDelay() public {
         uint256 initialBalance = address(trainsOracle).balance;
 
@@ -308,6 +268,10 @@ contract testOwner {
     //TODO
     function testRefundsTransferredCorrectlyToUserAddresses() public {
         uint256 initialBalance = address(this).balance;
+        //buy ticket before
+        //then check the refund
+        //be sure that the contract has enough funds to refund
+
         trainsOracle.setArrivalTimeAndCheckRequiredRefunds(
             "dynamicSegment1",
             block.timestamp + 2000
@@ -371,8 +335,8 @@ contract testOwner {
     //Leave as last function since it transfer ownership of the contract
     function testOwnershipTransfer() public {
         address newOwner = TestsAccounts.getAccount(10);
-        trainsOracle.setOwner(newOwner);
-        address contractOwner = trainsOracle.trainCompanyAddress;
+        trainsContract.setOwner(newOwner);
+        address contractOwner = trainsContract.trainCompanyAddress;
         Assert.equal(
             newOwner,
             contractOwner,
@@ -386,14 +350,10 @@ contract testUser1 {
     TrainsOracle trainsContract;
     address user;
 
-    event LogAccount(string description, address account);
-
     function beforeAll() public {
         user = TestsAccounts.getAccount(1);
-        emit LogAccount("Owner: ", owner);
 
         trainsContract = TrainsOracle(address(trainOracleAddress));
-        emit LogAccount("TrainsOracle: ", address(trainsOracle));
     }
 
     function beforeEach() public {}
@@ -502,10 +462,11 @@ contract testUser1 {
         );
     }
 
+    //TODO
     function testCalculateTotalTicketPrice() public {
-        uint32 calculatedPrice = trainsOracle.buyTicketStep("ticket1", "DS1");
+        uint32 calculatedPrice = trainsOracle.buyTicketStep("ticket1", "DS1"); //buyticketstep is internal not callable
 
-        uint32 expectedPrice = 100;
+        uint32 expectedPrice = 10;
 
         Assert.equal(
             calculatedPrice,
@@ -544,6 +505,40 @@ contract testUser1 {
             "Only the owner should be able to add or remove a user from the blacklist"
         );
     }
+
+    //TODO
+    function testCannotBuyTicketIfTrainIsFull() public {
+        (bool success, ) = address(trainsOracle).call(
+            abi.encodeWithSignature(
+                "buyDynamicTicket(string,string[])",
+                "ticket2",
+                new string[](1)
+            )
+        );
+        Assert.equal(
+            success,
+            false,
+            "User could buy a ticket even though train is full"
+        );
+    }
+
+    //TODO
+    function testCannotBuyDynamicTicketWithInsufficientEther() public {
+        string[] memory segments = new string[](1);
+        segments[0] = "segment1";
+        (bool success, ) = address(trainsOracle).call{value: 50}(
+            abi.encodeWithSignature(
+                "buyDynamicTicket(string,string[])",
+                "ticket1",
+                segments
+            )
+        );
+        Assert.equal(
+            success,
+            true,
+            "Couldn't buy a ticket with sufficient Ether"
+        );
+    }
 }
 
 contract testUser2 {
@@ -551,14 +546,14 @@ contract testUser2 {
     TrainsOracle trainsContract;
     address user;
 
-    event LogAccount(string description, address account);
+    //Could be useful for debugging
+    //event LogAccount(string description, address account);
+    //emit LogAccount("User: ", user);
 
     function beforeAll() public {
         user = TestsAccounts.getAccount(2);
-        emit LogAccount("User: ", user);
 
         trainsContract = TrainsOracle(address(trainOracleAddress));
-        emit LogAccount("TrainsOracle: ", address(trainsOracle));
     }
 
     function beforeEach() public {}

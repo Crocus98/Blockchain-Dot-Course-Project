@@ -1,3 +1,4 @@
 {
-  "solidity.compileUsingLocalVersion": "e:\\File\\Scuola Polimi Magistrale\\Blockchain\\Progetto\\Blockchain-Dot-Course-Project\\soljson-v0.8.21+commit.d9974bed.js"
+  "solidity.defaultCompiler": "localFile",
+  "solidity.remappings": ["@accounts=.deps/remix-tests/remix_accounts.sol", "@tests=.deps/remix-tests/remix_tests.sol"]
 }
