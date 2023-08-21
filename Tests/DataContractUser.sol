@@ -3,8 +3,6 @@
 pragma solidity >=0.7.0 <0.9.0;
 
 import "@tests";
-import "@accounts";
-//import "remix_accounts.sol";
 //import "remix_tests.sol";
 
 import "SmartContracts/DataContract.sol";
@@ -12,18 +10,15 @@ import "SmartContracts/DataContract.sol";
 //Run Owner - User1 - User2 in this order to properly test the contract
 
 contract TestUser1 {
-    address testOwnerAddress; //and this
-    address trainsOracleAddress;
+    address testOwnerAddress;
     TrainsOracle trainsContract;
     address user;
 
-    function beforeAll() public {
+    constructor(address trainsOracleAddress) {
         user = address(this);
 
         trainsContract = TrainsOracle(trainsOracleAddress);
     }
-
-    function beforeEach() public {}
 
     function testNonOwnerPermissions() public {
         bool success = true;
@@ -128,19 +123,6 @@ contract TestUser1 {
         );
     }
 
-    /*//TODO
-    function testCalculateTotalTicketPrice() public {
-        uint32 calculatedPrice = trainsContract.buyTicketStep("ticket1", "DS1"); //buyticketstep is internal not callable
-
-        uint32 expectedPrice = 10;
-
-        Assert.equal(
-            calculatedPrice,
-            expectedPrice,
-            "Total ticket price calculated is incorrect"
-        );
-    }*/
-
     function testUserShouldNotAddOrRemoveFromBlacklist() public {
         bool success = true;
         try
@@ -172,6 +154,19 @@ contract TestUser1 {
             "Only the owner should be able to add or remove a user from the blacklist"
         );
     }
+
+    /*//TODO
+    function testCalculateTotalTicketPrice() public {
+        uint32 calculatedPrice = trainsContract.buyTicketStep("ticket1", "DS1"); //buyticketstep is internal not callable
+
+        uint32 expectedPrice = 10;
+
+        Assert.equal(
+            calculatedPrice,
+            expectedPrice,
+            "Total ticket price calculated is incorrect"
+        );
+    }*/
 
     //TODO
     function testCannotBuyTicketIfTrainIsFull() public {
@@ -209,7 +204,7 @@ contract TestUser1 {
 }
 
 contract TestUser2 {
-    address testOwnerAddress; //and this
+    address testOwnerAddress;
     TrainsOracle trainsContract;
     address user;
 
@@ -218,17 +213,6 @@ contract TestUser2 {
 
         trainsContract = TrainsOracle(trainsOracleAddress);
     }
-
-    /*function beforeAll() public {
-        user = address(this);
-        trainsContract = TrainsOracle(trainsOracleAddress);
-    }
-
-    function beforeEach() public {}*/
-
-    //Could be useful for debugging
-    //event LogAccount(string description, address account);
-    //emit LogAccount("User: ", user);
 
     function testUserInBlacklistCannotBuyTicket() public {
         bool success = true;

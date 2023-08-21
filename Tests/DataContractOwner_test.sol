@@ -22,13 +22,14 @@ contract TestOwner {
     function beforeAll() public {
         owner = address(this);
         trainsContract = new TrainsOracle();
-        testUser1 = new TestUser1();
+        testUser1 = new TestUser1(trainsOracleAddress);
         testUser2 = new TestUser2(trainsOracleAddress);
         trainsOracleAddress = address(trainsContract);
     }
 
     function beforeEach() public {}
 
+    //TEST FOR OWNER
     function testOwnerPermissions() public {
         bool success = true;
 
@@ -323,7 +324,7 @@ contract TestOwner {
         );
     }*/
 
-    //Leave as last function since it transfer ownership of the contract
+    //Leave as last function of the owner since it transfer ownership of the contract
     function testOwnershipTransfer() public {
         address newOwner = TestsAccounts.getAccount(10);
         trainsContract.setNewOwner(newOwner);
@@ -333,5 +334,19 @@ contract TestOwner {
             contractOwner,
             "The owner address should be set correctly during ownership transfer"
         );
+    }
+
+    //TEST FOR USER 1
+    function testNonOwnerPermissions() public {
+        testUser1.testNonOwnerPermissions();
+    }
+
+    function testUserShouldNotAddOrRemoveFromBlacklist() public {
+        testUser1.testUserShouldNotAddOrRemoveFromBlacklist();
+    }
+
+    //TEST FOR USER 2
+    function testUserInBlacklistCannotBuyTicket() public {
+        testUser2.testUserInBlacklistCannotBuyTicket();
     }
 }
