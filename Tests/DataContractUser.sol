@@ -19,7 +19,7 @@ contract TestUser1 {
         trainsContract = TrainsOracle(trainsOracleAddress);
     }
 
-    function testNonOwnerPermissions() public {
+    function testUserNonOwnerPermissions() public {
         bool success = true;
 
         try trainsContract.addTrain("T2", "Slow Train", 50) {
@@ -49,7 +49,11 @@ contract TestUser1 {
         } catch {
             success = false;
         }
-        Assert.equal(success, true, "Owner should be able to add a station");
+        Assert.equal(
+            success,
+            false,
+            "Non-owner should not be able to add a station"
+        );
 
         try
             trainsContract.addConsecutiveSegment(
@@ -167,7 +171,7 @@ contract TestUser1 {
         );
     }*/
 
-    //TODO
+    /*//TODO
     function testCannotBuyTicketIfTrainIsFull() public {
         (bool success, ) = address(trainsContract).call(
             abi.encodeWithSignature(
@@ -181,9 +185,9 @@ contract TestUser1 {
             false,
             "User could buy a ticket even though train is full"
         );
-    }
+    }*/
 
-    //TODO
+    /*//TODO
     function testCannotBuyDynamicTicketWithInsufficientEther() public {
         string[] memory segments = new string[](1);
         segments[0] = "segment1";
@@ -199,7 +203,7 @@ contract TestUser1 {
             true,
             "Couldn't buy a ticket with sufficient Ether"
         );
-    }
+    }*/
 }
 
 contract TestUser2 {

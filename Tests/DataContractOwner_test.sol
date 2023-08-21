@@ -335,8 +335,8 @@ contract TestOwner {
     }
 
     //TEST FOR USER 1
-    function testNonOwnerPermissions() public {
-        testUser1.testNonOwnerPermissions();
+    function testUserNonOwnerPermissions() public {
+        testUser1.testUserNonOwnerPermissions();
     }
 
     function testUserShouldNotAddOrRemoveFromBlacklist() public {
