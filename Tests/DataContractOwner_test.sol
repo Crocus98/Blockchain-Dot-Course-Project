@@ -2,35 +2,27 @@
 
 pragma solidity >=0.7.0 <0.9.0;
 
-//import "@tests";
-//import "@accounts";
-import "remix_accounts.sol";
-import "remix_tests.sol";
+import "@tests";
+import "@accounts";
+//import "remix_accounts.sol";
+//import "remix_tests.sol";
 
 import "SmartContracts/DataContract.sol";
 
 //Run Owner - User1 - User2 in this order to properly test the contract
 
 contract testOwner {
-    string trainOracleAddressString = ""; //set this only
-    address trainOracleAddress;
+    address trainOracleAddress; //set this only
     TrainsOracle trainsContract;
     address owner;
 
     function beforeAll() public {
         owner = TestsAccounts.getAccount(0);
-        if (bytes(trainOracleAddressString).length < 20) {
-            trainsContract = new TrainsOracle();
-            trainOracleAddress = address(trainsContract);
-        } else {
-            trainOracleAddress = address(
-                bytes20(bytes(trainOracleAddressString))
-            );
-            trainsContract = TrainsOracle(address(trainOracleAddress));
-        }
+
+        trainsContract = TrainsOracle(address(trainOracleAddress));
     }
 
-    //function beforeEach() public {}
+    function beforeEach() public {}
 
     function testOwnerPermissions() public {
         bool success = true;
@@ -350,5 +342,3 @@ contract testOwner {
         );
     }
 }
-
-

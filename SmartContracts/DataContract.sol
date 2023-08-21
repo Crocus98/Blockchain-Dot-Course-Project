@@ -65,7 +65,7 @@ contract TrainsOracle {
         _;
     }
 
-    constructor() {
+    constructor() payable {
         trainCompanyAddress = msg.sender;
     }
 

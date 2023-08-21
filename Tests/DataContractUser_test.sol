@@ -2,15 +2,14 @@
 
 pragma solidity >=0.7.0 <0.9.0;
 
-//import "@tests";
-//import "@accounts";
-import "remix_accounts.sol";
-import "remix_tests.sol";
+import "@tests";
+import "@accounts";
+//import "remix_accounts.sol";
+//import "remix_tests.sol";
 
 import "SmartContracts/DataContract.sol";
 
 //Run Owner - User1 - User2 in this order to properly test the contract
-
 
 contract testUser1 {
     address trainOracleAddress; //set only this
