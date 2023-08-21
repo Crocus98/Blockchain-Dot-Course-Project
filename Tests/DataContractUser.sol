@@ -10,7 +10,6 @@ import "SmartContracts/DataContract.sol";
 //Run Owner - User1 - User2 in this order to properly test the contract
 
 contract TestUser1 {
-    address testOwnerAddress;
     TrainsOracle trainsContract;
     address user;
 
@@ -204,7 +203,6 @@ contract TestUser1 {
 }
 
 contract TestUser2 {
-    address testOwnerAddress;
     TrainsOracle trainsContract;
     address user;
 

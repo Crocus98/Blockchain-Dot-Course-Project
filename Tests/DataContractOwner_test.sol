@@ -14,7 +14,6 @@ import "Tests/DataContractUser.sol";
 
 contract TestOwner {
     address public owner; //set this only
-    address public trainsOracleAddress;
     TestUser1 testUser1;
     TestUser2 testUser2;
     TrainsOracle trainsContract;
@@ -22,9 +21,8 @@ contract TestOwner {
     function beforeAll() public {
         owner = address(this);
         trainsContract = new TrainsOracle();
-        testUser1 = new TestUser1(trainsOracleAddress);
-        testUser2 = new TestUser2(trainsOracleAddress);
-        trainsOracleAddress = address(trainsContract);
+        testUser1 = new TestUser1(address(trainsContract));
+        testUser2 = new TestUser2(address(trainsContract));
     }
 
     function beforeEach() public {}
