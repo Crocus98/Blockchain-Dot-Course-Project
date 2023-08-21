@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: GPL-3.0
 pragma solidity >=0.7.0 <0.9.0;
+pragma experimental ABIEncoderV2;
 
 contract TrainsOracle {
     address public trainCompanyAddress;
@@ -54,10 +55,7 @@ contract TrainsOracle {
     modifier onlyOwner() {
         require(
             msg.sender == trainCompanyAddress,
-            string.concat(
-                string.concat("Only ", trainCompanyName),
-                " can call this function"
-            )
+            "Only the owner of the contract can call this function"
         );
         _;
     }
