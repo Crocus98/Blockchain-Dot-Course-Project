@@ -77,6 +77,12 @@ contract TrainsOracle{
         _;
     }
 
+    modifier notBlacklisted {
+    require(!blackList[msg.sender], "This passenger is blacklisted");
+    _;
+}
+
+
     constructor() {
         trainCompanyAddress = payable(msg.sender);
     }
@@ -132,47 +138,44 @@ contract TrainsOracle{
     }
 
 
-    function buyTicketStep(string calldata ticketId, string calldata dynamicSegmentId) public returns (uint32){
+    // Add the notBlacklisted modifier to the function signature
+    function buyTicketStep(string calldata ticketId, string calldata dynamicSegmentId) public notBlacklisted returns (uint32) {
         require(dynamicSegments[dynamicSegmentId]._isSet, "Dynamic segment does not exist");
-        require(!blackList[msg.sender], "This passenger is blacklisted");
 
-        // Check if there's room on the segment
         uint16 maxPassengers = trains[consecutiveSegments[dynamicConsecutiveSegments[dynamicSegments[dynamicSegmentId]._dynamicConsecutiveSegmentIds[0]]._consecutiveSegmentId]._trainId]._maxPassengersNumber;
         
         uint32 totalPrice = 0;
 
         for (uint i = 0; i < dynamicSegments[dynamicSegmentId]._dynamicConsecutiveSegmentIds.length; i++) {
             uint16 currentPassengersCount = dynamicConsecutiveSegments[dynamicSegments[dynamicSegmentId]._dynamicConsecutiveSegmentIds[i]]._passengersNumber;
-            require(currentPassengersCount <= maxPassengers,"The train has not enought space available");
-            totalPrice +=consecutiveSegments[dynamicConsecutiveSegments[dynamicSegments[dynamicSegmentId]._dynamicConsecutiveSegmentIds[i]]._consecutiveSegmentId]._price;
+            require(currentPassengersCount <= maxPassengers, "The train has not enough space available");
+            totalPrice += consecutiveSegments[dynamicConsecutiveSegments[dynamicSegments[dynamicSegmentId]._dynamicConsecutiveSegmentIds[i]]._consecutiveSegmentId]._price;
         }
 
-        // Add the passenger to the dynamic segment
         dynamicSegments[dynamicSegmentId]._passengerAddresses.push(msg.sender);
 
-        // Update the passenger count in dynamicConsecutiveSegment
         for (uint i = 0; i < dynamicSegments[dynamicSegmentId]._dynamicConsecutiveSegmentIds.length; i++) {
             dynamicConsecutiveSegments[dynamicSegments[dynamicSegmentId]._dynamicConsecutiveSegmentIds[i]]._passengersNumber++;
         }
 
-        // Update the DynamicTicket for the passenger
-        if(!dynamicTickets[ticketId]._isSet) {
+        if (!dynamicTickets[ticketId]._isSet) {
             dynamicTickets[ticketId] = DynamicTicket(new string[](0), true);
         }
         
-        //Add the segment to the ticket
         dynamicTickets[ticketId]._dynamicSegmentIds.push(dynamicSegmentId);
 
         return totalPrice;
     }
 
-    function buyDynamicTicket (string calldata ticketId, string [] calldata dynamicSegmentsIds) public payable{
+    // Add the notBlacklisted modifier to the function signature
+    function buyDynamicTicket (string calldata ticketId, string [] calldata dynamicSegmentsIds) public payable notBlacklisted {
         uint32 totalPrice = 0;
         for (uint i = 0; i < dynamicSegmentsIds.length; i++) {
             totalPrice += this.buyTicketStep(ticketId, dynamicSegmentsIds[i]);
         }
-        require(msg.value >= totalPrice, "Not enought money");
+        require(msg.value >= totalPrice, "Not enough money");
     }
+
 
     function setArrivalTimeAndCheckRequiredRefunds(string calldata dynamicConsecutiveSegmentId, uint256 actualArrivalTime) public onlyOwner{
         require(dynamicConsecutiveSegments[dynamicConsecutiveSegmentId]._isSet, "DynamicConsecutiveSegment does not exist");
