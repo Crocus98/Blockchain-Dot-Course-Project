@@ -245,6 +245,7 @@ contract testOwner {
         );
     }
 
+    //TODO
     function testCannotBuyTicketIfTrainIsFull() public {
         (bool success, ) = address(trainsOracle).call(
             abi.encodeWithSignature(
@@ -260,7 +261,7 @@ contract testOwner {
         );
     }
 
-    /// #sender: acc1
+    //TODO
     function testBuyDynamicTicketWithSufficientEther() public {
         string[] memory segments = new string[](1);
         segments[0] = "segment1";
@@ -278,7 +279,7 @@ contract testOwner {
         );
     }
 
-    /// #sender: acc0
+    //TODO
     function testRefundsCalculatedCorrectlyBasedOnDelay() public {
         uint256 initialBalance = address(trainsOracle).balance;
 
@@ -304,7 +305,7 @@ contract testOwner {
         );
     }
 
-    /// #sender: acc0
+    //TODO
     function testRefundsTransferredCorrectlyToUserAddresses() public {
         uint256 initialBalance = address(this).balance;
         trainsOracle.setArrivalTimeAndCheckRequiredRefunds(
@@ -319,7 +320,7 @@ contract testOwner {
         );
     }
 
-    /// #sender: acc0
+    //TODO
     function testOnlyOwnerCanModifyArrivalTime() public {
         (bool success, ) = address(trainsOracle).call(
             abi.encodeWithSignature(
@@ -334,7 +335,7 @@ contract testOwner {
         );
     }
 
-    /// #sender: acc0
+    //TODO
     function testModifiedArrivalTimeIsSavedCorrectly() public {
         uint256 newTime = block.timestamp + 2 hours;
         trainsOracle.setArrivalTimeAndCheckRequiredRefunds(
@@ -367,28 +368,15 @@ contract testOwner {
         );
     }
 
-    /// #sender: acc0
-    function testOnlyOwnerCanExecuteFunctionsRequiringOnlyOwner() public {
-        address nonOwner = 0xAb8483F64d9C6d1EcF9b849Ae677dD3315835cb2;
-
-        (bool success, ) = address(nonOwner).call(
-            abi.encodeWithSignature("addToBlacklist(address)", nonOwner)
-        );
+    //Leave as last function since it transfer ownership of the contract
+    function testOwnershipTransfer() public {
+        address newOwner = TestsAccounts.getAccount(10);
+        trainsOracle.setOwner(newOwner);
+        address contractOwner = trainsOracle.trainCompanyAddress;
         Assert.equal(
-            success,
-            false,
-            "Non-owner could execute function requiring onlyOwner"
-        );
-    }
-
-    /// #sender: acc0
-    function testContractInitialization() public {
-        trainsOracle.setOwner(trainCompanyAddress); // Only for debugging
-        address owner = trainsOracle.owner();
-        Assert.equal(
-            owner,
-            trainCompanyAddress,
-            "The owner address should be set correctly during contract creation"
+            newOwner,
+            contractOwner,
+            "The owner address should be set correctly during ownership transfer"
         );
     }
 }
@@ -499,6 +487,18 @@ contract testUser1 {
             success,
             false,
             "Non-owner should not be able to add a dynamic consecutive segment to a dynamic segment"
+        );
+
+        address newOwner = user;
+        try trainsOracle.setOwner(user) {
+            success = true;
+        } catch {
+            success = false;
+        }
+        Assert.equal(
+            success,
+            false,
+            "The owner address should not be set by non-owner"
         );
     }
 
