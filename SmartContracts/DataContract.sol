@@ -107,7 +107,8 @@ contract TrainsOracle {
         require(stations[startingStationId], "Starting station does not exist");
         require(stations[arrivingStationId], "Arriving station does not exist");
         require(
-            stations[startingStationId] != stations[arrivingStationId],
+            keccak256(bytes(startingStationId)) !=
+                keccak256(bytes(arrivingStationId)),
             "Starting station and arriving station cannot be the same"
         );
         require(price > 0, "Price cannot be negative or null");
