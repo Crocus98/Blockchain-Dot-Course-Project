@@ -38,14 +38,14 @@ contract testOwner {
         }
         Assert.equal(success, true, "Owner should be able to add a train");
 
-        try trainsOracle.addStation("S1") {
+        try trainsContract.addStation("S1") {
             success = true;
         } catch {
             success = false;
         }
         Assert.equal(success, true, "Owner should be able to add a station");
 
-        try trainsOracle.addStation("S2") {
+        try trainsContract.addStation("S2") {
             success = true;
         } catch {
             success = false;
@@ -53,7 +53,7 @@ contract testOwner {
         Assert.equal(success, true, "Owner should be able to add a station");
 
         try
-            trainsOracle.addConsecutiveSegment(
+            trainsContract.addConsecutiveSegment(
                 "CS1",
                 "T1",
                 "S1",
@@ -72,7 +72,7 @@ contract testOwner {
             "Owner should be able to add a consecutive segment"
         );
 
-        try trainsOracle.addDynamicConsecutiveSegment("DCS1", "CS1") {
+        try trainsContract.addDynamicConsecutiveSegment("DCS1", "CS1") {
             success = true;
         } catch {
             success = false;
@@ -83,7 +83,7 @@ contract testOwner {
             "Owner should be able to add a dynamic consecutive segment"
         );
 
-        try trainsOracle.addDynamicSegment("DS001") {
+        try trainsContract.addDynamicSegment("DS001") {
             success = true;
         } catch {
             success = false;
@@ -95,7 +95,7 @@ contract testOwner {
         );
 
         try
-            trainsOracle.addDynamicConsecutiveSegmentToDynamicSegment(
+            trainsContract.addDynamicConsecutiveSegmentToDynamicSegment(
                 "DS1",
                 "DCS1",
                 true
@@ -113,6 +113,7 @@ contract testOwner {
     }
 
     function testCannotAddConsecutiveSegment() public {
+        bool success = false;
         try
             trainsContract.addConsecutiveSegment(
                 "CS2",
@@ -195,6 +196,7 @@ contract testOwner {
     }
 
     function testAddOrRemoveFromBlacklist() public {
+        bool success = true;
         try
             trainsContract.addToBlacklist(
                 0xAb8483F64d9C6d1EcF9b849Ae677dD3315835cb2
@@ -241,15 +243,15 @@ contract testOwner {
 
     //TODO
     function testRefundsCalculatedCorrectlyBasedOnDelay() public {
-        uint256 initialBalance = address(trainsOracle).balance;
+        uint256 initialBalance = address(trainsContract).balance;
 
         // Simulate delay and set arrival time
-        trainsOracle.setArrivalTimeAndCheckRequiredRefunds(
+        trainsContract.setArrivalTimeAndCheckRequiredRefunds(
             "dynamicSegment1",
             block.timestamp + 2000
         );
 
-        uint256 finalBalance = address(trainsOracle).balance;
+        uint256 finalBalance = address(trainsContract).balance;
 
         // Suppose the expected refund per ticket is 0.01 Ether
         uint256 expectedRefundAmount = 0.01 ether;
@@ -272,7 +274,7 @@ contract testOwner {
         //then check the refund
         //be sure that the contract has enough funds to refund
 
-        trainsOracle.setArrivalTimeAndCheckRequiredRefunds(
+        trainsContract.setArrivalTimeAndCheckRequiredRefunds(
             "dynamicSegment1",
             block.timestamp + 2000
         );
@@ -286,7 +288,7 @@ contract testOwner {
 
     //TODO
     function testOnlyOwnerCanModifyArrivalTime() public {
-        (bool success, ) = address(trainsOracle).call(
+        (bool success, ) = address(trainsContract).call(
             abi.encodeWithSignature(
                 "modifyArrivalTime(uint256)",
                 block.timestamp + 2 hours
@@ -302,7 +304,7 @@ contract testOwner {
     //TODO
     function testModifiedArrivalTimeIsSavedCorrectly() public {
         uint256 newTime = block.timestamp + 2 hours;
-        trainsOracle.setArrivalTimeAndCheckRequiredRefunds(
+        trainsContract.setArrivalTimeAndCheckRequiredRefunds(
             "dynamicConsecutiveSegment1",
             newTime
         );
@@ -312,7 +314,7 @@ contract testOwner {
             uint16 passengersNumber,
             uint256 actualArrivalTime,
             bool isSet
-        ) = trainsOracle.dynamicConsecutiveSegments(
+        ) = trainsContract.dynamicConsecutiveSegments(
                 "dynamicConsecutiveSegment1"
             );
 
@@ -346,7 +348,7 @@ contract testOwner {
 }
 
 contract testUser1 {
-    address trainOracleAddressString = "";
+    address trainOracleAddress = "";
     TrainsOracle trainsContract;
     address user;
 
@@ -361,7 +363,7 @@ contract testUser1 {
     function testNonOwnerPermissions() public {
         bool success = true;
 
-        try trainsOracle.addTrain("T2", "Slow Train", 50) {
+        try trainsContract.addTrain("T2", "Slow Train", 50) {
             success = true;
         } catch {
             success = false;
@@ -372,7 +374,7 @@ contract testUser1 {
             "Non-owner should not be able to add a train"
         );
 
-        try trainsOracle.addStation("S3") {
+        try trainsContract.addStation("S3") {
             success = true;
         } catch {
             success = false;
@@ -383,7 +385,7 @@ contract testUser1 {
             "Non-owner should not be able to add a station"
         );
 
-        try trainsOracle.addStation("S4") {
+        try trainsContract.addStation("S4") {
             success = true;
         } catch {
             success = false;
@@ -391,7 +393,7 @@ contract testUser1 {
         Assert.equal(success, true, "Owner should be able to add a station");
 
         try
-            trainsOracle.addConsecutiveSegment(
+            trainsContract.addConsecutiveSegment(
                 "CS",
                 "T2",
                 "S3",
@@ -410,7 +412,7 @@ contract testUser1 {
             "Non-owner should not be able to add a consecutive segment"
         );
 
-        try trainsOracle.addDynamicConsecutiveSegment("DCS2", "CS2") {
+        try trainsContract.addDynamicConsecutiveSegment("DCS2", "CS2") {
             success = true;
         } catch {
             success = false;
@@ -421,7 +423,7 @@ contract testUser1 {
             "Non-owner should not be able to add a dynamic consecutive segment"
         );
 
-        try trainsOracle.addDynamicSegment("DS2") {
+        try trainsContract.addDynamicSegment("DS2") {
             success = true;
         } catch {
             success = false;
@@ -433,7 +435,7 @@ contract testUser1 {
         );
 
         try
-            trainsOracle.addDynamicConsecutiveSegmentToDynamicSegment(
+            trainsContract.addDynamicConsecutiveSegmentToDynamicSegment(
                 "DS2",
                 "DCS2",
                 true
@@ -450,7 +452,7 @@ contract testUser1 {
         );
 
         address newOwner = user;
-        try trainsOracle.setOwner(user) {
+        try trainsContract.setOwner(user) {
             success = true;
         } catch {
             success = false;
@@ -464,7 +466,7 @@ contract testUser1 {
 
     //TODO
     function testCalculateTotalTicketPrice() public {
-        uint32 calculatedPrice = trainsOracle.buyTicketStep("ticket1", "DS1"); //buyticketstep is internal not callable
+        uint32 calculatedPrice = trainsContract.buyTicketStep("ticket1", "DS1"); //buyticketstep is internal not callable
 
         uint32 expectedPrice = 10;
 
@@ -476,6 +478,7 @@ contract testUser1 {
     }
 
     function testUserShouldNotAddOrRemoveFromBlacklist() public {
+        bool success = true;
         try
             trainsContract.addToBlacklist(
                 0xAb8483F64d9C6d1EcF9b849Ae677dD3315835cb2
@@ -508,7 +511,7 @@ contract testUser1 {
 
     //TODO
     function testCannotBuyTicketIfTrainIsFull() public {
-        (bool success, ) = address(trainsOracle).call(
+        (bool success, ) = address(trainsContract).call(
             abi.encodeWithSignature(
                 "buyDynamicTicket(string,string[])",
                 "ticket2",
@@ -526,7 +529,7 @@ contract testUser1 {
     function testCannotBuyDynamicTicketWithInsufficientEther() public {
         string[] memory segments = new string[](1);
         segments[0] = "segment1";
-        (bool success, ) = address(trainsOracle).call{value: 50}(
+        (bool success, ) = address(trainsContract).call{value: 50}(
             abi.encodeWithSignature(
                 "buyDynamicTicket(string,string[])",
                 "ticket1",
@@ -542,7 +545,7 @@ contract testUser1 {
 }
 
 contract testUser2 {
-    address trainOracleAddressString = "";
+    address trainOracleAddress = "";
     TrainsOracle trainsContract;
     address user;
 
@@ -559,6 +562,7 @@ contract testUser2 {
     function beforeEach() public {}
 
     function testUserInBlacklistCannotBuyTicket() public {
+        bool success = true;
         try trainsContract.buyDynamicTicket("ticket2", new string[](0)) {
             success = true;
         } catch {
