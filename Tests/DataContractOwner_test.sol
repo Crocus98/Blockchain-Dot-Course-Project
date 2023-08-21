@@ -7,6 +7,8 @@ import "remix_accounts.sol";
 
 import "SmartContracts/DataContract.sol";
 
+//Run Owner - User - User2 in this order to properly test the contract
+
 contract testOwner {
     string trainOracleAddressString = "";
     TrainsOracle trainsContract;
@@ -198,9 +200,37 @@ contract testOwner {
         );
     }
 
-    function testOnlyOwnerCanAddOrRemoveFromBlacklist() public {
+    function testAddOrRemoveFromBlacklist() public {
         try
             trainsContract.addToBlacklist(
+                0xAb8483F64d9C6d1EcF9b849Ae677dD3315835cb2
+            )
+        {
+            success = true;
+        } catch {
+            success = false;
+        }
+        Assert.equal(
+            success,
+            true,
+            "The owner should be able to add or remove a user from the blacklist"
+        );
+        try
+            trainsContract.removeFromBlacklist(
+                0xAb8483F64d9C6d1EcF9b849Ae677dD3315835cb2
+            )
+        {
+            success = true;
+        } catch {
+            success = false;
+        }
+        Assert.equal(
+            success,
+            true,
+            "The owner should be able to add or remove a user from the blacklist"
+        );
+        try
+            trainsContract.removeFromBlacklist(
                 0x4B20993Bc481177ec7E8f571ceCaE8A9e22C02db
             )
         {
@@ -210,36 +240,10 @@ contract testOwner {
         }
         Assert.equal(
             success,
-            false,
-            "Only the owner should be able to add or remove a user from the blacklist"
-        );
-        (bool success2, ) = address(trainsOracle).call(
-            abi.encodeWithSignature(
-                "removeFromBlacklist(address)",
-                0x4B20993Bc481177ec7E8f571ceCaE8A9e22C02db
-            )
-        );
-        Assert.equal(
-            success2,
-            false,
-            "Only the owner should be able to add or remove a user from the blacklist"
+            true,
+            "The owner should be able to add or remove a user from the blacklist"
         );
     }
-
-    function testUserInBlacklistCannotBuyTicket() public {
-        address user = 0xAb8483F64d9C6d1EcF9b849Ae677dD3315835cb2;
-        trainsOracle.addToBlacklist(user);
-        (bool success, ) = address(trainsOracle).call(
-            abi.encodeWithSignature(
-                "buyDynamicTicket(string,string[])",
-                "ticket1",
-                new string[](1)
-            )
-        );
-        Assert.equal(success, false, "Blacklisted user could buy a ticket");
-    }
-
-    /// #sender: acc2
 
     function testCannotBuyTicketIfTrainIsFull() public {
         (bool success, ) = address(trainsOracle).call(
@@ -389,7 +393,7 @@ contract testOwner {
     }
 }
 
-contract testUser {
+contract testUser1 {
     address trainOracleAddressString = "";
     TrainsOracle trainsContract;
     address user;
@@ -507,6 +511,68 @@ contract testUser {
             calculatedPrice,
             expectedPrice,
             "Total ticket price calculated is incorrect"
+        );
+    }
+
+    function testUserShouldNotAddOrRemoveFromBlacklist() public {
+        try
+            trainsContract.addToBlacklist(
+                0xAb8483F64d9C6d1EcF9b849Ae677dD3315835cb2
+            )
+        {
+            success = true;
+        } catch {
+            success = false;
+        }
+        Assert.equal(
+            success,
+            false,
+            "Only the owner should be able to add or remove a user from the blacklist"
+        );
+        try
+            trainsContract.removeFromBlacklist(
+                0xAb8483F64d9C6d1EcF9b849Ae677dD3315835cb2
+            )
+        {
+            success = true;
+        } catch {
+            success = false;
+        }
+        Assert.equal(
+            success,
+            false,
+            "Only the owner should be able to add or remove a user from the blacklist"
+        );
+    }
+}
+
+contract testUser2 {
+    address trainOracleAddressString = "";
+    TrainsOracle trainsContract;
+    address user;
+
+    event LogAccount(string description, address account);
+
+    function beforeAll() public {
+        user = TestsAccounts.getAccount(2);
+        emit LogAccount("User: ", user);
+
+        trainsContract = TrainsOracle(address(trainOracleAddress));
+        emit LogAccount("TrainsOracle: ", address(trainsOracle));
+    }
+
+    function beforeEach() public {}
+
+    function testUserInBlacklistCannotBuyTicket() public {
+        try trainsContract.buyDynamicTicket("ticket2", new string[](0)) {
+            success = true;
+        } catch {
+            success = false;
+        }
+        Assert.equal(
+            success,
+            false,
+            "Blacklisted user should not be able to buy a ticket"
         );
     }
 }
