@@ -69,7 +69,7 @@ def insert_sample_data():
 
 def main():
     while True:
-        print("\nMenu Azienda Treni:")
+        print("\nMenu Italy Trains:")
         print("1. Aggiungi un treno")
         print("2. Aggiungi una stazione")
         print("3. Aggiungi un segmento consecutivo")
