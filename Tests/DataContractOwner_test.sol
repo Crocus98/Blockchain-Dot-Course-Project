@@ -2,10 +2,10 @@
 
 pragma solidity >=0.7.0 <0.9.0;
 
-import "@tests";
-import "@accounts";
-//import "remix_accounts.sol";
-//import "remix_tests.sol";
+// import "@tests";
+// import "@accounts";
+import "remix_accounts.sol";
+import "remix_tests.sol";
 
 import "SmartContracts/DataContract.sol";
 import "Tests/DataContractUser.sol";
@@ -17,6 +17,8 @@ contract TestOwner {
     TestUser1 testUser1;
     TestUser2 testUser2;
     TrainsOracle trainsContract;
+
+    uint256 internalTimeTest = 1704067200;
 
     function beforeAll() public {
         owner = address(this);
@@ -52,13 +54,40 @@ contract TestOwner {
         }
         Assert.equal(success, true, "Owner should be able to add a station");
 
+        try trainsContract.addStation("S3") {
+            success = true;
+        } catch {
+            success = false;
+        }
+        Assert.equal(success, true, "Owner should be able to add a station");
+
         try
             trainsContract.addConsecutiveSegment(
                 "CS1",
                 "T1",
                 "S1",
                 "S2",
-                block.timestamp + 1 hours,
+               internalTimeTest + 1800,
+                10
+            )
+        {
+            success = true;
+        } catch {
+            success = false;
+        }
+        Assert.equal(
+            success,
+            true,
+            "Owner should be able to add a consecutive segment"
+        );
+
+        try
+            trainsContract.addConsecutiveSegment(
+                "CS2",
+                "T1",
+                "S2",
+                "S3",
+                 internalTimeTest + 3600,
                 10
             )
         {
@@ -83,7 +112,29 @@ contract TestOwner {
             "Owner should be able to add a dynamic consecutive segment"
         );
 
+         try trainsContract.addDynamicConsecutiveSegment("DCS2", "CS2") {
+            success = true;
+        } catch {
+            success = false;
+        }
+        Assert.equal(
+            success,
+            true,
+            "Owner should be able to add a dynamic consecutive segment"
+        );
+
         try trainsContract.addDynamicSegment("DS1") {
+            success = true;
+        } catch {
+            success = false;
+        }
+        Assert.equal(
+            success,
+            true,
+            "Owner should be able to add a dynamic segment"
+        );
+
+        try trainsContract.addDynamicSegment("DS2") {
             success = true;
         } catch {
             success = false;
@@ -110,17 +161,34 @@ contract TestOwner {
             true,
             "Owner should be able to add a dynamic consecutive segment to a dynamic segment"
         );
+
+         try
+            trainsContract.addDynamicConsecutiveSegmentToDynamicSegment(
+                "DS2",
+                "DCS2",
+                true
+            )
+        {
+            success = true;
+        } catch {
+            success = false;
+        }
+        Assert.equal(
+            success,
+            true,
+            "Owner should be able to add a dynamic consecutive segment to a dynamic segment"
+        );
     }
 
     function testCannotAddConsecutiveSegment() public {
         bool success = false;
         try
             trainsContract.addConsecutiveSegment(
-                "CS2",
+                "CS3",
                 "T1",
                 "S2",
                 "S1",
-                block.timestamp + 20,
+                internalTimeTest + 20,
                 15
             )
         {
@@ -131,16 +199,16 @@ contract TestOwner {
         Assert.equal(
             success,
             true,
-            "Should have been able to add a consecutive segment with proper values"
+            "Should not have been able to add a consecutive segment with proper values"
         );
 
         try
             trainsContract.addConsecutiveSegment(
-                "CS3",
+                "CS1",
                 "T3",
                 "S1",
                 "S2",
-                block.timestamp + 20,
+                internalTimeTest + 20,
                 10
             )
         {
@@ -160,7 +228,7 @@ contract TestOwner {
                 "T1",
                 "S3",
                 "S4",
-                block.timestamp + 20,
+                internalTimeTest + 20,
                 100
             )
         {
@@ -176,11 +244,11 @@ contract TestOwner {
 
         try
             trainsContract.addConsecutiveSegment(
-                "CS3",
+                "CS1",
                 "T1",
                 "S2",
                 "S2",
-                block.timestamp + 20,
+                internalTimeTest + 20,
                 100
             )
         {
@@ -229,31 +297,19 @@ contract TestOwner {
         );
     }
 
-    /*//TODO
-    function testRefundsCalculatedCorrectlyBasedOnDelay() public {
-        uint256 initialBalance = address(trainsContract).balance;
+    function testBuyTicket() public{
 
-        // Simulate delay and set arrival time
-        trainsContract.setArrivalTimeAndCheckRequiredRefunds(
-            "dynamicSegment1",
-            block.timestamp + 2000
-        );
-
-        uint256 finalBalance = address(trainsContract).balance;
-
-        // Suppose the expected refund per ticket is 0.01 Ether
-        uint256 expectedRefundAmount = 0.01 ether;
-
-        // Calculate the actual refunded amount
-        uint256 actualRefundAmount = initialBalance - finalBalance;
-
-        // Check if the actual refund amount is correct
-        Assert.equal(
-            actualRefundAmount,
-            expectedRefundAmount,
-            "Refund amount calculated incorrectly based on delay"
-        );
-    }*/
+    }
+    
+    // function testRefundsCorrectly() public {
+    //     uint256 initialBalance = address(this).balance;
+    //     // Simulate delay and set arrival time
+    //     trainsContract.setArrivalTimeAndCheckRequiredRefunds("DCS1", block.timestamp + 2000);
+    //     uint256 finalBalance = address(this).balance;
+    //     uint256 expectedRefundAmount = ticketPrice * refundPercentage / 100;
+    //     uint256 actualRefundAmount = initialBalance - finalBalance;
+    //     Assert.equal(actualRefundAmount, expectedRefundAmount, "Refund amount calculated incorrectly based on delay");
+    // }
 
     /*//TODO
     function testRefundsTransferredCorrectlyToUserAddresses() public {
