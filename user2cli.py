@@ -6,7 +6,7 @@ from rich.table import Table
 from rich.logging import RichHandler
 
 # Configure Logging
-logging.basicConfig(level=logging.INFO)
+logging.basicConfig(level=logging.INFO, handlers=[RichHandler()])
 logger = logging.getLogger(__name__)
 
 console = Console()
