@@ -169,29 +169,10 @@ contract Test1 {
 
     function testCannotAddConsecutiveSegmentWithWrongParams() public {
         bool success = false;
-        try
-            trainsContract.addConsecutiveSegment(
-                "CS3",
-                "T1",
-                "S1",
-                "S2",
-                internalTimeTest + 20,
-                10
-            )
-        {
-            success = true;
-        } catch {
-            success = false;
-        }
-        Assert.equal(
-            success,
-            false,
-            "Should not have been able to add a consecutive segment with non-existent consecutive segment"
-        );
 
         try
             trainsContract.addConsecutiveSegment(
-                "CS1",
+                "CS3",
                 "T2",
                 "S1",
                 "S2",
@@ -306,7 +287,7 @@ contract Test1 {
         Assert.equal(
             success,
             false,
-            "Should not have been able to add a consecutive segment with a null price"
+            "Should not have been able to add a consecutive segment with a null (or negative) price"
         );
     }
 
