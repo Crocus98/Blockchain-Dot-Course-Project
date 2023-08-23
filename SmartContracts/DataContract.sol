@@ -264,14 +264,14 @@ contract TrainsOracle {
         dynamicConsecutiveSegments[dynamicConsecutiveSegmentId]
             ._actualArrivalTime = actualArrivalTime;
 
-        ConsecutiveSegment memory segment = consecutiveSegments[
+        uint256 arrivalTime = consecutiveSegments[
             dynamicConsecutiveSegments[dynamicConsecutiveSegmentId]
                 ._consecutiveSegmentId
-        ];
+        ]._arrivalTime;
 
         uint256 delay = 0;
-        if (actualArrivalTime > segment._arrivalTime) {
-            delay = actualArrivalTime - segment._arrivalTime;
+        if (actualArrivalTime > arrivalTime) {
+            delay = actualArrivalTime - arrivalTime;
         }
 
         if (delay == 0) {
@@ -301,13 +301,11 @@ contract TrainsOracle {
                 j++
             ) {
                 address passenger = dynamicSegment._passengerAddresses[j];
-                uint32 segmentPrice = consecutiveSegments[
-                    dynamicConsecutiveSegments[
-                        dynamicSegments[affectedDynamicSegmentIds[i]]
-                            ._dynamicConsecutiveSegmentIds[0]
-                    ]._consecutiveSegmentId
-                ]._price;
-                uint256 refundAmount = (segmentPrice * refundPercentage) / 100;
+                uint32 originalSegmentPrice = dynamicSegmentPrices[
+                    affectedDynamicSegmentIds[i]
+                ];
+                uint256 refundAmount = (originalSegmentPrice *
+                    refundPercentage) / 100;
                 payable(passenger).transfer(refundAmount);
             }
         }
