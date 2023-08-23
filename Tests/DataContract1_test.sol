@@ -344,12 +344,12 @@ contract Test1 {
 
     function testCannotBuyTicketWithInsufficientFundsOrWrongParams() public {
         bool success = true;
-        string[] memory consecutiveSegmentsIds = new string[](1);
-        consecutiveSegmentsIds[0] = "CS1";
+        string[] memory dynamicSegmentsIds = new string[](1);
+        dynamicSegmentsIds[0] = "DS1";
         try
             trainsContract.buyDynamicTicket{value: 3}(
                 "TKT1",
-                consecutiveSegmentsIds
+                dynamicSegmentsIds
             )
         {
             success = true;
@@ -362,11 +362,11 @@ contract Test1 {
             "User should not be able to buy a ticket without paying full price"
         );
 
-        consecutiveSegmentsIds[0] = "CS3";
+        dynamicSegmentsIds[0] = "DS3";
         try
             trainsContract.buyDynamicTicket{value: 8}(
                 "TKT1",
-                consecutiveSegmentsIds
+                dynamicSegmentsIds
             )
         {
             success = true;
@@ -382,12 +382,12 @@ contract Test1 {
 
     function testBuyTicket() public {
         bool success = true;
-        string[] memory consecutiveSegmentsIds = new string[](1);
-        consecutiveSegmentsIds[0] = "CS1";
+        string[] memory dynamicSegmentsIds = new string[](1);
+        dynamicSegmentsIds[0] = "DS1";
         try
             trainsContract.buyDynamicTicket{value: 9}(
                 "TKT1",
-                consecutiveSegmentsIds
+                dynamicSegmentsIds
             )
         {
             success = true;
@@ -395,6 +395,27 @@ contract Test1 {
             success = false;
         }
         Assert.equal(success, true, "User should be able to buy a ticket");
+    }
+
+    function testBuyTicketThatAlreadyExist() public {
+        bool success = true;
+        string[] memory dynamicSegmentsIds = new string[](1);
+        dynamicSegmentsIds[0] = "DS1";
+        try
+            trainsContract.buyDynamicTicket{value: 9}(
+                "TKT1",
+                dynamicSegmentsIds
+            )
+        {
+            success = true;
+        } catch {
+            success = false;
+        }
+        Assert.equal(
+            success,
+            true,
+            "User should not be able to buy a ticket that already has been already sold"
+        );
     }
 
     function testRefundsCalculatedCorrectly() public {

@@ -124,10 +124,23 @@ contract TestUser1 {
             false,
             "The owner address should not be set by non-owner"
         );
-    }
 
-    function testUserShouldNotAddOrRemoveFromBlacklist() public {
-        bool success = true;
+        try
+            trainsContract.setArrivalTimeAndCheckRequiredRefunds(
+                "DCS1",
+                block.timestamp + 1000
+            )
+        {
+            success = true;
+        } catch {
+            success = false;
+        }
+        Assert.equal(
+            success,
+            false,
+            "Non owner should not be able to add a new arrival time"
+        );
+
         try
             trainsContract.addToBlacklist(
                 0xAb8483F64d9C6d1EcF9b849Ae677dD3315835cb2

@@ -64,10 +64,6 @@ contract Test2 {
         testUser1.testUserNonOwnerPermissions();
     }
 
-    function testUserShouldNotAddOrRemoveFromBlacklist() public {
-        testUser1.testUserShouldNotAddOrRemoveFromBlacklist();
-    }
-
     //TEST FOR USER 2
     function testUserInBlacklistCannotBuyTicket() public {
         testUser2.testUserInBlacklistCannotBuyTicket();

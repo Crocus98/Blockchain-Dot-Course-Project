@@ -194,8 +194,6 @@ contract TrainsOracle {
             ]._trainId
         ]._maxPassengersNumber;
 
-        uint32 totalPrice = 0;
-
         for (
             uint i = 0;
             i <
@@ -214,7 +212,6 @@ contract TrainsOracle {
                 "The train has not enough space available"
             );
         }
-        totalPrice = dynamicSegmentPrices[dynamicSegmentId];
 
         dynamicSegments[dynamicSegmentId]._passengerAddresses.push(msg.sender);
 
@@ -239,7 +236,7 @@ contract TrainsOracle {
 
         dynamicTickets[ticketId]._dynamicSegmentIds.push(dynamicSegmentId);
 
-        return totalPrice;
+        return dynamicSegmentPrices[dynamicSegmentId];
     }
 
     // Add the notBlacklisted modifier to the function signature
@@ -247,6 +244,7 @@ contract TrainsOracle {
         string calldata ticketId,
         string[] calldata dynamicSegmentsIds
     ) public payable notBlacklisted {
+        require(!dynamicTickets[ticketId]._isSet, "Ticket already sold");
         uint32 totalPrice = 0;
         for (uint i = 0; i < dynamicSegmentsIds.length; i++) {
             totalPrice += buyTicketStep(ticketId, dynamicSegmentsIds[i]);
