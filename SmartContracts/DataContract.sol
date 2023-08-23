@@ -239,7 +239,6 @@ contract TrainsOracle {
         return dynamicSegmentPrices[dynamicSegmentId];
     }
 
-    // Add the notBlacklisted modifier to the function signature
     function buyDynamicTicket(
         string calldata ticketId,
         string[] calldata dynamicSegmentsIds
@@ -274,7 +273,12 @@ contract TrainsOracle {
             delay = actualArrivalTime - arrivalTime;
         }
 
-        if (delay == 0) {
+        string[]
+            memory affectedDynamicSegmentIds = lastDynamicConsecutiveSegmentIdToDynamicSegmentIds[
+                dynamicConsecutiveSegmentId
+            ];
+
+        if (delay == 0 || affectedDynamicSegmentIds.length == 0) {
             return;
         }
 
@@ -287,14 +291,13 @@ contract TrainsOracle {
             refundPercentage = 100;
         }
 
-        string[]
-            memory affectedDynamicSegmentIds = lastDynamicConsecutiveSegmentIdToDynamicSegmentIds[
-                dynamicConsecutiveSegmentId
-            ];
         for (uint i = 0; i < affectedDynamicSegmentIds.length; i++) {
             DynamicSegment memory dynamicSegment = dynamicSegments[
                 affectedDynamicSegmentIds[i]
             ];
+            if (dynamicSegment._passengerAddresses.length == 0) {
+                continue;
+            }
             for (
                 uint j = 0;
                 j < dynamicSegment._passengerAddresses.length;
