@@ -2,10 +2,10 @@
 
 pragma solidity >=0.7.0 <0.9.0;
 
-// import "@tests";
-// import "@accounts";
-import "remix_accounts.sol";
-import "remix_tests.sol";
+import "@tests";
+import "@accounts";
+//import "remix_accounts.sol";
+//import "remix_tests.sol";
 
 import "SmartContracts/DataContract.sol";
 import "Tests/DataContractUser.sol";
@@ -30,7 +30,41 @@ contract TestOwner {
     function beforeEach() public {}
 
     //TEST FOR OWNER
-    function testOwnerPermissions() public {
+    function testAddOrRemoveFromBlacklist() public {
+        bool success = true;
+        try trainsContract.addToBlacklist(address(testUser1)) {
+            success = true;
+        } catch {
+            success = false;
+        }
+        Assert.equal(
+            success,
+            true,
+            "The owner should be able to add or remove a user from the blacklist"
+        );
+        try trainsContract.removeFromBlacklist(address(testUser1)) {
+            success = true;
+        } catch {
+            success = false;
+        }
+        Assert.equal(
+            success,
+            true,
+            "The owner should be able to add or remove a user from the blacklist"
+        );
+        try trainsContract.addToBlacklist(address(testUser2)) {
+            success = true;
+        } catch {
+            success = false;
+        }
+        Assert.equal(
+            success,
+            true,
+            "The owner should be able to add or remove a user from the blacklist"
+        );
+    }
+
+    function testAddEntitiesWithOwnerPermissions() public {
         bool success = true;
 
         try trainsContract.addTrain("T1", "Fast Train", 100) {
@@ -67,8 +101,8 @@ contract TestOwner {
                 "T1",
                 "S1",
                 "S2",
-               internalTimeTest + 1800,
-                10
+                internalTimeTest + 1800,
+                15
             )
         {
             success = true;
@@ -87,7 +121,7 @@ contract TestOwner {
                 "T1",
                 "S2",
                 "S3",
-                 internalTimeTest + 3600,
+                internalTimeTest + 3600,
                 10
             )
         {
@@ -112,7 +146,7 @@ contract TestOwner {
             "Owner should be able to add a dynamic consecutive segment"
         );
 
-         try trainsContract.addDynamicConsecutiveSegment("DCS2", "CS2") {
+        try trainsContract.addDynamicConsecutiveSegment("DCS2", "CS2") {
             success = true;
         } catch {
             success = false;
@@ -134,22 +168,11 @@ contract TestOwner {
             "Owner should be able to add a dynamic segment"
         );
 
-        try trainsContract.addDynamicSegment("DS2") {
-            success = true;
-        } catch {
-            success = false;
-        }
-        Assert.equal(
-            success,
-            true,
-            "Owner should be able to add a dynamic segment"
-        );
-
         try
             trainsContract.addDynamicConsecutiveSegmentToDynamicSegment(
                 "DS1",
                 "DCS1",
-                true
+                false
             )
         {
             success = true;
@@ -162,9 +185,9 @@ contract TestOwner {
             "Owner should be able to add a dynamic consecutive segment to a dynamic segment"
         );
 
-         try
+        try
             trainsContract.addDynamicConsecutiveSegmentToDynamicSegment(
-                "DS2",
+                "DS1",
                 "DCS2",
                 true
             )
@@ -180,16 +203,16 @@ contract TestOwner {
         );
     }
 
-    function testCannotAddConsecutiveSegment() public {
+    function testCannotAddConsecutiveSegmentWithWrongParams() public {
         bool success = false;
         try
             trainsContract.addConsecutiveSegment(
                 "CS3",
                 "T1",
-                "S2",
                 "S1",
+                "S2",
                 internalTimeTest + 20,
-                15
+                10
             )
         {
             success = true;
@@ -198,14 +221,14 @@ contract TestOwner {
         }
         Assert.equal(
             success,
-            true,
-            "Should not have been able to add a consecutive segment with proper values"
+            false,
+            "Should not have been able to add a consecutive segment with non-existent consecutive segment"
         );
 
         try
             trainsContract.addConsecutiveSegment(
                 "CS1",
-                "T3",
+                "T2",
                 "S1",
                 "S2",
                 internalTimeTest + 20,
@@ -244,6 +267,26 @@ contract TestOwner {
 
         try
             trainsContract.addConsecutiveSegment(
+                "CS3",
+                "T1",
+                "S4",
+                "S3",
+                internalTimeTest + 20,
+                100
+            )
+        {
+            success = true;
+        } catch {
+            success = false;
+        }
+        Assert.equal(
+            success,
+            false,
+            "Should not have been able to add a consecutive segment with non-existent stations"
+        );
+
+        try
+            trainsContract.addConsecutiveSegment(
                 "CS1",
                 "T1",
                 "S2",
@@ -261,46 +304,101 @@ contract TestOwner {
             false,
             "Should not have been able to add a consecutive segment with a trip from a station to the same station."
         );
-    }
 
-    function testAddOrRemoveFromBlacklist() public {
-        bool success = true;
-        try trainsContract.addToBlacklist(address(testUser1)) {
+        try
+            trainsContract.addConsecutiveSegment(
+                "CS1",
+                "T1",
+                "S1",
+                "S2",
+                block.timestamp - 10,
+                100
+            )
+        {
             success = true;
         } catch {
             success = false;
         }
         Assert.equal(
             success,
-            true,
-            "The owner should be able to add or remove a user from the blacklist"
+            false,
+            "Should not have been able to add a consecutive segment with an arrival time in the past"
         );
-        try trainsContract.removeFromBlacklist(address(testUser1)) {
+
+        try
+            trainsContract.addConsecutiveSegment(
+                "CS1",
+                "T1",
+                "S1",
+                "S2",
+                internalTimeTest + 20,
+                0
+            )
+        {
             success = true;
         } catch {
             success = false;
         }
         Assert.equal(
             success,
-            true,
-            "The owner should be able to add or remove a user from the blacklist"
+            false,
+            "Should not have been able to add a consecutive segment with a null price"
         );
-        try trainsContract.addToBlacklist(address(testUser2)) {
+    }
+
+    function testCannotAddDynamicConsecutiveSegmenWithWrongParams() public {
+        bool success = false;
+        try trainsContract.addDynamicConsecutiveSegment("DCS3", "CS3") {
             success = true;
         } catch {
             success = false;
         }
         Assert.equal(
             success,
-            true,
-            "The owner should be able to add or remove a user from the blacklist"
+            false,
+            "Should not have been able to add a dynamic consecutive segment without a corresponding static one"
         );
     }
 
-    function testBuyTicket() public{
+    function testCannotAddDCStoDSWithWrongParams() public {
+        bool success = false;
+        try
+            trainsContract.addDynamicConsecutiveSegmentToDynamicSegment(
+                "DS1",
+                "DCS3",
+                false
+            )
+        {
+            success = true;
+        } catch {
+            success = false;
+        }
+        Assert.equal(
+            success,
+            false,
+            "Should not be able to add a non existent DCS to a DS"
+        );
 
+        try
+            trainsContract.addDynamicConsecutiveSegmentToDynamicSegment(
+                "DS2",
+                "DCS1",
+                false
+            )
+        {
+            success = true;
+        } catch {
+            success = false;
+        }
+        Assert.equal(
+            success,
+            false,
+            "Should not be able to add a DCS to a non existent DS"
+        );
     }
-    
+
+    function testBuyTicket() public {}
+
     // function testRefundsCorrectly() public {
     //     uint256 initialBalance = address(this).balance;
     //     // Simulate delay and set arrival time
