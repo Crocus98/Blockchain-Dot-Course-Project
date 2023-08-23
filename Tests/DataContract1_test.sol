@@ -413,7 +413,7 @@ contract Test1 {
         }
         Assert.equal(
             success,
-            true,
+            false,
             "User should not be able to buy a ticket that already has been already sold"
         );
     }
