@@ -349,7 +349,7 @@ contract Test1 {
         string[] memory dynamicSegmentsIds = new string[](1);
         dynamicSegmentsIds[0] = "DS1";
         try
-            trainsContract.buyDynamicTicket{value: 3}(
+            trainsContract.buyDynamicTicket{value: 3 ether}(
                 "TKT1",
                 dynamicSegmentsIds
             )
@@ -366,7 +366,7 @@ contract Test1 {
 
         dynamicSegmentsIds[0] = "DS3";
         try
-            trainsContract.buyDynamicTicket{value: 8}(
+            trainsContract.buyDynamicTicket{value: 8 ether}(
                 "TKT1",
                 dynamicSegmentsIds
             )
@@ -389,7 +389,7 @@ contract Test1 {
         string[] memory dynamicSegmentsIds = new string[](1);
         dynamicSegmentsIds[0] = "DS1";
         try
-            trainsContract.buyDynamicTicket{value: 9}(
+            trainsContract.buyDynamicTicket{value: 9 ether}(
                 "TKT1",
                 dynamicSegmentsIds
             )
@@ -408,7 +408,7 @@ contract Test1 {
         string[] memory dynamicSegmentsIds = new string[](1);
         dynamicSegmentsIds[0] = "DS1";
         try
-            trainsContract.buyDynamicTicket{value: 9}(
+            trainsContract.buyDynamicTicket{value: 9 ether}(
                 "TKT1",
                 dynamicSegmentsIds
             )
