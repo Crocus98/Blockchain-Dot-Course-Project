@@ -157,53 +157,6 @@ contract TestUser1 {
             "Only the owner should be able to add or remove a user from the blacklist"
         );
     }
-
-    /*//TODO
-    function testCalculateTotalTicketPrice() public {
-        uint32 calculatedPrice = trainsContract.buyTicketStep("ticket1", "DS1"); //buyticketstep is internal not callable
-
-        uint32 expectedPrice = 10;
-
-        Assert.equal(
-            calculatedPrice,
-            expectedPrice,
-            "Total ticket price calculated is incorrect"
-        );
-    }*/
-
-    /*//TODO
-    function testCannotBuyTicketIfTrainIsFull() public {
-        (bool success, ) = address(trainsContract).call(
-            abi.encodeWithSignature(
-                "buyDynamicTicket(string,string[])",
-                "ticket2",
-                new string[](1)
-            )
-        );
-        Assert.equal(
-            success,
-            false,
-            "User could buy a ticket even though train is full"
-        );
-    }*/
-
-    /*//TODO
-    function testCannotBuyDynamicTicketWithInsufficientEther() public {
-        string[] memory segments = new string[](1);
-        segments[0] = "segment1";
-        (bool success, ) = address(trainsContract).call{value: 50}(
-            abi.encodeWithSignature(
-                "buyDynamicTicket(string,string[])",
-                "ticket1",
-                segments
-            )
-        );
-        Assert.equal(
-            success,
-            true,
-            "Couldn't buy a ticket with sufficient Ether"
-        );
-    }*/
 }
 
 contract TestUser2 {

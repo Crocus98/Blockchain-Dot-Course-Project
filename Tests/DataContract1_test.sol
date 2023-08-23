@@ -8,12 +8,10 @@ import "@accounts";
 //import "remix_tests.sol";
 
 import "SmartContracts/DataContract.sol";
-import "Tests/DataContractUser.sol";
+import "Tests/DataContractTestUser.sol";
 
-//Run Owner - User1 - User2 in this order to properly test the contract
-
-contract TestOwner {
-    address public owner; //set this only
+contract Test1 {
+    address public owner;
     TestUser1 testUser1;
     TestUser2 testUser2;
     TrainsOracle trainsContract;
@@ -30,40 +28,6 @@ contract TestOwner {
     function beforeEach() public {}
 
     //TEST FOR OWNER
-    function testAddOrRemoveFromBlacklist() public {
-        bool success = true;
-        try trainsContract.addToBlacklist(address(testUser1)) {
-            success = true;
-        } catch {
-            success = false;
-        }
-        Assert.equal(
-            success,
-            true,
-            "The owner should be able to add or remove a user from the blacklist"
-        );
-        try trainsContract.removeFromBlacklist(address(testUser1)) {
-            success = true;
-        } catch {
-            success = false;
-        }
-        Assert.equal(
-            success,
-            true,
-            "The owner should be able to add or remove a user from the blacklist"
-        );
-        try trainsContract.addToBlacklist(address(testUser2)) {
-            success = true;
-        } catch {
-            success = false;
-        }
-        Assert.equal(
-            success,
-            true,
-            "The owner should be able to add or remove a user from the blacklist"
-        );
-    }
-
     function testAddEntitiesWithOwnerPermissions() public {
         bool success = true;
 
@@ -494,19 +458,7 @@ contract TestOwner {
         );
     }
 
-    //TEST FOR USER 1
-    function testUserNonOwnerPermissions() public {
-        testUser1.testUserNonOwnerPermissions();
-    }
-
-    function testUserShouldNotAddOrRemoveFromBlacklist() public {
-        testUser1.testUserShouldNotAddOrRemoveFromBlacklist();
-    }
-
-    //TEST FOR OWNER - CONTINUED
-
     function testCannotBuyTicketWithoutSpace() public {
-        //TODO: add payment 25...
         bool success = true;
         string[] memory consecutiveSegmentsIds = new string[](1);
         consecutiveSegmentsIds[0] = "CS1";
@@ -531,10 +483,5 @@ contract TestOwner {
             contractOwner,
             "The owner address should be set correctly during ownership transfer"
         );
-    }
-
-    //TEST FOR USER 2
-    function testUserInBlacklistCannotBuyTicket() public {
-        testUser2.testUserInBlacklistCannotBuyTicket();
     }
 }
