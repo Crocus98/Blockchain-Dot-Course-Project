@@ -67,7 +67,7 @@ contract TestOwner {
     function testAddEntitiesWithOwnerPermissions() public {
         bool success = true;
 
-        try trainsContract.addTrain("T1", "Fast Train", 1) {
+        try trainsContract.addTrain("T1", "Fast Train", 2) {
             success = true;
         } catch {
             success = false;
@@ -102,7 +102,7 @@ contract TestOwner {
                 "S1",
                 "S2",
                 internalTimeTest + 1800,
-                15
+                5
             )
         {
             success = true;
@@ -122,7 +122,7 @@ contract TestOwner {
                 "S2",
                 "S3",
                 internalTimeTest + 3600,
-                10
+                3
             )
         {
             success = true;
@@ -397,11 +397,54 @@ contract TestOwner {
         );
     }
 
+    function testCannotBuyTicketWithInsufficientFundsOrWrongParams() public {
+        bool success = true;
+        string[] memory consecutiveSegmentsIds = new string[](1);
+        consecutiveSegmentsIds[0] = "CS1";
+        try
+            trainsContract.buyDynamicTicket{value: 3}(
+                "TKT1",
+                consecutiveSegmentsIds
+            )
+        {
+            success = true;
+        } catch {
+            success = false;
+        }
+        Assert.equal(
+            success,
+            false,
+            "User should not be able to buy a ticket without paying full price"
+        );
+
+        consecutiveSegmentsIds[0] = "CS3";
+        try
+            trainsContract.buyDynamicTicket{value: 8}(
+                "TKT1",
+                consecutiveSegmentsIds
+            )
+        {
+            success = true;
+        } catch {
+            success = false;
+        }
+        Assert.equal(
+            success,
+            false,
+            "User should not be able to buy a ticket for non existent segments"
+        );
+    }
+
     function testBuyTicket() public {
         bool success = true;
         string[] memory consecutiveSegmentsIds = new string[](1);
         consecutiveSegmentsIds[0] = "CS1";
-        try trainsContract.buyDynamicTicket("TKT1", consecutiveSegmentsIds) {
+        try
+            trainsContract.buyDynamicTicket{value: 9}(
+                "TKT1",
+                consecutiveSegmentsIds
+            )
+        {
             success = true;
         } catch {
             success = false;
@@ -409,7 +452,61 @@ contract TestOwner {
         Assert.equal(success, true, "User should be able to buy a ticket");
     }
 
+    function testRefundsCalculatedCorrectly() public {
+        uint256 simulatedArrivalTime = internalTimeTest + 4000;
+        uint256 initialBalance = address(this).balance;
+        trainsContract.setArrivalTimeAndCheckRequiredRefunds(
+            "DCS1",
+            simulatedArrivalTime - 2000
+        );
+        trainsContract.setArrivalTimeAndCheckRequiredRefunds(
+            "DCS2",
+            simulatedArrivalTime
+        );
+        uint256 finalBalance = address(this).balance;
+
+        (, , , uint256 actualArrivalTime, , ) = trainsContract
+            .consecutiveSegments("CS1");
+
+        uint256 delay = simulatedArrivalTime > actualArrivalTime
+            ? simulatedArrivalTime - actualArrivalTime
+            : 0;
+        uint8 refundPercentage;
+        if (delay == 0) {
+            refundPercentage = 0;
+        } else if (delay <= 600) {
+            refundPercentage = 20;
+        } else if (delay <= 1800) {
+            refundPercentage = 50;
+        } else {
+            refundPercentage = 100;
+        }
+
+        uint32 ticketPrice = trainsContract.dynamicSegmentPrices("DS1");
+        ticketPrice += trainsContract.dynamicSegmentPrices("DS2");
+        uint256 expectedRefundAmount = (ticketPrice * refundPercentage) / 100;
+        uint256 actualRefundAmount = initialBalance - finalBalance;
+
+        Assert.equal(
+            actualRefundAmount,
+            expectedRefundAmount,
+            "Refund amount calculated incorrectly based on delay"
+        );
+    }
+
+    //TEST FOR USER 1
+    function testUserNonOwnerPermissions() public {
+        testUser1.testUserNonOwnerPermissions();
+    }
+
+    function testUserShouldNotAddOrRemoveFromBlacklist() public {
+        testUser1.testUserShouldNotAddOrRemoveFromBlacklist();
+    }
+
+    //TEST FOR OWNER - CONTINUED
+
     function testCannotBuyTicketWithoutSpace() public {
+        //TODO: add payment 25...
         bool success = true;
         string[] memory consecutiveSegmentsIds = new string[](1);
         consecutiveSegmentsIds[0] = "CS1";
@@ -425,9 +522,6 @@ contract TestOwner {
         );
     }
 
-    function testRefundCalculatedCorrectly() public {}
-
-    //Leave as last function of the owner since it transfer ownership of the contract
     function testOwnershipTransfer() public {
         address newOwner = TestsAccounts.getAccount(10);
         trainsContract.setNewOwner(newOwner);
@@ -437,15 +531,6 @@ contract TestOwner {
             contractOwner,
             "The owner address should be set correctly during ownership transfer"
         );
-    }
-
-    //TEST FOR USER 1
-    function testUserNonOwnerPermissions() public {
-        testUser1.testUserNonOwnerPermissions();
-    }
-
-    function testUserShouldNotAddOrRemoveFromBlacklist() public {
-        testUser1.testUserShouldNotAddOrRemoveFromBlacklist();
     }
 
     //TEST FOR USER 2

@@ -35,7 +35,7 @@ contract TrainsOracle {
     }
     mapping(string => DynamicConsecutiveSegment)
         public dynamicConsecutiveSegments;
-    //It maps to the consecutive segments ids all the dynamic segmentsc ids that have the specific consecutive segment as last.
+    //It maps to the consecutive segments ids all the dynamic segments ids that have the specific consecutive segment as last.
     mapping(string => string[])
         public lastDynamicConsecutiveSegmentIdToDynamicSegmentIds;
 
@@ -45,6 +45,7 @@ contract TrainsOracle {
         bool _isSet;
     }
     mapping(string => DynamicSegment) public dynamicSegments;
+    mapping(string => uint32) public dynamicSegmentPrices;
 
     struct DynamicTicket {
         string[] _dynamicSegmentIds;
@@ -168,9 +169,13 @@ contract TrainsOracle {
                 dynamicConsecutiveSegmentId
             ].push(dynamicSegmentId);
         }
+
+        dynamicSegmentPrices[dynamicSegmentId] += consecutiveSegments[
+            dynamicConsecutiveSegments[dynamicConsecutiveSegmentId]
+                ._consecutiveSegmentId
+        ]._price;
     }
 
-    // Add the notBlacklisted modifier to the function signature
     function buyTicketStep(
         string calldata ticketId,
         string calldata dynamicSegmentId
@@ -208,13 +213,8 @@ contract TrainsOracle {
                 currentPassengersCount <= maxPassengers,
                 "The train has not enough space available"
             );
-            totalPrice += consecutiveSegments[
-                dynamicConsecutiveSegments[
-                    dynamicSegments[dynamicSegmentId]
-                        ._dynamicConsecutiveSegmentIds[i]
-                ]._consecutiveSegmentId
-            ]._price;
         }
+        totalPrice = dynamicSegmentPrices[dynamicSegmentId];
 
         dynamicSegments[dynamicSegmentId]._passengerAddresses.push(msg.sender);
 
