@@ -342,6 +342,8 @@ contract Test1 {
         );
     }
 
+    /// #sender: account-0
+    /// #value: 20
     function testCannotBuyTicketWithInsufficientFundsOrWrongParams() public {
         bool success = true;
         string[] memory dynamicSegmentsIds = new string[](1);
@@ -380,7 +382,9 @@ contract Test1 {
         );
     }
 
-    function testBuyTicket() public {
+    /// #sender: account-0
+    /// #value: 10
+    function testBuyTicket() public payable {
         bool success = true;
         string[] memory dynamicSegmentsIds = new string[](1);
         dynamicSegmentsIds[0] = "DS1";
