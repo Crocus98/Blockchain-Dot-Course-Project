@@ -453,7 +453,6 @@ contract Test1 {
         }
 
         uint32 ticketPrice = trainsContract.dynamicSegmentPrices("DS1");
-        ticketPrice += trainsContract.dynamicSegmentPrices("DS2");
         uint256 expectedRefundAmount = (ticketPrice * refundPercentage) / 100;
         uint256 actualRefundAmount = initialBalance - finalBalance;
 
