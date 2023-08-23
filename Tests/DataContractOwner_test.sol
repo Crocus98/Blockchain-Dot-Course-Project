@@ -67,7 +67,7 @@ contract TestOwner {
     function testAddEntitiesWithOwnerPermissions() public {
         bool success = true;
 
-        try trainsContract.addTrain("T1", "Fast Train", 100) {
+        try trainsContract.addTrain("T1", "Fast Train", 1) {
             success = true;
         } catch {
             success = false;
@@ -397,84 +397,35 @@ contract TestOwner {
         );
     }
 
-    function testBuyTicket() public {}
+    function testBuyTicket() public {
+        bool success = true;
+        string[] memory consecutiveSegmentsIds = new string[](1);
+        consecutiveSegmentsIds[0] = "CS1";
+        try trainsContract.buyDynamicTicket("TKT1", consecutiveSegmentsIds) {
+            success = true;
+        } catch {
+            success = false;
+        }
+        Assert.equal(success, true, "User should be able to buy a ticket");
+    }
 
-    // function testRefundsCorrectly() public {
-    //     uint256 initialBalance = address(this).balance;
-    //     // Simulate delay and set arrival time
-    //     trainsContract.setArrivalTimeAndCheckRequiredRefunds("DCS1", block.timestamp + 2000);
-    //     uint256 finalBalance = address(this).balance;
-    //     uint256 expectedRefundAmount = ticketPrice * refundPercentage / 100;
-    //     uint256 actualRefundAmount = initialBalance - finalBalance;
-    //     Assert.equal(actualRefundAmount, expectedRefundAmount, "Refund amount calculated incorrectly based on delay");
-    // }
-
-    /*//TODO
-    function testRefundsTransferredCorrectlyToUserAddresses() public {
-        uint256 initialBalance = address(this).balance;
-        //buy ticket before
-        //then check the refund
-        //be sure that the contract has enough funds to refund
-
-        trainsContract.setArrivalTimeAndCheckRequiredRefunds(
-            "dynamicSegment1",
-            block.timestamp + 2000
-        );
-        uint256 finalBalance = address(this).balance;
-        Assert.equal(
-            finalBalance > initialBalance,
-            true,
-            "Refunds were not transferred correctly to user addresses"
-        );
-    }*/
-
-    /*//TODO
-    function testOnlyOwnerCanModifyArrivalTime() public {
-        (bool success, ) = address(trainsContract).call(
-            abi.encodeWithSignature(
-                "modifyArrivalTime(uint256)",
-                block.timestamp + 2 hours
-            )
-        );
+    function testCannotBuyTicketWithoutSpace() public {
+        bool success = true;
+        string[] memory consecutiveSegmentsIds = new string[](1);
+        consecutiveSegmentsIds[0] = "CS1";
+        try trainsContract.buyDynamicTicket("TKT2", consecutiveSegmentsIds) {
+            success = true;
+        } catch {
+            success = false;
+        }
         Assert.equal(
             success,
             false,
-            "Only the owner should be able to modify the arrival time"
+            "User should not be able to buy a ticket if the train is full"
         );
-    }*/
+    }
 
-    /*//TODO
-    function testModifiedArrivalTimeIsSavedCorrectly() public {
-        uint256 newTime = block.timestamp + 2 hours;
-        trainsContract.setArrivalTimeAndCheckRequiredRefunds(
-            "dynamicConsecutiveSegment1",
-            newTime
-        );
-
-        (
-            string memory consecutiveSegmentId,
-            uint16 passengersNumber,
-            uint256 actualArrivalTime,
-            bool isSet
-        ) = trainsContract.dynamicConsecutiveSegments(
-                "dynamicConsecutiveSegment1"
-            );
-
-        TrainsOracle.DynamicConsecutiveSegment memory segment = TrainsOracle
-            .DynamicConsecutiveSegment(
-                consecutiveSegmentId,
-                passengersNumber,
-                actualArrivalTime,
-                isSet
-            );
-
-        uint256 savedTime = segment._actualArrivalTime;
-        Assert.equal(
-            savedTime,
-            newTime,
-            "Modified arrival time was not saved correctly"
-        );
-    }*/
+    function testRefundCalculatedCorrectly() public {}
 
     //Leave as last function of the owner since it transfer ownership of the contract
     function testOwnershipTransfer() public {

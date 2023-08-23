@@ -218,7 +218,7 @@ contract TestUser2 {
 
     function testUserInBlacklistCannotBuyTicket() public {
         bool success = true;
-        try trainsContract.buyDynamicTicket("ticket2", new string[](0)) {
+        try trainsContract.buyDynamicTicket("TKT3", new string[](0)) {
             success = true;
         } catch {
             success = false;
