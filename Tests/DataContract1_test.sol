@@ -66,7 +66,7 @@ contract Test1 {
                 "S1",
                 "S2",
                 internalTimeTest + 1800,
-                5
+                uint256(5 ether)
             )
         {
             success = true;
@@ -86,7 +86,7 @@ contract Test1 {
                 "S2",
                 "S3",
                 internalTimeTest + 3600,
-                3
+                uint256(3 ether)
             )
         {
             success = true;
@@ -343,7 +343,7 @@ contract Test1 {
     }
 
     /// #sender: account-0
-    /// #value: 20
+    /// #value: 20 ether
     function testCannotBuyTicketWithInsufficientFundsOrWrongParams() public {
         bool success = true;
         string[] memory dynamicSegmentsIds = new string[](1);
@@ -383,7 +383,7 @@ contract Test1 {
     }
 
     /// #sender: account-0
-    /// #value: 10
+    /// #value: 10 ether
     function testBuyTicket() public payable {
         bool success = true;
         string[] memory dynamicSegmentsIds = new string[](1);
@@ -401,6 +401,8 @@ contract Test1 {
         Assert.equal(success, true, "User should be able to buy a ticket");
     }
 
+    /// #sender: account-0
+    /// #value: 10 ether
     function testBuyTicketThatAlreadyExist() public {
         bool success = true;
         string[] memory dynamicSegmentsIds = new string[](1);
@@ -422,9 +424,12 @@ contract Test1 {
         );
     }
 
+    /// #sender: account-1
+    /// #value: 50 ether
     function testRefundsCalculatedCorrectly() public {
         uint256 simulatedArrivalTime = internalTimeTest + 4000;
         uint256 initialBalance = address(this).balance;
+        payable(address(trainsContract)).transfer(25 ether);
         trainsContract.setArrivalTimeAndCheckRequiredRefunds(
             "DCS1",
             simulatedArrivalTime - 2000
@@ -441,7 +446,7 @@ contract Test1 {
         uint256 delay = simulatedArrivalTime > actualArrivalTime
             ? simulatedArrivalTime - actualArrivalTime
             : 0;
-        uint8 refundPercentage;
+        uint32 refundPercentage;
         if (delay == 0) {
             refundPercentage = 0;
         } else if (delay <= 600) {
@@ -452,7 +457,7 @@ contract Test1 {
             refundPercentage = 100;
         }
 
-        uint32 ticketPrice = trainsContract.dynamicSegmentPrices("DS1");
+        uint256 ticketPrice = trainsContract.dynamicSegmentPrices("DS1");
         uint256 expectedRefundAmount = (ticketPrice * refundPercentage) / 100;
         uint256 actualRefundAmount = initialBalance - finalBalance;
 

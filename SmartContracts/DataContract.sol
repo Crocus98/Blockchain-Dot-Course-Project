@@ -22,7 +22,7 @@ contract TrainsOracle {
         string _startingStationId;
         string _arrivingStationId;
         uint256 _arrivalTime;
-        uint32 _price;
+        uint256 _price;
         bool _isSet;
     }
     mapping(string => ConsecutiveSegment) public consecutiveSegments;
@@ -45,7 +45,7 @@ contract TrainsOracle {
         bool _isSet;
     }
     mapping(string => DynamicSegment) public dynamicSegments;
-    mapping(string => uint32) public dynamicSegmentPrices;
+    mapping(string => uint256) public dynamicSegmentPrices;
 
     struct DynamicTicket {
         string[] _dynamicSegmentIds;
@@ -100,7 +100,7 @@ contract TrainsOracle {
         string calldata startingStationId,
         string calldata arrivingStationId,
         uint256 arrivalTime,
-        uint32 price
+        uint256 price
     ) public onlyOwner {
         require(trains[trainId]._isSet, "Train does not exist");
         require(stations[startingStationId], "Starting station does not exist");
@@ -179,7 +179,7 @@ contract TrainsOracle {
     function buyTicketStep(
         string calldata ticketId,
         string calldata dynamicSegmentId
-    ) internal notBlacklisted returns (uint32) {
+    ) internal notBlacklisted returns (uint256) {
         require(
             dynamicSegments[dynamicSegmentId]._isSet,
             "Dynamic segment does not exist"
@@ -244,7 +244,7 @@ contract TrainsOracle {
         string[] calldata dynamicSegmentsIds
     ) public payable notBlacklisted {
         require(!dynamicTickets[ticketId]._isSet, "Ticket already sold");
-        uint32 totalPrice = 0;
+        uint256 totalPrice = 0;
         for (uint i = 0; i < dynamicSegmentsIds.length; i++) {
             totalPrice += buyTicketStep(ticketId, dynamicSegmentsIds[i]);
         }
@@ -304,7 +304,7 @@ contract TrainsOracle {
                 j++
             ) {
                 address passenger = dynamicSegment._passengerAddresses[j];
-                uint32 originalSegmentPrice = dynamicSegmentPrices[
+                uint256 originalSegmentPrice = dynamicSegmentPrices[
                     affectedDynamicSegmentIds[i]
                 ];
                 uint256 refundAmount = (originalSegmentPrice *
