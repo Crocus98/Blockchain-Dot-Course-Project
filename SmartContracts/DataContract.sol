@@ -184,7 +184,6 @@ contract TrainsOracle {
             dynamicSegments[dynamicSegmentId]._isSet,
             "Dynamic segment does not exist"
         );
-
         uint16 maxPassengers = trains[
             consecutiveSegments[
                 dynamicConsecutiveSegments[
@@ -208,21 +207,9 @@ contract TrainsOracle {
                 ]
             ]._passengersNumber;
             require(
-                currentPassengersCount <= maxPassengers,
+                currentPassengersCount < maxPassengers,
                 "The train has not enough space available"
             );
-        }
-
-        dynamicSegments[dynamicSegmentId]._passengerAddresses.push(msg.sender);
-
-        for (
-            uint i = 0;
-            i <
-            dynamicSegments[dynamicSegmentId]
-                ._dynamicConsecutiveSegmentIds
-                .length;
-            i++
-        ) {
             dynamicConsecutiveSegments[
                 dynamicSegments[dynamicSegmentId]._dynamicConsecutiveSegmentIds[
                     i
@@ -230,9 +217,7 @@ contract TrainsOracle {
             ]._passengersNumber++;
         }
 
-        if (!dynamicTickets[ticketId]._isSet) {
-            dynamicTickets[ticketId] = DynamicTicket(new string[](0), true);
-        }
+        dynamicSegments[dynamicSegmentId]._passengerAddresses.push(msg.sender);
 
         dynamicTickets[ticketId]._dynamicSegmentIds.push(dynamicSegmentId);
 
@@ -244,6 +229,7 @@ contract TrainsOracle {
         string[] calldata dynamicSegmentsIds
     ) public payable notBlacklisted {
         require(!dynamicTickets[ticketId]._isSet, "Ticket already sold");
+        dynamicTickets[ticketId] = DynamicTicket(new string[](0), true);
         uint256 totalPrice = 0;
         for (uint i = 0; i < dynamicSegmentsIds.length; i++) {
             totalPrice += buyTicketStep(ticketId, dynamicSegmentsIds[i]);
