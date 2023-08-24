@@ -70,6 +70,8 @@ contract TrainsOracle {
         trainCompanyAddress = msg.sender;
     }
 
+    receive() external payable {}
+
     function setNewOwner(address newOwner) public onlyOwner {
         trainCompanyAddress = newOwner;
     }
