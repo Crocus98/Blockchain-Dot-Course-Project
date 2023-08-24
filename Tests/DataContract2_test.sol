@@ -19,8 +19,8 @@ contract Test2 {
     function beforeAll() public {
         owner = address(this);
         trainsContract = new TrainsOracle();
-        testUser1 = new TestUser1(address(trainsContract));
-        testUser2 = new TestUser2(address(trainsContract));
+        testUser1 = new TestUser1(payable(trainsContract));
+        testUser2 = new TestUser2(payable(trainsContract));
     }
 
     function beforeEach() public {}
