@@ -66,7 +66,7 @@ contract Test1 {
                 "S1",
                 "S2",
                 internalTimeTest + 1800,
-                uint256(5 ether)
+                5000000000000000000
             )
         {
             success = true;
@@ -86,7 +86,7 @@ contract Test1 {
                 "S2",
                 "S3",
                 internalTimeTest + 3600,
-                uint256(3 ether)
+                3000000000000000000
             )
         {
             success = true;
@@ -177,7 +177,7 @@ contract Test1 {
                 "S1",
                 "S2",
                 internalTimeTest + 20,
-                10
+                10000000000000000000
             )
         {
             success = true;
@@ -197,7 +197,7 @@ contract Test1 {
                 "S3",
                 "S4",
                 internalTimeTest + 20,
-                100
+                200000000000000000
             )
         {
             success = true;
@@ -217,7 +217,7 @@ contract Test1 {
                 "S4",
                 "S3",
                 internalTimeTest + 20,
-                100
+                10000000000000000000
             )
         {
             success = true;
@@ -237,7 +237,7 @@ contract Test1 {
                 "S2",
                 "S2",
                 internalTimeTest + 20,
-                100
+                10000000000000000000
             )
         {
             success = true;
@@ -257,7 +257,7 @@ contract Test1 {
                 "S1",
                 "S2",
                 block.timestamp - 10,
-                100
+                10000000000000000000
             )
         {
             success = true;
@@ -343,13 +343,13 @@ contract Test1 {
     }
 
     /// #sender: account-0
-    /// #value: 20 ether
+    /// #value: 20000000000000000000
     function testCannotBuyTicketWithInsufficientFundsOrWrongParams() public {
         bool success = true;
         string[] memory dynamicSegmentsIds = new string[](1);
         dynamicSegmentsIds[0] = "DS1";
         try
-            trainsContract.buyDynamicTicket{value: 3 ether}(
+            trainsContract.buyDynamicTicket{value: 3000000000000000000}(
                 "TKT1",
                 dynamicSegmentsIds
             )
@@ -366,7 +366,7 @@ contract Test1 {
 
         dynamicSegmentsIds[0] = "DS3";
         try
-            trainsContract.buyDynamicTicket{value: 8 ether}(
+            trainsContract.buyDynamicTicket{value: 8000000000000000000}(
                 "TKT1",
                 dynamicSegmentsIds
             )
@@ -383,13 +383,13 @@ contract Test1 {
     }
 
     /// #sender: account-0
-    /// #value: 10 ether
+    /// #value: 10000000000000000000
     function testBuyTicket() public payable {
         bool success = true;
         string[] memory dynamicSegmentsIds = new string[](1);
         dynamicSegmentsIds[0] = "DS1";
         try
-            trainsContract.buyDynamicTicket{value: 9 ether}(
+            trainsContract.buyDynamicTicket{value: 9000000000000000000}(
                 "TKT1",
                 dynamicSegmentsIds
             )
@@ -402,13 +402,13 @@ contract Test1 {
     }
 
     /// #sender: account-0
-    /// #value: 10 ether
+    /// #value: 10000000000000000000
     function testBuyTicketThatAlreadyExist() public {
         bool success = true;
         string[] memory dynamicSegmentsIds = new string[](1);
         dynamicSegmentsIds[0] = "DS1";
         try
-            trainsContract.buyDynamicTicket{value: 9 ether}(
+            trainsContract.buyDynamicTicket{value: 9000000000000000000}(
                 "TKT1",
                 dynamicSegmentsIds
             )
@@ -425,11 +425,11 @@ contract Test1 {
     }
 
     /// #sender: account-1
-    /// #value: 50 ether
+    /// #value: 50000000000000000000
     function testRefundsCalculatedCorrectly() public {
         uint256 simulatedArrivalTime = internalTimeTest + 4000;
         uint256 initialBalance = address(this).balance;
-        payable(address(trainsContract)).transfer(25 ether);
+        payable(address(trainsContract)).transfer(25000000000000000000);
         trainsContract.setArrivalTimeAndCheckRequiredRefunds(
             "DCS1",
             simulatedArrivalTime - 2000
