@@ -13,7 +13,7 @@ contract TestUser1 {
     TrainsOracle trainsContract;
     address user;
 
-    constructor(address trainsOracleAddress) {
+    constructor(address payable trainsOracleAddress) {
         user = address(this);
 
         trainsContract = TrainsOracle(trainsOracleAddress);
@@ -176,7 +176,7 @@ contract TestUser2 {
     TrainsOracle trainsContract;
     address user;
 
-    constructor(address trainsOracleAddress) {
+    constructor(address payable trainsOracleAddress) {
         user = address(this);
 
         trainsContract = TrainsOracle(trainsOracleAddress);

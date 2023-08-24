@@ -21,8 +21,8 @@ contract Test1 {
     function beforeAll() public {
         owner = address(this);
         trainsContract = new TrainsOracle();
-        testUser1 = new TestUser1(address(trainsContract));
-        testUser2 = new TestUser2(address(trainsContract));
+        testUser1 = new TestUser1(payable(trainsContract));
+        testUser2 = new TestUser2(payable(trainsContract));
     }
 
     function beforeEach() public {}
@@ -429,7 +429,7 @@ contract Test1 {
     function testRefundsCalculatedCorrectly() public {
         uint256 simulatedArrivalTime = internalTimeTest + 4000;
         uint256 initialBalance = address(this).balance;
-        payable(address(trainsContract)).transfer(25000000000000000000);
+        //payable(address(trainsContract)).transfer(25000000000000000000);
         trainsContract.setArrivalTimeAndCheckRequiredRefunds(
             "DCS1",
             simulatedArrivalTime - 2000
