@@ -53,6 +53,8 @@ contract TrainsOracle {
     }
     mapping(string => DynamicTicket) public dynamicTickets;
 
+    mapping(address => uint256) public refunds;
+
     modifier onlyOwner() {
         require(
             msg.sender == trainCompanyAddress,
@@ -71,6 +73,8 @@ contract TrainsOracle {
     }
 
     receive() external payable {}
+
+    fallback() external payable {}
 
     function setNewOwner(address newOwner) public onlyOwner {
         trainCompanyAddress = newOwner;
@@ -280,25 +284,30 @@ contract TrainsOracle {
         }
 
         for (uint i = 0; i < affectedDynamicSegmentIds.length; i++) {
-            DynamicSegment memory dynamicSegment = dynamicSegments[
+            address[] memory passengerAddresses = dynamicSegments[
                 affectedDynamicSegmentIds[i]
-            ];
-            if (dynamicSegment._passengerAddresses.length == 0) {
+            ]._passengerAddresses;
+            if (passengerAddresses.length == 0) {
                 continue;
             }
-            for (
-                uint j = 0;
-                j < dynamicSegment._passengerAddresses.length;
-                j++
-            ) {
-                address passenger = dynamicSegment._passengerAddresses[j];
-                uint256 originalSegmentPrice = dynamicSegmentPrices[
-                    affectedDynamicSegmentIds[i]
-                ];
+            uint256 originalSegmentPrice = dynamicSegmentPrices[
+                affectedDynamicSegmentIds[i]
+            ];
+            for (uint j = 0; j < passengerAddresses.length; j++) {
+                address passenger = passengerAddresses[j];
+
                 uint256 refundAmount = (originalSegmentPrice *
                     refundPercentage) / 100;
-                payable(passenger).transfer(refundAmount);
+                //payable(passenger).transfer(refundAmount);
+                refunds[passenger] += refundAmount;
             }
         }
+    }
+
+    function getRefund() public notBlacklisted {
+        uint256 refundAmount = refunds[msg.sender];
+        require(refundAmount > 0, "No refund available");
+        refunds[msg.sender] = 0;
+        payable(msg.sender).transfer(refundAmount);
     }
 }

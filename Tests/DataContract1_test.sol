@@ -428,8 +428,7 @@ contract Test1 {
     /// #value: 50000000000000000000
     function testRefundsCalculatedCorrectly() public {
         uint256 simulatedArrivalTime = internalTimeTest + 4000;
-        uint256 initialBalance = address(this).balance;
-        //payable(address(trainsContract)).transfer(25000000000000000000);
+        //uint256 initialBalance = address(this).balance;
         trainsContract.setArrivalTimeAndCheckRequiredRefunds(
             "DCS1",
             simulatedArrivalTime - 2000
@@ -438,10 +437,10 @@ contract Test1 {
             "DCS2",
             simulatedArrivalTime
         );
-        uint256 finalBalance = address(this).balance;
+        //uint256 finalBalance = address(this).balance;
 
         (, , , uint256 actualArrivalTime, , ) = trainsContract
-            .consecutiveSegments("CS1");
+            .consecutiveSegments("CS2");
 
         uint256 delay = simulatedArrivalTime > actualArrivalTime
             ? simulatedArrivalTime - actualArrivalTime
@@ -459,7 +458,7 @@ contract Test1 {
 
         uint256 ticketPrice = trainsContract.dynamicSegmentPrices("DS1");
         uint256 expectedRefundAmount = (ticketPrice * refundPercentage) / 100;
-        uint256 actualRefundAmount = initialBalance - finalBalance;
+        uint256 actualRefundAmount = trainsContract.refunds(address(this));
 
         Assert.equal(
             actualRefundAmount,
