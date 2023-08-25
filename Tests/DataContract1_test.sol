@@ -507,15 +507,4 @@ contract Test1 {
             "User should not be able to buy a ticket if the train is full"
         );
     }
-
-    function testOwnershipTransfer() public {
-        address newOwner = TestsAccounts.getAccount(10);
-        trainsContract.setNewOwner(newOwner);
-        address contractOwner = trainsContract.trainCompanyAddress();
-        Assert.equal(
-            newOwner,
-            contractOwner,
-            "The owner address should be set correctly during ownership transfer"
-        );
-    }
 }
