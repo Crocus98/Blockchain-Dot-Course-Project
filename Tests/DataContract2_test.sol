@@ -59,6 +59,17 @@ contract Test2 {
         );
     }
 
+    function testOwnershipTransfer() public {
+        address newOwner = TestsAccounts.getAccount(10);
+        trainsContract.setNewOwner(newOwner);
+        address contractOwner = trainsContract.trainCompanyAddress();
+        Assert.equal(
+            newOwner,
+            contractOwner,
+            "The owner address should be set correctly during ownership transfer"
+        );
+    }
+
     //TEST FOR USER 1
     function testUserNonOwnerPermissions() public {
         testUser1.testUserNonOwnerPermissions();
