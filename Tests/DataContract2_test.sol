@@ -65,7 +65,7 @@ contract Test2 {
     }
 
     //TEST FOR USER 2
-    function testUserInBlacklistCannotBuyTicket() public {
-        testUser2.testUserInBlacklistCannotBuyTicket();
+    function testUserInBlacklistCannotBuyTicketOrGetRefund() public {
+        testUser2.testUserInBlacklistCannotBuyTicketOrGetRefund();
     }
 }

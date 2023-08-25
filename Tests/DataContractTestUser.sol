@@ -182,7 +182,7 @@ contract TestUser2 {
         trainsContract = TrainsOracle(trainsOracleAddress);
     }
 
-    function testUserInBlacklistCannotBuyTicket() public {
+    function testUserInBlacklistCannotBuyTicketOrGetRefund() public {
         bool success = true;
         try trainsContract.buyDynamicTicket("TKT3", new string[](0)) {
             success = true;
@@ -193,6 +193,17 @@ contract TestUser2 {
             success,
             false,
             "Blacklisted user should not be able to buy a ticket"
+        );
+
+        try trainsContract.getRefund() {
+            success = true;
+        } catch {
+            success = false;
+        }
+        Assert.equal(
+            success,
+            false,
+            "Blacklisted user should not be able to obtain a refund"
         );
     }
 }

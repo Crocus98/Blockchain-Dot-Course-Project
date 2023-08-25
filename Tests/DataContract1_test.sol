@@ -31,7 +31,7 @@ contract Test1 {
     function testAddEntitiesWithOwnerPermissions() public {
         bool success = true;
 
-        try trainsContract.addTrain("T1", "Fast Train", 2) {
+        try trainsContract.addTrain("T1", "Fast Train", 1) {
             success = true;
         } catch {
             success = false;
@@ -424,8 +424,26 @@ contract Test1 {
         );
     }
 
-    /// #sender: account-1
-    /// #value: 50000000000000000000
+    function testCannotSetActualArrivalTimeOfNonExistentSegment() public {
+        bool success = true;
+        uint256 simulatedArrivalTime = internalTimeTest + 3000;
+        try
+            trainsContract.setArrivalTimeAndCheckRequiredRefunds(
+                "DCS3",
+                simulatedArrivalTime - 2000
+            )
+        {
+            success = true;
+        } catch {
+            success = false;
+        }
+        Assert.equal(
+            success,
+            false,
+            "Should not be able to set the actual arrival time for a non existent CS"
+        );
+    }
+
     function testRefundsCalculatedCorrectly() public {
         uint256 simulatedArrivalTime = internalTimeTest + 4000;
         //uint256 initialBalance = address(this).balance;
@@ -467,11 +485,18 @@ contract Test1 {
         );
     }
 
+    /// #sender: account-0
+    /// #value: 10000000000000000000
     function testCannotBuyTicketWithoutSpace() public {
         bool success = true;
         string[] memory consecutiveSegmentsIds = new string[](1);
         consecutiveSegmentsIds[0] = "CS1";
-        try trainsContract.buyDynamicTicket("TKT2", consecutiveSegmentsIds) {
+        try
+            trainsContract.buyDynamicTicket{value: 9000000000000000000}(
+                "TKT2",
+                consecutiveSegmentsIds
+            )
+        {
             success = true;
         } catch {
             success = false;
