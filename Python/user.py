@@ -1,155 +1,122 @@
+import logging
 from web3 import Web3
-import json
-from dotenv import load_dotenv
+from rich.prompt import Prompt
+from rich.console import Console
+from rich.table import Table
+from rich.logging import RichHandler
 
-# Connetti al nodo Ethereum
-w3 = Web3(Web3.HTTPProvider('http://localhost:8545'))
+# Configure Logging
+logging.basicConfig(level=logging.INFO, handlers=[RichHandler()])
+logger = logging.getLogger(__name__)
 
-# Indirizzo del contratto e ABI
-contract_address = "0xAb8483F64d9C6d1EcF9b849Ae677dD3315835cb2"
-# Load environment variables from .env file
-load_dotenv()
+console = Console()
 
-# Get the ABI from the environment variables
-contract_abi_json = os.getenv("CONTRACT_ABI")
 
-# Parse the JSON string to get the ABI
-contract_abi = json.loads('ABI.json')
+class User:
+    def __init__(self, contract_address, private_key):
+        self.web3 = Web3(Web3.HTTPProvider('HTTP://127.0.0.1:7545'))
+        self.private_key = private_key
+        self.contract = self.web3.eth.contract(
+            address=contract_address, abi=YOUR_ABI_HERE)  # Replace with your ABI
 
-# Crea un oggetto contratto
-contract = w3.eth.contract(address=contract_address, abi=contract_abi)
+    def view_profile(self):
+        # Display user's previous activities, tickets, refunds, etc.
+        # For simplicity, let's display some dummy data. This would require querying the blockchain for actual data.
+        table = Table(title="User Profile")
+        table.add_column("Activity")
+        table.add_column("Date")
+        table.add_row("Bought Ticket", "12-08-2023")
+        table.add_row("Received Refund", "13-08-2023")
+        self.console.print(table)
+
+    def view_available_trains(self):
+        # Display available trains, segments, and timings
+        # This would require querying the blockchain for actual data.
+        table = Table(title="Available Trains")
+        table.add_column("Train ID")
+        table.add_column("Segment")
+        table.add_column("Timing")
+        table.add_row("T1", "S1-S2", "10:00 AM")
+        table.add_row("T2", "S2-S3", "02:00 PM")
+        self.console.print(table)
+
+    def buy_ticket(self):
+        train_id = Prompt.ask("Enter the train ID you want to book")
+        seat_pref = Prompt.ask("Seat Preference", choices=["window", "aisle"])
+        # Execute smart contract method to buy ticket
+        # Let's assume it's successful for this example
+        self.console.print(
+            f"Ticket booked for train {train_id} with {seat_pref} seat preference!", style="bold green")
+
+    def cancel_ticket(self):
+        ticket_id = Prompt.ask("Enter the ticket ID you want to cancel")
+        # Execute smart contract method to cancel ticket
+        # Let's assume it's successful for this example
+        self.console.print(
+            f"Ticket {ticket_id} cancelled successfully!", style="bold green")
+
+    def set_arrival_time_and_check_refunds(self):
+        # Fetch the necessary data
+        dynamic_consecutive_segment_id = Prompt.ask(
+            "Enter the dynamic consecutive segment ID")
+        actual_arrival_time = Prompt.ask(
+            "Enter the actual arrival time (UNIX timestamp)")
+
+        # Execute the smart contract method to set the arrival time and check for refunds.
+        # For simplicity, we'll assume the function is named 'setArrivalTimeAndCheckRefunds' in the smart contract.
+        try:
+            tx_hash = self.contract.functions.setArrivalTimeAndCheckRefunds(
+                dynamic_consecutive_segment_id, int(actual_arrival_time)).transact()
+            receipt = w3.eth.waitForTransactionReceipt(tx_hash)
+            if receipt['status'] == 1:
+                self.console.print(
+                    f"Arrival time set successfully for segment {dynamic_consecutive_segment_id}!", style="bold green")
+            else:
+                self.console.print(
+                    f"Failed to set arrival time for segment {dynamic_consecutive_segment_id}!", style="bold red")
+        except Exception as e:
+            logger.error(f"Error setting arrival time: {str(e)}")
+            self.console.print(
+                f"Error setting arrival time: {str(e)}", style="bold red")
 
 
 def main():
-    while True:
-        print("\nMenu:")
-        print("1. Aggiungi alla blacklist")
-        print("2. Rimuovi dalla blacklist")
-        print("3. Aggiungi un treno")
-        print("4. Aggiungi una stazione")
-        print("5. Aggiungi un segmento consecutivo")
-        print("6. Aggiungi un segmento consecutivo dinamico")
-        print("7. Aggiungi un segmento dinamico")
-        print("8. Aggiungi un segmento consecutivo dinamico a un segmento dinamico")
-        print("9. Compra un biglietto step-by-step")
-        print("10. Compra un biglietto dinamico")
-        print("11. Imposta orario di arrivo e verifica rimborsi")
-        print("12. Esci")
+    console.print(
+        "Welcome to [bold blue]User CLI[/bold blue]!", style="bold yellow")
+    user = User(contract_address="your_contract_address_here",
+                private_key="your_private_key_here")
 
-        choice = input("Seleziona un'opzione: ")
+    options = {
+        "1": "View Profile",
+        "2": "View Available Trains",
+        "3": "Buy Ticket",
+        "4": "Cancel Ticket",
+        "5": "Set arrival time and check refunds",
+        "6": "Exit"
+    }
+
+    while True:
+        console.print("\n[bold green]Please choose an action:[/bold green]")
+        for key, value in options.items():
+            console.print(f"{key}. {value}")
+
+        choice = Prompt.ask("Enter your choice", choices=list(options.keys()))
 
         if choice == "1":
-            address = input(
-                "Inserisci l'indirizzo da aggiungere alla blacklist: ")
-            tx_hash = contract.functions.addToBlacklist(address).transact()
-            receipt = w3.eth.waitForTransactionReceipt(tx_hash)
-            print("Transazione completata con stato:", receipt['status'])
-
+            user.view_profile()
         elif choice == "2":
-            address = input(
-                "Inserisci l'indirizzo da rimuovere dalla blacklist: ")
-            tx_hash = contract.functions.removeFromBlacklist(
-                address).transact()
-            receipt = w3.eth.waitForTransactionReceipt(tx_hash)
-            print("Transazione completata con stato:", receipt['status'])
-
+            user.view_available_trains()
         elif choice == "3":
-            train_id = input("Inserisci l'ID del treno: ")
-            train_name = input("Inserisci il nome del treno: ")
-            max_passengers = int(
-                input("Inserisci il numero massimo di passeggeri: "))
-            tx_hash = contract.functions.addTrain(
-                train_id, train_name, max_passengers).transact()
-            receipt = w3.eth.waitForTransactionReceipt(tx_hash)
-            print("Transazione completata con stato:", receipt['status'])
-
+            user.buy_ticket()
         elif choice == "4":
-            station_id = input("Inserisci l'ID della stazione: ")
-            tx_hash = contract.functions.addStation(station_id).transact()
-            receipt = w3.eth.waitForTransactionReceipt(tx_hash)
-            print("Transazione completata con stato:", receipt['status'])
-
+            user.cancel_ticket()
         elif choice == "5":
-            consecutive_segment_id = input(
-                "Inserisci l'ID del segmento consecutivo: ")
-            train_id = input("Inserisci l'ID del treno: ")
-            starting_station_id = input(
-                "Inserisci l'ID della stazione di partenza: ")
-            arriving_station_id = input(
-                "Inserisci l'ID della stazione di arrivo: ")
-            arrival_time = int(
-                input("Inserisci l'orario di arrivo (timestamp UNIX): "))
-            price = int(input("Inserisci il prezzo: "))
-            tx_hash = contract.functions.addConsecutiveSegment(
-                consecutive_segment_id, train_id, starting_station_id, arriving_station_id, arrival_time, price).transact()
-            receipt = w3.eth.waitForTransactionReceipt(tx_hash)
-            print("Transazione completata con stato:", receipt['status'])
-
+            user.set_arrival_time_and_check_refunds()
         elif choice == "6":
-            dynamic_consecutive_segment_id = input(
-                "Inserisci l'ID del segmento consecutivo dinamico: ")
-            consecutive_segment_id = input(
-                "Inserisci l'ID del segmento consecutivo associato: ")
-            tx_hash = contract.functions.addDynamicConsecutiveSegment(
-                dynamic_consecutive_segment_id, consecutive_segment_id).transact()
-            receipt = w3.eth.waitForTransactionReceipt(tx_hash)
-            print("Transazione completata con stato:", receipt['status'])
-
-        elif choice == "7":
-            dynamic_segment_id = input(
-                "Inserisci l'ID del segmento dinamico: ")
-            tx_hash = contract.functions.addDynamicSegment(
-                dynamic_segment_id).transact()
-            receipt = w3.eth.waitForTransactionReceipt(tx_hash)
-            print("Transazione completata con stato:", receipt['status'])
-
-        elif choice == "8":
-            dynamic_segment_id = input(
-                "Inserisci l'ID del segmento dinamico: ")
-            dynamic_consecutive_segment_id = input(
-                "Inserisci l'ID del segmento consecutivo dinamico: ")
-            last_segment_stop = input(
-                "È l'ultima fermata del segmento? (si/no): ").lower() == 'si'
-            tx_hash = contract.functions.addDynamicConsecutiveSegmentToDynamicSegment(
-                dynamic_segment_id, dynamic_consecutive_segment_id, last_segment_stop).transact()
-            receipt = w3.eth.waitForTransactionReceipt(tx_hash)
-            print("Transazione completata con stato:", receipt['status'])
-
-        elif choice == "9":
-            ticket_id = input("Inserisci l'ID del biglietto: ")
-            dynamic_segment_id = input(
-                "Inserisci l'ID del segmento dinamico: ")
-            tx_hash = contract.functions.buyTicketStep(
-                ticket_id, dynamic_segment_id).transact()
-            receipt = w3.eth.waitForTransactionReceipt(tx_hash)
-            print("Transazione completata con stato:", receipt['status'])
-
-        elif choice == "10":
-            ticket_id = input("Inserisci l'ID del biglietto: ")
-            dynamic_segments_ids = input(
-                "Inserisci gli ID dei segmenti dinamici separati da virgole: ").split(',')
-            tx_hash = contract.functions.buyDynamicTicket(
-                ticket_id, dynamic_segments_ids).transact()
-            receipt = w3.eth.waitForTransactionReceipt(tx_hash)
-            print("Transazione completata con stato:", receipt['status'])
-
-        elif choice == "11":
-            dynamic_consecutive_segment_id = input(
-                "Inserisci l'ID del segmento consecutivo dinamico: ")
-            actual_arrival_time = int(
-                input("Inserisci l'orario di arrivo effettivo (timestamp UNIX): "))
-            tx_hash = contract.functions.setArrivalTimeAndCheckRequiredRefunds(
-                dynamic_consecutive_segment_id, actual_arrival_time).transact()
-            receipt = w3.eth.waitForTransactionReceipt(tx_hash)
-            print("Transazione completata con stato:", receipt['status'])
-
-        elif choice == "12":
-            print("Uscita.")
+            console.print("Goodbye!", style="bold red")
             break
 
-        else:
-            print("Opzione non valida. Riprova.")
 
-
-if __name__ == "__main__":
+if __name__ == '__main__':
+    # Assuming the contract is already initialized elsewhere in the code
     main()

@@ -1,157 +1,297 @@
-from web3 import Web3
-import json
-import time
+import logging
 import random
+import time
+from rich.console import Console
+from rich.prompt import Prompt
+from rich.logging import RichHandler
+from web3 import Web3
 from dotenv import load_dotenv
+import os
 
-
-# Connetti al nodo Ethereum
-w3 = Web3(Web3.HTTPProvider('HTTP://127.0.0.1:7545'))
-
-# Indirizzo del contratto e ABI
-contract_address = "0x5B38Da6a701c568545dCfcB03FcB875f56beddC4"
-# Load environment variables from .env file
 load_dotenv()
 
-# Get the ABI from the environment variables
-contract_abi_json = os.getenv("CONTRACT_ABI")
+# Set up logging
+logging.basicConfig(level=logging.INFO, handlers=[RichHandler()])
+logger = logging.getLogger("Company CLI")
 
-# Parse the JSON string to get the ABI
-contract_abi = json.loads('ABI.json')
-
-# Crea un oggetto contratto
-contract = w3.eth.contract(address=contract_address, abi=contract_abi)
+console = Console()
 
 
-def confirm_train_arrival(train_id, dynamic_consecutive_segment_id):
-    # Simula l'arrivo del treno con un ritardo casuale del 30% delle volte
-    is_delayed = random.random() < 0.3
+class Company:
 
-    if is_delayed:
-        print(f"Il treno {train_id} è in ritardo!")
-        actual_arrival_time = int(
-            input("Inserisci l'orario di arrivo effettivo (timestamp UNIX): "))
-        tx_hash = contract.functions.setArrivalTimeAndCheckRequiredRefunds(
-            dynamic_consecutive_segment_id, actual_arrival_time).transact()
-        receipt = w3.eth.waitForTransactionReceipt(tx_hash)
-        print("Transazione completata con stato:", receipt['status'])
-    else:
-        print(f"Il treno {train_id} è arrivato in orario!")
+    def __init__(self, contract_address, private_key):
+        self.web3 = Web3(Web3.HTTPProvider('HTTP://127.0.0.1:7545'))
+        self.contract_address = contract_address
+        self.private_key = private_key
+        self.contract = self.web3.eth.contract(
+            address=self.contract_address, abi=YOUR_ABI_HERE)  # Add your ABI
 
+    # Other class methods ...
 
-def insert_sample_data():
-    # Inserisce dati di esempio
-    print("Inserimento dati di esempio...")
+    def confirm_train_arrival(self):
+        train_id = Prompt.ask("Inserisci l'ID del treno")
+        dynamic_consecutive_segment_id = Prompt.ask(
+            "Inserisci l'ID del segmento consecutivo dinamico")
 
-    contract.functions.addTrain("T1", "Express", 300).transact()
-    time.sleep(1)
+        is_delayed = random.random() < 0.3
 
-    contract.functions.addStation("S1").transact()
-    time.sleep(1)
+        if is_delayed:
+            console.print(
+                f"Il treno {train_id} è in ritardo!", style="bold red")
+            actual_arrival_time = Prompt.ask(
+                "Inserisci l'orario di arrivo effettivo (timestamp UNIX)", int)
+            try:
+                self.contract.functions.setArrivalTimeAndCheckRequiredRefunds(
+                    dynamic_consecutive_segment_id, actual_arrival_time).transact({"from": self.web3.eth.defaultAccount})
+                logger.info(f"Transazione completata per il treno {train_id}")
+            except Exception as e:
+                logger.error(f"Errore nella transazione: {e}")
+        else:
+            console.print(
+                f"Il treno {train_id} è arrivato in orario!", style="bold green")
 
-    contract.functions.addStation("S2").transact()
-    time.sleep(1)
+    def insert_sample_data(self):
+        console.print("Inserimento dati di esempio...", style="bold yellow")
+        try:
+            self.contract.functions.addTrain("T1", "Express", 300).transact(
+                {"from": self.web3.eth.defaultAccount})
+            self.contract.functions.addStation("S1").transact(
+                {"from": self.web3.eth.defaultAccount})
+            self.contract.functions.addStation("S2").transact(
+                {"from": self.web3.eth.defaultAccount})
+            self.contract.functions.addConsecutiveSegment("CS1", "T1", "S1", "S2", int(
+                time.time()) + 3600, 50).transact({"from": self.web3.eth.defaultAccount})
+            self.contract.functions.addDynamicConsecutiveSegment(
+                "DCS1", "CS1").transact({"from": self.web3.eth.defaultAccount})
+            self.contract.functions.addDynamicSegment("DS1").transact(
+                {"from": self.web3.eth.defaultAccount})
+            self.contract.functions.addDynamicConsecutiveSegmentToDynamicSegment(
+                "DS1", "DCS1", False).transact({"from": self.web3.eth.defaultAccount})
+            console.print("Dati di esempio inseriti.", style="bold green")
+        except Exception as e:
+            logger.error(f"Errore nell'inserimento dei dati di esempio: {e}")
 
-    contract.functions.addConsecutiveSegment(
-        "CS1", "T1", "S1", "S2", int(time.time()) + 3600, 50).transact()
-    time.sleep(1)
+    def add_train(self):
+        name = Prompt.ask("Enter the train name")
+        description = Prompt.ask("Enter the train description")
+        max_passengers = Prompt.ask("Enter the max passengers", int)
+        if Prompt.ask("Are you sure you want to add this train? [yes/no]", choices=["yes", "no"]) == "yes":
+            try:
+                self.contract.functions.addTrain(name, description, max_passengers).transact({
+                    "from": self.web3.eth.defaultAccount})
+                console.print(
+                    f"Train {name} added successfully!", style="bold green")
+            except Exception as e:
+                logger.error(f"Failed to add train: {e}")
 
-    contract.functions.addDynamicConsecutiveSegment("DCS1", "CS1").transact()
-    time.sleep(1)
+    def add_station(self):
+        station_id = Prompt.ask("Enter the station ID")
+        if Prompt.ask("Are you sure you want to add this station? [yes/no]", choices=["yes", "no"]) == "yes":
+            try:
+                self.contract.functions.addStation(station_id).transact(
+                    {"from": self.web3.eth.defaultAccount})
+                console.print(
+                    f"Station {station_id} added successfully!", style="bold green")
+            except Exception as e:
+                logger.error(f"Failed to add station: {e}")
 
-    contract.functions.addDynamicSegment("DS1").transact()
-    time.sleep(1)
+    def add_consecutive_segment(self):
+        segment_id = Prompt.ask("Enter the consecutive segment ID")
+        train_id = Prompt.ask("Enter the train ID")
+        starting_station_id = Prompt.ask("Enter the starting station ID")
+        arriving_station_id = Prompt.ask("Enter the arriving station ID")
+        arrival_time = Prompt.ask(
+            "Enter the arrival time (UNIX timestamp)", int)
+        price = Prompt.ask("Enter the price", int)
 
-    contract.functions.addDynamicConsecutiveSegmentToDynamicSegment(
-        "DS1", "DCS1", False).transact()
-    print("Dati di esempio inseriti.")
+        if Prompt.ask(f"Are you sure you want to add this consecutive segment {segment_id}? [yes/no]", choices=["yes", "no"]) == "yes":
+            try:
+                self.contract.functions.addConsecutiveSegment(
+                    segment_id, train_id, starting_station_id, arriving_station_id, arrival_time, price).transact({"from": self.web3.eth.defaultAccount})
+                console.print(
+                    f"Consecutive Segment {segment_id} added successfully!", style="bold green")
+            except Exception as e:
+                logger.error(f"Failed to add consecutive segment: {e}")
+
+    def add_dynamic_consecutive_segment(self):
+        dynamic_consecutive_segment_id = Prompt.ask(
+            "Enter the dynamic consecutive segment ID")
+        consecutive_segment_id = Prompt.ask("Enter the consecutive segment ID")
+
+        if Prompt.ask(f"Are you sure you want to add this dynamic consecutive segment {dynamic_consecutive_segment_id}? [yes/no]", choices=["yes", "no"]) == "yes":
+            try:
+                self.contract.functions.addDynamicConsecutiveSegment(
+                    dynamic_consecutive_segment_id, consecutive_segment_id).transact({"from": self.web3.eth.defaultAccount})
+                console.print(
+                    f"Dynamic Consecutive Segment {dynamic_consecutive_segment_id} added successfully!", style="bold green")
+            except Exception as e:
+                logger.error(f"Failed to add dynamic consecutive segment: {e}")
+
+    def add_dynamic_segment(self):
+        dynamic_segment_id = Prompt.ask("Enter the dynamic segment ID")
+        if Prompt.ask("Are you sure you want to add this dynamic segment? [yes/no]", choices=["yes", "no"]) == "yes":
+            try:
+                self.contract.functions.addDynamicSegment(dynamic_segment_id).transact(
+                    {"from": self.web3.eth.defaultAccount})
+                console.print(
+                    f"Dynamic Segment {dynamic_segment_id} added successfully!", style="bold green")
+            except Exception as e:
+                logger.error(f"Failed to add dynamic segment: {e}")
+
+    def add_dynamic_consecutive_segment_to_dynamic_segment(self):
+        dynamic_segment_id = Prompt.ask("Enter the dynamic segment ID")
+        dynamic_consecutive_segment_id = Prompt.ask(
+            "Enter the dynamic consecutive segment ID")
+        last_segment_stop = Prompt.ask(
+            "Is this the last segment stop? [yes/no]", choices=["yes", "no"]) == "yes"
+
+        if Prompt.ask(f"Are you sure you want to add dynamic consecutive segment {dynamic_consecutive_segment_id} to dynamic segment {dynamic_segment_id}? [yes/no]", choices=["yes", "no"]) == "yes":
+            try:
+                self.contract.functions.addDynamicConsecutiveSegmentToDynamicSegment(
+                    dynamic_segment_id, dynamic_consecutive_segment_id, last_segment_stop).transact({"from": self.web3.eth.defaultAccount})
+                console.print(
+                    f"Dynamic Consecutive Segment {dynamic_consecutive_segment_id} added to Dynamic Segment {dynamic_segment_id} successfully!", style="bold green")
+            except Exception as e:
+                logger.error(
+                    f"Failed to add dynamic consecutive segment to dynamic segment: {e}")
+
+    def list_all_users(self):
+        # For simplicity, let's assume the contract has a function to list all users (addresses)
+        try:
+            users = self.contract.functions.listAllUsers().call()
+            if len(users) == 0:
+                console.print("No users found!", style="bold red")
+            else:
+                console.print("List of all users:", style="bold green")
+                for user in users:
+                    console.print(user, style="bold blue")
+            return users
+        except Exception as e:
+            logger.error(f"Failed to list all users: {e}")
+            return []
+
+    def list_blacklisted_users(self):
+        # Assuming the contract has a function to list all blacklisted users (addresses)
+        try:
+            blacklisted_users = self.contract.functions.listBlacklistedUsers().call()
+            if len(blacklisted_users) == 0:
+                console.print("No blacklisted users found!", style="bold red")
+            else:
+                console.print("List of blacklisted users:", style="bold green")
+                for user in blacklisted_users:
+                    console.print(user, style="bold blue")
+            return blacklisted_users
+        except Exception as e:
+            logger.error(f"Failed to list blacklisted users: {e}")
+            return []
+
+    def add_user_to_blacklist(self):
+        users = self.list_all_users()
+        user_to_blacklist = Prompt.ask(
+            "Enter the address of the user you want to blacklist", choices=users)
+        if Prompt.ask(f"Are you sure you want to blacklist user {user_to_blacklist}? [yes/no]", choices=["yes", "no"]) == "yes":
+            try:
+                self.contract.functions.addUserToBlacklist(user_to_blacklist).transact({
+                    "from": self.web3.eth.defaultAccount})
+                console.print(
+                    f"User {user_to_blacklist} added to blacklist successfully!", style="bold green")
+            except Exception as e:
+                logger.error(f"Failed to add user to blacklist: {e}")
+
+    def remove_user_from_blacklist(self):
+        blacklisted_users = self.list_blacklisted_users()
+        user_to_remove = Prompt.ask(
+            "Enter the address of the user you want to remove from blacklist", choices=blacklisted_users)
+        if Prompt.ask(f"Are you sure you want to remove user {user_to_remove} from the blacklist? [yes/no]", choices=["yes", "no"]) == "yes":
+            try:
+                self.contract.functions.removeUserFromBlacklist(user_to_remove).transact({
+                    "from": self.web3.eth.defaultAccount})
+                console.print(
+                    f"User {user_to_remove} removed from blacklist successfully!", style="bold green")
+            except Exception as e:
+                logger.error(f"Failed to remove user from blacklist: {e}")
+
+    # ... Other methods se necessari savageee ...
 
 
 def main():
-    while True:
-        print("\nMenu Italy Trains:")
-        print("1. Aggiungi un treno")
-        print("2. Aggiungi una stazione")
-        print("3. Aggiungi un segmento consecutivo")
-        print("4. Aggiungi un segmento consecutivo dinamico")
-        print("5. Aggiungi un segmento dinamico")
-        print("6. Aggiungi un segmento consecutivo dinamico a un segmento dinamico")
-        print("7. Inserisci dati di esempio")
-        print("8. Esci")
+    logo = """
+  /$$$$$$ /$$               /$$                 /$$$$$$$$                 /$$                    
+|_  $$_/| $$              | $$                |__  $$__/                |__/                    
+  | $$ /$$$$$$    /$$$$$$ | $$ /$$   /$$         | $$  /$$$$$$  /$$$$$$  /$$ /$$$$$$$   /$$$$$$$
+  | $$|_  $$_/   |____  $$| $$| $$  | $$         | $$ /$$__  $$|____  $$| $$| $$__  $$ /$$_____/
+  | $$  | $$      /$$$$$$$| $$| $$  | $$         | $$| $$  \__/ /$$$$$$$| $$| $$  \ $$|  $$$$$$ 
+  | $$  | $$ /$$ /$$__  $$| $$| $$  | $$         | $$| $$      /$$__  $$| $$| $$  | $$ \____  $$
+ /$$$$$$|  $$$$/|  $$$$$$$| $$|  $$$$$$$         | $$| $$     |  $$$$$$$| $$| $$  | $$ /$$$$$$$/
+|______/ \___/   \_______/|__/ \____  $$         |__/|__/      \_______/|__/|__/  |__/|_______/ 
+                               /$$  | $$                                                        
+                              |  $$$$$$/                                                        
+                               \______/  
+                                            o  o  O  O
+                                        ,_____  ____    O
+                                        | G V \_|[]|_'__Y
+                                        |_M_S___|__|_|__|}
+=========================================oo--oo==oo--OOO\\======================================
+    """
+    console.print(logo, style="bold blue")
+    console.print(
+        "Welcome to [bold blue]Company CLI[/bold blue]!", style="bold red")
+    company = Company(contract_address="your_contract_address_here",
+                      private_key="your_private_key_here")
 
-        choice = input("Seleziona un'opzione: ")
+    options = {
+        "1": "Add Train",
+        "2": "Add Station",
+        "3": "Add Consecutive Segment",
+        "4": "Add Dynamic Consecutive Segment",
+        "5": "Add Dynamic Segment",
+        "6": "Aggiungi un segmento consecutivo dinamico a un segmento dinamico",
+        "7": "Conferma l'arrivo del treno",
+        "8": "Inserisci dati di esempio",
+        "9": "Aggiungi un utente alla blacklist",
+        "10": "Rimuovi un utente dalla blacklist",
+        "11": "Exit"
+    }
+
+    while True:
+        console.print("\n[bold green]Please choose an action:[/bold green]")
+        for key, value in options.items():
+            console.print(f"{key}. {value}")
+
+        choice = Prompt.ask("Enter your choice", choices=list(options.keys()))
 
         if choice == "1":
-            train_id = input("Inserisci l'ID del treno: ")
-            train_name = input("Inserisci il nome del treno: ")
-            max_passengers = int(
-                input("Inserisci il numero massimo di passeggeri: "))
-            tx_hash = contract.functions.addTrain(
-                train_id, train_name, max_passengers).transact()
-            receipt = w3.eth.waitForTransactionReceipt(tx_hash)
-            print("Transazione completata con stato:", receipt['status'])
-
+            company.add_train()
         elif choice == "2":
-            station_id = input("Inserisci l'ID della stazione: ")
-            tx_hash = contract.functions.addStation(station_id).transact()
-            receipt = w3.eth.waitForTransactionReceipt(tx_hash)
-            print("Transazione completata con stato:", receipt['status'])
-
+            company.add_station()
+            pass
         elif choice == "3":
-            consecutive_segment_id = input(
-                "Inserisci l'ID del segmento consecutivo: ")
-            train_id = input("Inserisci l'ID del treno: ")
-            starting_station_id = input(
-                "Inserisci l'ID della stazione di partenza: ")
-            arriving_station_id = input(
-                "Inserisci l'ID della stazione di arrivo: ")
-            arrival_time = int(
-                input("Inserisci l'orario di arrivo (timestamp UNIX): "))
-            price = int(input("Inserisci il prezzo: "))
-            tx_hash = contract.functions.addConsecutiveSegment(
-                consecutive_segment_id, train_id, starting_station_id, arriving_station_id, arrival_time, price).transact()
-            receipt = w3.eth.waitForTransactionReceipt(tx_hash)
-            print("Transazione completata con stato:", receipt['status'])
-
+            company.add_consecutive_segment()
+            pass
         elif choice == "4":
-            dynamic_consecutive_segment_id = input(
-                "Inserisci l'ID del segmento consecutivo dinamico: ")
-            consecutive_segment_id = input(
-                "Inserisci l'ID del segmento consecutivo associato: ")
-            tx_hash = contract.functions.addDynamicConsecutiveSegment(
-                dynamic_consecutive_segment_id, consecutive_segment_id).transact()
-            receipt = w3.eth.waitForTransactionReceipt(tx_hash)
-            print("Transazione completata con stato:", receipt['status'])
-
+            company.add_dynamic_consecutive_segment()
+            pass
         elif choice == "5":
-            dynamic_segment_id = input(
-                "Inserisci l'ID del segmento dinamico: ")
-            tx_hash = contract.functions.addDynamicSegment(
-                dynamic_segment_id).transact()
-            receipt = w3.eth.waitForTransactionReceipt(tx_hash)
-            print("Transazione completata con stato:", receipt['status'])
-
+            company.add_dynamic_segment()
+            pass
         elif choice == "6":
-            dynamic_segment_id = input(
-                "Inserisci l'ID del segmento dinamico: ")
-            dynamic_consecutive_segment_id = input(
-                "Inserisci l'ID del segmento consecutivo dinamico: ")
-            last_segment_stop = input(
-                "È l'ultima fermata del segmento? (si/no): ").lower() == 'si'
-            tx_hash = contract.functions.addDynamicConsecutiveSegmentToDynamicSegment(
-                dynamic_segment_id, dynamic_consecutive_segment_id, last_segment_stop).transact()
-            receipt = w3.eth.waitForTransactionReceipt(tx_hash)
-            print("Transazione completata con stato:", receipt['status'])
-
+            company.add_dynamic_consecutive_segment_to_dynamic_segment()
+            pass
         elif choice == "7":
-            insert_sample_data()
-
+            company.confirm_train_arrival()
+            pass
         elif choice == "8":
-            print("Uscita.")
+            company.insert_sample_data()
+            pass
+        elif choice == "9":
+            company.add_user_to_blacklist()
+            pass
+        elif choice == "10":
+            company.remove_user_from_blacklist()
+            pass
+        elif choice == "11":
+            console.print("Goodbye!", style="bold red")
             break
-
-        else:
-            print("Opzione non valida. Riprova.")
 
 
 if __name__ == "__main__":
