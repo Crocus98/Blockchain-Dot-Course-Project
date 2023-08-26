@@ -1,6 +1,7 @@
 import logging
 import random
 import time
+import json
 from rich.console import Console
 from rich.prompt import Prompt
 from rich.logging import RichHandler
@@ -10,7 +11,6 @@ import os
 
 load_dotenv()
 
-# Set up logging
 logging.basicConfig(level=logging.INFO, handlers=[RichHandler()])
 logger = logging.getLogger("Company CLI")
 
@@ -19,14 +19,17 @@ console = Console()
 
 class Company:
 
-    def __init__(self, contract_address, private_key):
-        self.web3 = Web3(Web3.HTTPProvider('HTTP://127.0.0.1:7545'))
-        self.contract_address = contract_address
-        self.private_key = private_key
-        self.contract = self.web3.eth.contract(
-            address=self.contract_address, abi=YOUR_ABI_HERE)  # Add your ABI
+    def __init__(self):
+        self.web3 = Web3(Web3.HTTPProvider(os.getenv("RPCPROVIDERHOST") + ":"+ os.getenv("RPCPROVIDERPORT")))
+        self.contract_address = os.getenv("CONTRACTADDRESS")
+        with open("/SmartContracts/ABI.json", "r") as abi_file:
+            self.contract_abi = json.load(abi_file)
+        
+        if self.contract_address:
+            self.contract = self.web3.eth.contract(address=self.contract_address, abi=self.contract_abi)
+        else:
+            self.contract = self.deploy_contract()
 
-    # Other class methods ...
 
     def confirm_train_arrival(self):
         train_id = Prompt.ask("Inserisci l'ID del treno")
@@ -293,6 +296,6 @@ def main():
             console.print("Goodbye!", style="bold red")
             break
 
-
+# Run the main function only if this file is being run directly (not imported from another file)
 if __name__ == "__main__":
     main()
