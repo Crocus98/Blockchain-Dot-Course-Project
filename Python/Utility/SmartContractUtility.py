@@ -9,8 +9,7 @@ class SmartContractUtility:
 
     @staticmethod
     def compile_contract(web3, contract_source_path, contract_abi_path, contract_bytecode_path):
-        with open(contract_source_path, "r") as source_file:
-            contract_source_code = source_file.read()
+        contract_source_code = SmartContractUtility.get_contract_source_code(contract_source_path)
 
         compiled_contract = web3.eth.compileContract(contract_source_code)
         contract_abi = compiled_contract["info"]["abiDefinition"]
@@ -27,24 +26,25 @@ class SmartContractUtility:
         return contract_source_code, contract_abi, contract_bytecode
     
     @staticmethod
+    def get_contract_abi(contract_abi_path):
+        with open(contract_abi_path, "r") as abi_file:
+            contract_abi = json.load(abi_file)
+        return contract_abi
+    
+    @staticmethod
+    def get_contract_bytecode(contract_bytecode_path):
+        with open(contract_bytecode_path, "r") as bytecode_file:
+            contract_bytecode = bytecode_file.read()
+        return contract_bytecode
+    
+    @staticmethod
     def get_contract_instance(web3, contract_address, contract_abi):
         return web3.eth.contract(address=contract_address, abi=contract_abi)
 
     @staticmethod
-    def get_contract_source_code(web3, contract_address, contract_abi):
-        return web3.eth.contract(address=contract_address, abi=contract_abi)
-    
-    @staticmethod
-    def estimate_gas_and_price(web3, contract_bytecode, sender_private_key):
-        sender_account = web3.eth.account.privateKeyToAccount(sender_private_key)
-
-        contract = web3.eth.contract(bytecode=contract_bytecode)
-        contract_constructor = contract.constructor()
-
-        estimated_gas = contract_constructor.estimateGas()
-        suggested_gas_price = web3.eth.gasPrice  # Use current suggested gas price
-
-        return estimated_gas, suggested_gas_price
+    def get_contract_source_code(contract_source_path):
+        with open(contract_source_path, "r") as source_file:
+            contract_source_code = source_file.read()
 
     @staticmethod
     def deploy_contract(web3, contract_bytecode, sender_private_key, value = 0, gas_limit=None, gas_price=None):
@@ -73,3 +73,29 @@ class SmartContractUtility:
         tx_receipt = web3.eth.waitForTransactionReceipt(tx_hash)
 
         return tx_receipt.contractAddress
+    
+    @staticmethod
+    def get_contract_instance(web3, contract_address, contract_abi):
+        return web3.eth.contract(address=contract_address, abi=contract_abi)
+    
+    @staticmethod
+    def call_contract_function(web3, contract, function_name, function_params, gas_limit=None, gas_price=None):
+        function = contract.get_function_by_name(function_name)
+
+        if gas_limit is None:
+            gas_limit = function.estimateGas()
+
+        if gas_price is None:
+            gas_price = web3.eth.gasPrice
+
+        function_call = function.buildTransaction({'gas': gas_limit}).data_in_transaction(*function_params)
+
+        # Send the transaction
+        tx_hash = web3.eth.sendTransaction({
+            'to': contract.address,
+            'data': function_call,
+            'gas': gas_limit,
+            'gasPrice': gas_price,
+        })
+
+        return tx_hash

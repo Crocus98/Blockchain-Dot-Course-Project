@@ -4,6 +4,7 @@ from rich.prompt import Prompt
 from rich.console import Console
 from rich.table import Table
 from rich.logging import RichHandler
+from Utility.SmartContractUtility import SmartContractUtility
 
 # Configure Logging
 logging.basicConfig(level=logging.INFO, handlers=[RichHandler()])
