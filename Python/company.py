@@ -8,6 +8,7 @@ from rich.logging import RichHandler
 from web3 import Web3
 from dotenv import load_dotenv
 import os
+from Utility.SmartContractUtility import SmartContractUtility
 
 load_dotenv()
 
