@@ -6,7 +6,7 @@ from rich.console import Console
 from rich.prompt import Prompt
 from rich.logging import RichHandler
 from web3 import Web3
-from dotenv import load_dotenv
+from dotenv import load_dotenv, find_dotenv
 import os
 from Utility.SmartContractUtility import SmartContractUtility
 
@@ -22,6 +22,7 @@ class Company:
 
     def __init__(self):
         self.web3 = SmartContractUtility.web3_instance(os.getenv("RPCPROVIDERHOST") + ":"+ os.getenv("RPCPROVIDERPORT"))
+        self.dot_env_path = find_dotenv()
         self.contract_address = os.getenv("CONTRACTADDRESS")
         self.contract_abi_path = os.getenv("CONTRACTABIPATH")
         self.contract_bytecode_path = os.getenv("CONTRACTBYTECODEPATH")
@@ -37,6 +38,7 @@ class Company:
             self.contract_source_code, self.contract_abi, self.contract_bytecode = SmartContractUtility.compile_contract(self.web3, self.contract_source_path, self.contract_abi_path, self.contract_bytecode_path, self.contract_name)
             self.contract = SmartContractUtility.deploy_contract(self.web3, self.contract_abi, self.contract_bytecode, self.company_private_key)
             self.contract_address = self.contract.address
+            SmartContractUtility.set_contract_address_in_env(self.contract_address, self.dot_env_path)
             console.print(f"Contract deployed at address {self.contract_address}", style="bold green")
             
         self.contract = SmartContractUtility.get_contract_instance(self.web3, self.contract_address, self.contract_abi)

@@ -1,6 +1,7 @@
 from web3 import Web3
 from solcx import compile_standard
 import json
+from dotenv import dotenv_values, set_key
 
 class SmartContractUtility:
 
@@ -92,6 +93,15 @@ class SmartContractUtility:
         tx_receipt = web3.eth.waitForTransactionReceipt(tx_hash)
 
         return tx_receipt.contractAddress
+    
+    @staticmethod
+    def set_contract_address_in_env(address, dotenv_path):
+        env_file_path = dotenv_path
+        env_values = dotenv_values(env_file_path)
+
+        env_values["CONTRACTADDRESS"] = address
+
+        set_key(env_file_path, "CONTRACTADDRESS", address)
     
     @staticmethod
     def call_contract_function(web3, contract, function_name, function_params, gas_limit=None, gas_price=None):
