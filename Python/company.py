@@ -21,15 +21,25 @@ console = Console()
 class Company:
 
     def __init__(self):
-        self.web3 = Web3(Web3.HTTPProvider(os.getenv("RPCPROVIDERHOST") + ":"+ os.getenv("RPCPROVIDERPORT")))
+        self.web3 = SmartContractUtility.web3_instance(os.getenv("RPCPROVIDERHOST") + ":"+ os.getenv("RPCPROVIDERPORT"))
         self.contract_address = os.getenv("CONTRACTADDRESS")
-        with open("/SmartContracts/ABI.json", "r") as abi_file:
-            self.contract_abi = json.load(abi_file)
+        self.contract_abi_path = os.getenv("CONTRACTABIPATH")
+        self.contract_bytecode_path = os.getenv("CONTRACTBYTECODEPATH")
+        self.contract_source_path = os.getenv("CONTRACTSOURCEPATH")
+        self.company_private_key = os.getenv("PRIVATEKEY0")
         
         if self.contract_address:
-            self.contract = self.web3.eth.contract(address=self.contract_address, abi=self.contract_abi)
+            self.contract_abi = SmartContractUtility.get_contract_abi(self.contract_abi_path)
+            self.contract_source_code = SmartContractUtility.get_contract_source_code(self.contract_source_path)
+            self.contract_bytecode = SmartContractUtility.get_contract_bytecode(self.contract_bytecode_path)
         else:
-            self.contract = self.deploy_contract()
+            self.contract_source_code, self.contract_abi, self.contract_bytecode = SmartContractUtility.compile_contract(self.web3, self.contract_source_path, self.contract_abi_path, self.contract_bytecode_path)
+            self.contract = SmartContractUtility.deploy_contract(self.web3, self.contract_bytecode, self.company_private_key)
+            self.contract_address = self.contract.address
+            console.print(f"Contract deployed at address {self.contract_address}", style="bold green")
+            
+        self.contract = SmartContractUtility.get_contract_instance(self.web3, self.contract_address, self.contract_abi)
+        console.print(f"Contract instance obtained for contract at address {self.contract_address}", style="bold green")
 
 
     def confirm_train_arrival(self):

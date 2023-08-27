@@ -5,6 +5,7 @@ from rich.console import Console
 from rich.table import Table
 from rich.logging import RichHandler
 from Utility.SmartContractUtility import SmartContractUtility
+import os
 
 # Configure Logging
 logging.basicConfig(level=logging.INFO, handlers=[RichHandler()])
@@ -14,11 +15,13 @@ console = Console()
 
 
 class User:
-    def __init__(self, contract_address, private_key):
-        self.web3 = Web3(Web3.HTTPProvider('HTTP://127.0.0.1:7545'))
-        self.private_key = private_key
-        self.contract = self.web3.eth.contract(
-            address=contract_address, abi=YOUR_ABI_HERE)  # Replace with your ABI
+    def __init__(self):
+        self.web3 = SmartContractUtility.web3_instance(os.getenv("RPCPROVIDERHOST") + ":"+ os.getenv("RPCPROVIDERPORT"))
+        self.contract_address = os.getenv("CONTRACTADDRESS")
+        self.contract_abi_path = os.getenv("CONTRACTABIPATH")
+        self.contract_abi = SmartContractUtility.get_contract_abi(self.contract_abi_path)
+        self.contract = SmartContractUtility.get_contract_instance(self.web3, self.contract_address, self.contract_abi)
+        console.print(f"Contract instance obtained for contract at address {self.contract_address}", style="bold green")
 
     def view_profile(self):
         # Display user's previous activities, tickets, refunds, etc.

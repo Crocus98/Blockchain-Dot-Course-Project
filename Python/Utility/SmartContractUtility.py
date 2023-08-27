@@ -75,10 +75,6 @@ class SmartContractUtility:
         return tx_receipt.contractAddress
     
     @staticmethod
-    def get_contract_instance(web3, contract_address, contract_abi):
-        return web3.eth.contract(address=contract_address, abi=contract_abi)
-    
-    @staticmethod
     def call_contract_function(web3, contract, function_name, function_params, gas_limit=None, gas_price=None):
         function = contract.get_function_by_name(function_name)
 
