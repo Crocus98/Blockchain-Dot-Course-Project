@@ -27,21 +27,22 @@ class Company:
         self.contract_bytecode_path = os.getenv("CONTRACTBYTECODEPATH")
         self.contract_source_path = os.getenv("CONTRACTSOURCEPATH")
         self.company_private_key = os.getenv("PRIVATEKEY0")
+        self.contract_name = os.getenv("CONTRACTNAME")
         
         if self.contract_address:
             self.contract_abi = SmartContractUtility.get_contract_abi(self.contract_abi_path)
             self.contract_source_code = SmartContractUtility.get_contract_source_code(self.contract_source_path)
             self.contract_bytecode = SmartContractUtility.get_contract_bytecode(self.contract_bytecode_path)
         else:
-            self.contract_source_code, self.contract_abi, self.contract_bytecode = SmartContractUtility.compile_contract(self.web3, self.contract_source_path, self.contract_abi_path, self.contract_bytecode_path)
-            self.contract = SmartContractUtility.deploy_contract(self.web3, self.contract_bytecode, self.company_private_key)
+            self.contract_source_code, self.contract_abi, self.contract_bytecode = SmartContractUtility.compile_contract(self.web3, self.contract_source_path, self.contract_abi_path, self.contract_bytecode_path, self.contract_name)
+            self.contract = SmartContractUtility.deploy_contract(self.web3, self.contract_abi, self.contract_bytecode, self.company_private_key)
             self.contract_address = self.contract.address
             console.print(f"Contract deployed at address {self.contract_address}", style="bold green")
             
         self.contract = SmartContractUtility.get_contract_instance(self.web3, self.contract_address, self.contract_abi)
         console.print(f"Contract instance obtained for contract at address {self.contract_address}", style="bold green")
 
-
+""""
     def confirm_train_arrival(self):
         train_id = Prompt.ask("Inserisci l'ID del treno")
         dynamic_consecutive_segment_id = Prompt.ask(
@@ -226,7 +227,7 @@ class Company:
                 logger.error(f"Failed to remove user from blacklist: {e}")
 
     # ... Other methods se necessari savageee ...
-
+"""
 
 def main():
     logo = """
@@ -248,11 +249,7 @@ def main():
 =========================================oo--oo==oo--OOO\\======================================
     """
     console.print(logo, style="bold blue")
-    console.print(
-        "Welcome to [bold blue]Company CLI[/bold blue]!", style="bold red")
-    company = Company(contract_address="your_contract_address_here",
-                      private_key="your_private_key_here")
-
+    console.print("Welcome to [bold blue]Company CLI[/bold blue]!", style="bold red")
     options = {
         "1": "Add Train",
         "2": "Add Station",
@@ -266,6 +263,7 @@ def main():
         "10": "Rimuovi un utente dalla blacklist",
         "11": "Exit"
     }
+    company = Company()
 
     while True:
         console.print("\n[bold green]Please choose an action:[/bold green]")
@@ -276,6 +274,7 @@ def main():
 
         if choice == "1":
             company.add_train()
+            pass
         elif choice == "2":
             company.add_station()
             pass
@@ -306,6 +305,10 @@ def main():
         elif choice == "11":
             console.print("Goodbye!", style="bold red")
             break
+        console.clear()
+        console.print(logo, style="bold blue")
+        console.print("Welcome to [bold blue]Company CLI[/bold blue]!", style="bold red")
+        
 
 # Run the main function only if this file is being run directly (not imported from another file)
 if __name__ == "__main__":

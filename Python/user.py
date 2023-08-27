@@ -22,7 +22,7 @@ class User:
         self.contract_abi = SmartContractUtility.get_contract_abi(self.contract_abi_path)
         self.contract = SmartContractUtility.get_contract_instance(self.web3, self.contract_address, self.contract_abi)
         console.print(f"Contract instance obtained for contract at address {self.contract_address}", style="bold green")
-
+"""
     def view_profile(self):
         # Display user's previous activities, tickets, refunds, etc.
         # For simplicity, let's display some dummy data. This would require querying the blockchain for actual data.
@@ -82,7 +82,7 @@ class User:
             logger.error(f"Error setting arrival time: {str(e)}")
             self.console.print(
                 f"Error setting arrival time: {str(e)}", style="bold red")
-
+"""
 
 def main():
     console.print(
