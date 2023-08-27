@@ -2,13 +2,12 @@ import logging
 from rich.console import Console
 from rich.prompt import Prompt
 from rich.logging import RichHandler
-from web3 import Web3
 from dotenv import load_dotenv, find_dotenv
 import os
 from Utility.SmartContractUtility import SmartContractUtility
 
 logging.basicConfig(level=logging.INFO, handlers=[RichHandler()])
-logger = logging.getLogger(__name__)
+logger = logging.getLogger("Company")
 
 load_dotenv()
 console = Console()
@@ -30,7 +29,7 @@ class Company:
             self.contract_source_code = SmartContractUtility.get_contract_source_code(self.contract_source_path)
             self.contract_bytecode = SmartContractUtility.get_contract_bytecode(self.contract_bytecode_path)
         else:
-            self.contract_source_code, self.contract_abi, self.contract_bytecode = SmartContractUtility.compile_contract(self.web3, self.contract_source_path, self.contract_abi_path, self.contract_bytecode_path, self.contract_name)
+            self.contract_source_code, self.contract_abi, self.contract_bytecode = SmartContractUtility.compile_contract(self.contract_source_path, self.contract_abi_path, self.contract_bytecode_path, self.contract_name)
             self.contract_address = SmartContractUtility.deploy_contract(self.web3, self.contract_abi, self.contract_bytecode, self.company_private_key)
             SmartContractUtility.set_contract_address_in_env(self.contract_address, self.dot_env_path)
             console.print(f"Contract deployed at address {self.contract_address}", style="bold green")
@@ -38,6 +37,19 @@ class Company:
         self.contract = SmartContractUtility.get_contract_instance(self.web3, self.contract_address, self.contract_abi)
         console.print(f"Contract instance obtained for contract at address {self.contract_address}", style="bold green")
 
+    def add_train(self):
+        trainId = Prompt.ask("Enter the train ID")
+        trainName = Prompt.ask("Enter the train name")
+        maxPassengersNumber = int(Prompt.ask("Enter the max passengers number"))
+        if Prompt.ask("Are you sure you want to add this train? [yes/no]", choices=["yes", "no"]) == "yes":
+            try:
+                function_params = [trainId, trainName, maxPassengersNumber]
+                SmartContractUtility.call_contract_function(self.web3, self.contract, "addTrain", function_params ,self.company_private_key)
+                console.print(f"Train {trainName} added successfully!", style="bold green")
+            except Exception as e:
+                logger.error(f"Failed to add train: {e}")
+        else :
+            console.print("Train not added!", style="bold red")
 """"
     def confirm_train_arrival(self):
         train_id = Prompt.ask("Inserisci l'ID del treno")
@@ -82,18 +94,6 @@ class Company:
         except Exception as e:
             logger.error(f"Errore nell'inserimento dei dati di esempio: {e}")
 
-    def add_train(self):
-        name = Prompt.ask("Enter the train name")
-        description = Prompt.ask("Enter the train description")
-        max_passengers = Prompt.ask("Enter the max passengers", int)
-        if Prompt.ask("Are you sure you want to add this train? [yes/no]", choices=["yes", "no"]) == "yes":
-            try:
-                self.contract.functions.addTrain(name, description, max_passengers).transact({
-                    "from": self.web3.eth.defaultAccount})
-                console.print(
-                    f"Train {name} added successfully!", style="bold green")
-            except Exception as e:
-                logger.error(f"Failed to add train: {e}")
 
     def add_station(self):
         station_id = Prompt.ask("Enter the station ID")
@@ -296,6 +296,7 @@ def main():
             console.print("Goodbye!", style="bold red")
             break
         
+        input()
         console.clear()
         
 

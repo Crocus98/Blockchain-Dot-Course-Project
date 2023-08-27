@@ -1,5 +1,4 @@
 import logging
-from web3 import Web3
 from rich.prompt import Prompt
 from rich.console import Console
 from rich.table import Table
@@ -9,7 +8,7 @@ import os
 from dotenv import load_dotenv
 
 logging.basicConfig(level=logging.INFO, handlers=[RichHandler()])
-logger = logging.getLogger("Company CLI")
+logger = logging.getLogger("User")
 
 load_dotenv()
 console = Console()
@@ -22,6 +21,7 @@ class User:
         self.contract_abi = SmartContractUtility.get_contract_abi(self.contract_abi_path)
         self.contract = SmartContractUtility.get_contract_instance(self.web3, self.contract_address, self.contract_abi)
         console.print(f"Contract instance obtained for contract at address {self.contract_address}", style="bold green")
+
 """
     def view_profile(self):
         # Display user's previous activities, tickets, refunds, etc.
@@ -141,6 +141,7 @@ def main():
             console.print("Goodbye!", style="bold red")
             break
         
+        input()
         console.clear()
 
 

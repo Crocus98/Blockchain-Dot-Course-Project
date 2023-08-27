@@ -9,7 +9,7 @@ class SmartContractUtility:
         return Web3(Web3.HTTPProvider(provider))
 
     @staticmethod
-    def compile_contract(web3, contract_source_path, contract_abi_path, contract_bytecode_path, contract_name):
+    def compile_contract(contract_source_path, contract_abi_path, contract_bytecode_path, contract_name):
         contract_source_code = SmartContractUtility.get_contract_source_code(contract_source_path)
         
         compiled_contract = compile_standard({
@@ -70,7 +70,7 @@ class SmartContractUtility:
     @staticmethod
     def deploy_contract(web3, contract_abi, contract_bytecode, sender_private_key, value = None, gas_limit=None, gas_price=None):
         sender_account = web3.eth.account.from_key(str(sender_private_key))
-        nonce = web3.eth.get_transaction_count(sender_account.address, "pending")
+        nonce = web3.eth.get_transaction_count(sender_account.address)
 
         contract = web3.eth.contract(abi=contract_abi, bytecode=contract_bytecode)
         contract_constructor = contract.constructor()
@@ -108,23 +108,35 @@ class SmartContractUtility:
         set_key(env_file_path, "CONTRACTADDRESS", address)
     
     @staticmethod
-    def call_contract_function(web3, contract, function_name, function_params, gas_limit=None, gas_price=None):
+    def call_contract_function(web3, contract, function_name, function_params, sender_private_key, value=None, gas_limit=None, gas_price=None):
+        sender_account = web3.eth.account.from_key(str(sender_private_key))
         function = contract.get_function_by_name(function_name)
 
-        if gas_limit is None:
-            gas_limit = function.estimateGas()
-
         if gas_price is None:
-            gas_price = web3.eth.gasPrice
+            gas_price = web3.eth.gas_price
 
-        function_call = function.buildTransaction({'gas': gas_limit}).data_in_transaction(*function_params)
-
-        # Send the transaction
-        tx_hash = web3.eth.sendTransaction({
-            'to': contract.address,
-            'data': function_call,
+        if gas_limit is None:
+            gas_limit = contract.functions[function_name](*function_params).estimate_gas({'from': sender_account.address})
+        
+        nonce = web3.eth.get_transaction_count(sender_account.address)
+        
+        transaction_data = {
+            'nonce': nonce,
             'gas': gas_limit,
             'gasPrice': gas_price,
-        })
+        }
+        
+        if value is not None:
+            transaction_data['value'] = value
+        
+        transaction_data = function(*function_params).build_transaction(transaction_data)
+        
+        signed_txn = sender_account.sign_transaction(transaction_data)
+        tx_hash = web3.eth.send_raw_transaction(signed_txn.rawTransaction)
 
         return tx_hash
+
+
+
+
+
