@@ -29,7 +29,7 @@ class Company:
         self.contract_source_path = os.getenv("CONTRACTSOURCEPATH")
         self.company_private_key = os.getenv("PRIVATEKEY0")
         self.contract_name = os.getenv("CONTRACTNAME")
-        
+    
         if self.contract_address:
             self.contract_abi = SmartContractUtility.get_contract_abi(self.contract_abi_path)
             self.contract_source_code = SmartContractUtility.get_contract_source_code(self.contract_source_path)
@@ -40,7 +40,7 @@ class Company:
             self.contract_address = self.contract.address
             SmartContractUtility.set_contract_address_in_env(self.contract_address, self.dot_env_path)
             console.print(f"Contract deployed at address {self.contract_address}", style="bold green")
-            
+
         self.contract = SmartContractUtility.get_contract_instance(self.web3, self.contract_address, self.contract_abi)
         console.print(f"Contract instance obtained for contract at address {self.contract_address}", style="bold green")
 

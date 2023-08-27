@@ -76,7 +76,7 @@ class SmartContractUtility:
             gas_price = web3.eth.gas_price
         
         if gas_limit is None:
-            gas_limit = 3000000 #contract_constructor.estimate_gas()
+            gas_limit = 400000 #contract_constructor.estimate_gas()
         
         if value is None:
             value = web3.to_wei(1, 'ether')
