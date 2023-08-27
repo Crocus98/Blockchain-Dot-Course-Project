@@ -6,13 +6,13 @@ from rich.table import Table
 from rich.logging import RichHandler
 from Utility.SmartContractUtility import SmartContractUtility
 import os
+from dotenv import load_dotenv
 
-# Configure Logging
 logging.basicConfig(level=logging.INFO, handlers=[RichHandler()])
-logger = logging.getLogger(__name__)
+logger = logging.getLogger("Company CLI")
 
+load_dotenv()
 console = Console()
-
 
 class User:
     def __init__(self):
@@ -85,11 +85,24 @@ class User:
 """
 
 def main():
-    console.print(
-        "Welcome to [bold blue]User CLI[/bold blue]!", style="bold yellow")
-    user = User(contract_address="your_contract_address_here",
-                private_key="your_private_key_here")
-
+    logo = """
+  /$$$$$$ /$$               /$$                 /$$$$$$$$                 /$$                    
+|_  $$_/| $$              | $$                |__  $$__/                |__/                    
+  | $$ /$$$$$$    /$$$$$$ | $$ /$$   /$$         | $$  /$$$$$$  /$$$$$$  /$$ /$$$$$$$   /$$$$$$$
+  | $$|_  $$_/   |____  $$| $$| $$  | $$         | $$ /$$__  $$|____  $$| $$| $$__  $$ /$$_____/
+  | $$  | $$      /$$$$$$$| $$| $$  | $$         | $$| $$  \__/ /$$$$$$$| $$| $$  \ $$|  $$$$$$ 
+  | $$  | $$ /$$ /$$__  $$| $$| $$  | $$         | $$| $$      /$$__  $$| $$| $$  | $$ \____  $$
+ /$$$$$$|  $$$$/|  $$$$$$$| $$|  $$$$$$$         | $$| $$     |  $$$$$$$| $$| $$  | $$ /$$$$$$$/
+|______/ \___/   \_______/|__/ \____  $$         |__/|__/      \_______/|__/|__/  |__/|_______/ 
+                               /$$  | $$                                                        
+                              |  $$$$$$/                                                        
+                               \______/  
+                                            o  o  O  O
+                                        ,_____  ____    O
+                                        | G V \_|[]|_'__Y
+                                        |_M_S___|__|_|__|}
+=========================================oo--oo==oo--OOO\\======================================
+    """
     options = {
         "1": "View Profile",
         "2": "View Available Trains",
@@ -98,14 +111,22 @@ def main():
         "5": "Set arrival time and check refunds",
         "6": "Exit"
     }
+    user = User()
 
     while True:
+        console.print(logo, style="bold blue")
+        console.print("Welcome to [bold blue]User CLI[/bold blue]!", style="bold yellow")
         console.print("\n[bold green]Please choose an action:[/bold green]")
         for key, value in options.items():
             console.print(f"{key}. {value}")
-
-        choice = Prompt.ask("Enter your choice", choices=list(options.keys()))
-
+        
+        
+        try:
+            choice = Prompt.ask("Enter your choice", choices=list(options.keys()))
+        except Exception:
+            console.print("Invalid choice!", style="bold red")
+            continue
+    
         if choice == "1":
             user.view_profile()
         elif choice == "2":
@@ -119,6 +140,8 @@ def main():
         elif choice == "6":
             console.print("Goodbye!", style="bold red")
             break
+        
+        console.clear()
 
 
 if __name__ == '__main__':

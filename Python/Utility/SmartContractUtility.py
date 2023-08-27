@@ -2,7 +2,6 @@ from web3 import Web3
 from solcx import compile_standard
 import json
 from dotenv import dotenv_values, set_key
-
 class SmartContractUtility:
 
     @staticmethod
@@ -12,7 +11,7 @@ class SmartContractUtility:
     @staticmethod
     def compile_contract(web3, contract_source_path, contract_abi_path, contract_bytecode_path, contract_name):
         contract_source_code = SmartContractUtility.get_contract_source_code(contract_source_path)
-
+        
         compiled_contract = compile_standard({
             "language": "Solidity",
             "sources": {
@@ -25,6 +24,10 @@ class SmartContractUtility:
                     "*": {
                         "*": ["abi", "evm.bytecode"],
                     },
+                },
+                "optimizer": {
+                    "enabled": True,
+                    "runs": 200    
                 },
             },
         })
@@ -76,7 +79,7 @@ class SmartContractUtility:
             gas_price = web3.eth.gas_price
         
         if gas_limit is None:
-            gas_limit = 400000 #contract_constructor.estimate_gas()
+            gas_limit = 3000000 #contract_constructor.estimate_gas()
         
         if value is None:
             value = web3.to_wei(1, 'ether')
@@ -90,8 +93,9 @@ class SmartContractUtility:
         }
 
         tx_hash = contract_constructor.transact(tx_params)
-        tx_receipt = web3.eth.waitForTransactionReceipt(tx_hash)
+        tx_receipt = web3.eth.wait_for_transaction_receipt(tx_hash)
 
+        print("Contract address: " + tx_receipt.contractAddress)
         return tx_receipt.contractAddress
     
     @staticmethod

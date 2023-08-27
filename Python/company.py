@@ -1,7 +1,4 @@
 import logging
-import random
-import time
-import json
 from rich.console import Console
 from rich.prompt import Prompt
 from rich.logging import RichHandler
@@ -10,13 +7,11 @@ from dotenv import load_dotenv, find_dotenv
 import os
 from Utility.SmartContractUtility import SmartContractUtility
 
-load_dotenv()
-
 logging.basicConfig(level=logging.INFO, handlers=[RichHandler()])
-logger = logging.getLogger("Company CLI")
+logger = logging.getLogger(__name__)
 
+load_dotenv()
 console = Console()
-
 
 class Company:
 
@@ -36,8 +31,7 @@ class Company:
             self.contract_bytecode = SmartContractUtility.get_contract_bytecode(self.contract_bytecode_path)
         else:
             self.contract_source_code, self.contract_abi, self.contract_bytecode = SmartContractUtility.compile_contract(self.web3, self.contract_source_path, self.contract_abi_path, self.contract_bytecode_path, self.contract_name)
-            self.contract = SmartContractUtility.deploy_contract(self.web3, self.contract_abi, self.contract_bytecode, self.company_private_key)
-            self.contract_address = self.contract.address
+            self.contract_address = SmartContractUtility.deploy_contract(self.web3, self.contract_abi, self.contract_bytecode, self.company_private_key)
             SmartContractUtility.set_contract_address_in_env(self.contract_address, self.dot_env_path)
             console.print(f"Contract deployed at address {self.contract_address}", style="bold green")
 
@@ -250,8 +244,6 @@ def main():
                                         |_M_S___|__|_|__|}
 =========================================oo--oo==oo--OOO\\======================================
     """
-    console.print(logo, style="bold blue")
-    console.print("Welcome to [bold blue]Company CLI[/bold blue]!", style="bold red")
     options = {
         "1": "Add Train",
         "2": "Add Station",
@@ -268,48 +260,43 @@ def main():
     company = Company()
 
     while True:
+        console.print(logo, style="bold blue")
+        console.print("Welcome to [bold blue]Company CLI[/bold blue]!", style="bold red")
         console.print("\n[bold green]Please choose an action:[/bold green]")
         for key, value in options.items():
             console.print(f"{key}. {value}")
-
-        choice = Prompt.ask("Enter your choice", choices=list(options.keys()))
+            
+        try:
+            choice = Prompt.ask("Enter your choice", choices=list(options.keys()))
+        except Exception:
+            console.print("Invalid choice!", style="bold red")
+            continue
 
         if choice == "1":
             company.add_train()
-            pass
         elif choice == "2":
             company.add_station()
-            pass
         elif choice == "3":
             company.add_consecutive_segment()
-            pass
         elif choice == "4":
             company.add_dynamic_consecutive_segment()
-            pass
         elif choice == "5":
             company.add_dynamic_segment()
-            pass
         elif choice == "6":
             company.add_dynamic_consecutive_segment_to_dynamic_segment()
-            pass
         elif choice == "7":
             company.confirm_train_arrival()
-            pass
         elif choice == "8":
             company.insert_sample_data()
-            pass
         elif choice == "9":
             company.add_user_to_blacklist()
-            pass
         elif choice == "10":
             company.remove_user_from_blacklist()
-            pass
         elif choice == "11":
             console.print("Goodbye!", style="bold red")
             break
+        
         console.clear()
-        console.print(logo, style="bold blue")
-        console.print("Welcome to [bold blue]Company CLI[/bold blue]!", style="bold red")
         
 
 # Run the main function only if this file is being run directly (not imported from another file)
