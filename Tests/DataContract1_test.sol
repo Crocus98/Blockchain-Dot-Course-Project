@@ -16,7 +16,7 @@ contract Test1 {
     TestUser2 testUser2;
     TrainsOracle trainsContract;
 
-    uint256 internalTimeTest = 1704067200;
+    uint256 arrivalTimeOffsetTestValue = 1704067200;
 
     function beforeAll() public {
         owner = address(this);
@@ -59,13 +59,17 @@ contract Test1 {
         }
         Assert.equal(success, true, "Owner should be able to add a station");
 
+        uint256 arrivalTimeOffset1 = (arrivalTimeOffsetTestValue + 1800) %
+            86400;
+        uint256 arrivalTimeDay1 = (arrivalTimeOffsetTestValue + 1800) -
+            arrivalTimeOffset1;
         try
             trainsContract.addConsecutiveSegment(
                 "CS1",
                 "T1",
                 "S1",
                 "S2",
-                internalTimeTest + 1800,
+                arrivalTimeOffset1,
                 5000000000000000000
             )
         {
@@ -79,13 +83,17 @@ contract Test1 {
             "Owner should be able to add a consecutive segment"
         );
 
+        uint256 arrivalTimeOffset2 = (arrivalTimeOffsetTestValue + 1800) %
+            86400;
+        uint256 arrivalTimeDay2 = (arrivalTimeOffsetTestValue + 1800) -
+            arrivalTimeOffset2;
         try
             trainsContract.addConsecutiveSegment(
                 "CS2",
                 "T1",
                 "S2",
                 "S3",
-                internalTimeTest + 3600,
+                arrivalTimeOffset2,
                 3000000000000000000
             )
         {
@@ -99,7 +107,13 @@ contract Test1 {
             "Owner should be able to add a consecutive segment"
         );
 
-        try trainsContract.addDynamicConsecutiveSegment("DCS1", "CS1") {
+        try
+            trainsContract.addDynamicConsecutiveSegment(
+                "DCS1",
+                "CS1",
+                arrivalTimeDay1
+            )
+        {
             success = true;
         } catch {
             success = false;
@@ -110,7 +124,13 @@ contract Test1 {
             "Owner should be able to add a dynamic consecutive segment"
         );
 
-        try trainsContract.addDynamicConsecutiveSegment("DCS2", "CS2") {
+        try
+            trainsContract.addDynamicConsecutiveSegment(
+                "DCS2",
+                "CS2",
+                arrivalTimeDay2
+            )
+        {
             success = true;
         } catch {
             success = false;
@@ -176,7 +196,7 @@ contract Test1 {
                 "T2",
                 "S1",
                 "S2",
-                internalTimeTest + 20,
+                arrivalTimeOffsetTestValue + 20,
                 10000000000000000000
             )
         {
@@ -196,7 +216,7 @@ contract Test1 {
                 "T1",
                 "S3",
                 "S4",
-                internalTimeTest + 20,
+                arrivalTimeOffsetTestValue + 20,
                 200000000000000000
             )
         {
@@ -216,7 +236,7 @@ contract Test1 {
                 "T1",
                 "S4",
                 "S3",
-                internalTimeTest + 20,
+                arrivalTimeOffsetTestValue + 20,
                 10000000000000000000
             )
         {
@@ -236,7 +256,7 @@ contract Test1 {
                 "T1",
                 "S2",
                 "S2",
-                internalTimeTest + 20,
+                arrivalTimeOffsetTestValue + 20,
                 10000000000000000000
             )
         {
@@ -276,7 +296,7 @@ contract Test1 {
                 "T1",
                 "S1",
                 "S2",
-                internalTimeTest + 20,
+                arrivalTimeOffsetTestValue + 20,
                 0
             )
         {
@@ -293,7 +313,16 @@ contract Test1 {
 
     function testCannotAddDynamicConsecutiveSegmenWithWrongParams() public {
         bool success = false;
-        try trainsContract.addDynamicConsecutiveSegment("DCS3", "CS3") {
+        uint256 arrivalTimeOffset = (arrivalTimeOffsetTestValue + 1800) % 86400;
+        uint256 arrivalTimeDay = (arrivalTimeOffsetTestValue + 1800) -
+            arrivalTimeOffset;
+        try
+            trainsContract.addDynamicConsecutiveSegment(
+                "DCS3",
+                "CS3",
+                arrivalTimeDay
+            )
+        {
             success = true;
         } catch {
             success = false;
@@ -302,6 +331,40 @@ contract Test1 {
             success,
             false,
             "Should not have been able to add a dynamic consecutive segment without a corresponding static one"
+        );
+
+        try
+            trainsContract.addDynamicConsecutiveSegment(
+                "DCS3",
+                "CS2",
+                arrivalTimeDay + 3000
+            )
+        {
+            success = true;
+        } catch {
+            success = false;
+        }
+        Assert.equal(
+            success,
+            false,
+            "Should not have been able to add a dynamic consecutive segment with an arrival time that is not a multiple of 86400 seconds"
+        );
+
+        try
+            trainsContract.addDynamicConsecutiveSegment(
+                "DCS3",
+                "CS2",
+                block.timestamp - 2000
+            )
+        {
+            success = true;
+        } catch {
+            success = false;
+        }
+        Assert.equal(
+            success,
+            false,
+            "Should not have been able to add a dynamic consecutive segment with an arrival in the past"
         );
     }
 
@@ -426,7 +489,7 @@ contract Test1 {
 
     function testCannotSetActualArrivalTimeOfNonExistentSegment() public {
         bool success = true;
-        uint256 simulatedArrivalTime = internalTimeTest + 3000;
+        uint256 simulatedArrivalTime = arrivalTimeOffsetTestValue + 3000;
         try
             trainsContract.setArrivalTimeAndCheckRequiredRefunds(
                 "DCS3",
@@ -445,7 +508,7 @@ contract Test1 {
     }
 
     function testRefundsCalculatedCorrectly() public {
-        uint256 simulatedArrivalTime = internalTimeTest + 4000;
+        uint256 simulatedArrivalTime = arrivalTimeOffsetTestValue + 4000;
         //uint256 initialBalance = address(this).balance;
         trainsContract.setArrivalTimeAndCheckRequiredRefunds(
             "DCS1",

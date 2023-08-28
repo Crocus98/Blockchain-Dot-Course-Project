@@ -21,7 +21,7 @@ contract TrainsOracle {
         string _trainId;
         string _startingStationId;
         string _arrivingStationId;
-        uint256 _arrivalTime;
+        uint256 _arrivalTimeOffset;
         uint256 _price;
         bool _isSet;
     }
@@ -30,6 +30,7 @@ contract TrainsOracle {
     struct DynamicConsecutiveSegment {
         string _consecutiveSegmentId;
         uint16 _passengersNumber;
+        uint256 _arrivalDay;
         uint256 _actualArrivalTime;
         bool _isSet;
     }
@@ -133,15 +134,27 @@ contract TrainsOracle {
 
     function addDynamicConsecutiveSegment(
         string calldata dynamicConsecutiveSegmentId,
-        string calldata consecutiveSegmentId
+        string calldata consecutiveSegmentId,
+        uint256 arrivalDay
     ) public onlyOwner {
         require(
             consecutiveSegments[consecutiveSegmentId]._isSet,
             "Consecutive segment does not exist"
         );
+        require(
+            arrivalDay > (block.timestamp - (block.timestamp % 86400)) &&
+                arrivalDay % 86400 == 0,
+            "Arrival day cannot be in the past and must be a multiple of 86400"
+        );
         dynamicConsecutiveSegments[
             dynamicConsecutiveSegmentId
-        ] = DynamicConsecutiveSegment(consecutiveSegmentId, 0, 0, true);
+        ] = DynamicConsecutiveSegment(
+            consecutiveSegmentId,
+            0,
+            arrivalDay,
+            0,
+            true
+        );
     }
 
     function addDynamicSegment(
@@ -258,7 +271,8 @@ contract TrainsOracle {
         uint256 arrivalTime = consecutiveSegments[
             dynamicConsecutiveSegments[dynamicConsecutiveSegmentId]
                 ._consecutiveSegmentId
-        ]._arrivalTime;
+        ]._arrivalTimeOffset +
+            dynamicConsecutiveSegments[dynamicConsecutiveSegmentId]._arrivalDay;
 
         uint256 delay = 0;
         if (actualArrivalTime > arrivalTime) {
