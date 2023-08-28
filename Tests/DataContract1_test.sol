@@ -16,13 +16,8 @@ contract Test1 {
     TestUser2 testUser2;
     TrainsOracle trainsContract;
 
-    uint256 arrivalTimeOffsetTestValue = 1704067200;
-    uint256 arrivalTimeOffset1 = (arrivalTimeOffsetTestValue + 1800) % 1 days;
-    uint256 arrivalTimeDay1 =
-        (arrivalTimeOffsetTestValue + 1800) - arrivalTimeOffset1;
-    uint256 arrivalTimeOffset2 = (arrivalTimeOffsetTestValue + 3600) % 1 days;
-    uint256 arrivalTimeDay2 =
-        (arrivalTimeOffsetTestValue + 3600) - arrivalTimeOffset1;
+    uint256 arrivalTimeOffset = 1704067200 + 30 minutes;
+    uint256 arrivalDay = arrivalTimeOffset % 1 days;
 
     function beforeAll() public {
         owner = address(this);
@@ -71,7 +66,7 @@ contract Test1 {
                 "T1",
                 "S1",
                 "S2",
-                arrivalTimeOffset1,
+                arrivalTimeOffset,
                 5000000000000000000
             )
         {
@@ -91,7 +86,7 @@ contract Test1 {
                 "T1",
                 "S2",
                 "S3",
-                arrivalTimeOffset2,
+                arrivalTimeOffset + 30 minutes,
                 3000000000000000000
             )
         {
@@ -109,7 +104,7 @@ contract Test1 {
             trainsContract.addDynamicConsecutiveSegment(
                 "DCS1",
                 "CS1",
-                arrivalTimeDay1
+                arrivalDay
             )
         {
             success = true;
@@ -126,7 +121,7 @@ contract Test1 {
             trainsContract.addDynamicConsecutiveSegment(
                 "DCS2",
                 "CS2",
-                arrivalTimeDay2
+                arrivalDay
             )
         {
             success = true;
@@ -274,7 +269,7 @@ contract Test1 {
                 "T1",
                 "S1",
                 "S2",
-                arrivalTimeOffsetTestValue + 20,
+                10 hours,
                 0
             )
         {
@@ -291,15 +286,11 @@ contract Test1 {
 
     function testCannotAddDynamicConsecutiveSegmenWithWrongParams() public {
         bool success = false;
-        uint256 arrivalTimeOffset = (arrivalTimeOffsetTestValue + 1800) %
-            1 days;
-        uint256 arrivalTimeDay = (arrivalTimeOffsetTestValue + 1800) -
-            arrivalTimeOffset;
         try
             trainsContract.addDynamicConsecutiveSegment(
                 "DCS3",
                 "CS3",
-                arrivalTimeDay
+                arrivalDay
             )
         {
             success = true;
@@ -316,7 +307,7 @@ contract Test1 {
             trainsContract.addDynamicConsecutiveSegment(
                 "DCS3",
                 "CS2",
-                arrivalTimeDay + 3000
+                arrivalDay + 30 minutes
             )
         {
             success = true;
@@ -467,7 +458,7 @@ contract Test1 {
     }
 
     function testRefundsCalculatedCorrectly() public {
-        uint256 simulatedArrivalTime = arrivalTimeOffsetTestValue + 4000;
+        uint256 simulatedArrivalTime = arrivalDay + 4000;
         //uint256 initialBalance = address(this).balance;
         trainsContract.setArrivalTimeAndCheckRequiredRefunds(
             "DCS1",
