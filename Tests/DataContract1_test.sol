@@ -8,12 +8,9 @@ import "@accounts";
 //import "remix_tests.sol";
 
 import "SmartContracts/DataContract.sol";
-import "Tests/DataContractTestUser.sol";
 
 contract Test1 {
     address public owner;
-    TestUser1 testUser1;
-    TestUser2 testUser2;
     TrainsOracle trainsContract;
 
     uint256 arrivalTimeOffset = 1704067200 + 30 minutes;
@@ -22,8 +19,6 @@ contract Test1 {
     function beforeAll() public {
         owner = address(this);
         trainsContract = new TrainsOracle();
-        testUser1 = new TestUser1(payable(trainsContract));
-        testUser2 = new TestUser2(payable(trainsContract));
     }
 
     function beforeEach() public {}
@@ -480,6 +475,7 @@ contract Test1 {
             ? simulatedArrivalTime -
                 (arrivalTimeOffsetForRefund + arrivalDayForRefund)
             : 0;
+
         uint32 refundPercentage;
         if (delay == 0) {
             refundPercentage = 0;
