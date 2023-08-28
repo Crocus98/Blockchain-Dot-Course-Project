@@ -106,7 +106,7 @@ contract TrainsOracle {
         string calldata trainId,
         string calldata startingStationId,
         string calldata arrivingStationId,
-        uint256 arrivalTime,
+        uint256 arrivalTimeOffset,
         uint256 price
     ) public onlyOwner {
         require(trains[trainId]._isSet, "Train does not exist");
@@ -122,7 +122,7 @@ contract TrainsOracle {
             trainId,
             startingStationId,
             arrivingStationId,
-            arrivalTime,
+            arrivalTimeOffset,
             price,
             true
         );
@@ -139,7 +139,7 @@ contract TrainsOracle {
         );
         uint256 time = block.timestamp;
         require(
-            (arrivalDay >= time % 1 days) && (arrivalDay % 1 days == 0),
+            arrivalDay >= time - (time % 1 days) && arrivalDay % 1 days == 0,
             "Arrival day cannot be in the past and must be a multiple of 1 day"
         );
         dynamicConsecutiveSegments[

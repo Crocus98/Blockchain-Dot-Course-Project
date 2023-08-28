@@ -17,7 +17,7 @@ contract Test1 {
     TrainsOracle trainsContract;
 
     uint256 arrivalTimeOffset = 1704067200 + 30 minutes;
-    uint256 arrivalDay = arrivalTimeOffset % 1 days;
+    uint256 arrivalDay = arrivalTimeOffset - (arrivalTimeOffset % 1 days);
 
     function beforeAll() public {
         owner = address(this);
