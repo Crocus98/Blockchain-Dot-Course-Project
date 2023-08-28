@@ -85,8 +85,8 @@ contract TrainsOracle {
         blackList[toBlackList] = true;
     }
 
-    function removeFromBlacklist(address toBlackList) public onlyOwner {
-        blackList[toBlackList] = false;
+    function removeFromBlacklist(address fromBlackList) public onlyOwner {
+        blackList[fromBlackList] = false;
     }
 
     function addTrain(

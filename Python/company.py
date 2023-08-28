@@ -37,212 +37,258 @@ class Company:
         self.contract = SmartContractUtility.get_contract_instance(self.web3, self.contract_address, self.contract_abi)
         console.print(f"Contract instance obtained for contract at address {self.contract_address}", style="bold green")
 
-    def add_train(self):
-        trainId = Prompt.ask("Enter the train ID")
-        trainName = Prompt.ask("Enter the train name")
-        maxPassengersNumber = int(Prompt.ask("Enter the max passengers number"))
-        function_params = [trainId, trainName, maxPassengersNumber]
-        if Prompt.ask("Are you sure you want to add this train? [yes/no]", choices=["yes", "no"]) == "yes":
+    def call_contract_function(self, function_name, function_params):
+        SmartContractUtility.call_contract_function(self.web3, self.contract, function_name, function_params ,self.company_private_key)
+
+    def add_train(self, function_params= None):
+        if function_params is None:
+            trainId = Prompt.ask("Enter the train ID")
+            trainName = Prompt.ask("Enter the train name")
+            maxPassengersNumber = int(Prompt.ask("Enter the max passengers number"))
+            
+            function_params = [trainId, trainName, maxPassengersNumber]
+        else:
+            skip_check = True
+            
+        if skip_check or Prompt.ask("Are you sure you want to add this train? [yes/no]", choices=["yes", "no"]) == "yes":
             try:
-                SmartContractUtility.call_contract_function(self.web3, self.contract, "addTrain", function_params ,self.company_private_key)
-                console.print(f"Train {trainName} added successfully!", style="bold green")
+                self.call_contract_function("addTrain", function_params)
+                console.print(f"Train {function_params[0]} - {function_params[1]} added successfully!", style="bold green")
             except Exception as e:
                 logger.error(f"Failed to add train: {e}")
         else :
             console.print("Train not added!", style="bold red")
     
-    def add_station(self):
-        stationId = Prompt.ask("Enter the station ID")
-        function_params = [stationId]
-        if Prompt.ask("Are you sure you want to add this station? [yes/no]", choices=["yes", "no"]) == "yes":
+    def add_station(self, function_params= None):
+        if function_params is None:
+            stationId = Prompt.ask("Enter the station ID")
+            
+            function_params = [stationId]
+        else:
+            skip_check = True
+            
+        if skip_check or Prompt.ask("Are you sure you want to add this station? [yes/no]", choices=["yes", "no"]) == "yes":
             try:
-                SmartContractUtility.call_contract_function(self.web3, self.contract, "addStation", function_params ,self.company_private_key)
-                console.print(f"Station {stationId} added successfully!", style="bold green")
+                self.call_contract_function("addStation", function_params)
+                console.print(f"Station {function_params[0]} added successfully!", style="bold green")
             except Exception as e:
                 logger.error(f"Failed to add station: {e}")
         else :
             console.print("Station not added!", style="bold red")
         
-    def add_consecutive_segment(self):
-        consecutiveSegmentId = Prompt.ask("Enter the consecutive segment ID")
-        trainId = Prompt.ask("Enter the train ID")
-        startingStationId = Prompt.ask("Enter the starting station ID")
-        arrivingStationId = Prompt.ask("Enter the arriving station ID")
-        arrivalTimeOffset = int(Prompt.ask("Enter the arrival timestamp offset (Timestamp is in seconds: 1 hour = 3600s.\n E.g. train arrives at 2:00 am, offset should be 7200. Train arrives at 2 pm, offset should be 50400.)"))
-        price = int(Prompt.ask("Enter the price of the consecutive segment"))
-        
-        function_params = [consecutiveSegmentId, trainId, startingStationId, arrivingStationId, arrivalTimeOffset, price]
+    def add_consecutive_segment(self, function_params= None):
+        if function_params is None:
+            consecutiveSegmentId = Prompt.ask("Enter the consecutive segment ID")
+            trainId = Prompt.ask("Enter the train ID")
+            startingStationId = Prompt.ask("Enter the starting station ID")
+            arrivingStationId = Prompt.ask("Enter the arriving station ID")
+            arrivalTimeOffset = int(Prompt.ask("Enter the arrival timestamp offset (Timestamp is in seconds: 1 hour = 3600s.\n E.g. train arrives at 2:00 am, offset should be 7200. Train arrives at 2 pm, offset should be 50400.)"))
+            price = int(Prompt.ask("Enter the price of the consecutive segment"))
+            
+            function_params = [consecutiveSegmentId, trainId, startingStationId, arrivingStationId, arrivalTimeOffset, price]
+        else:
+            skip_check = True
 
-        if Prompt.ask(f"Are you sure you want to add this consecutive segment {consecutiveSegmentId}? [yes/no]", choices=["yes", "no"]) == "yes":
+        if skip_check or Prompt.ask(f"Are you sure you want to add this consecutive segment? [yes/no]", choices=["yes", "no"]) == "yes":
             try:
-                SmartContractUtility.call_contract_function(self.web3, self.contract, "addConsecutiveSegment", function_params ,self.company_private_key)
-                console.print(f"Consecutive Segment {consecutiveSegmentId} added successfully!", style="bold green")
+                self.call_contract_function("addConsecutiveSegment", function_params)
+                console.print(f"Consecutive Segment {function_params[0]} added successfully!", style="bold green")
             except Exception as e:
                 logger.error(f"Failed to add consecutive segment: {e}")
         else: 
             console.print("Consecutive segment not added!", style="bold red")
-""""
-    def confirm_train_arrival(self):
-        train_id = Prompt.ask("Inserisci l'ID del treno")
-        dynamic_consecutive_segment_id = Prompt.ask(
-            "Inserisci l'ID del segmento consecutivo dinamico")
+    
+    def add_dynamic_consecutive_segment(self, function_params= None):
+        if function_params is None:
+            dynamicConsecutiveSegmentId = Prompt.ask("Enter the dynamic consecutive segment ID")
+            consecutiveSegmentId = Prompt.ask("Enter the consecutive segment ID")
+            arrivalDay = int(Prompt.ask("Enter the arrival day timestamp (must be multiple of 86400 seconds = 1 day)"))
 
-        is_delayed = random.random() < 0.3
-
-        if is_delayed:
-            console.print(
-                f"Il treno {train_id} è in ritardo!", style="bold red")
-            actual_arrival_time = Prompt.ask(
-                "Inserisci l'orario di arrivo effettivo (timestamp UNIX)", int)
-            try:
-                self.contract.functions.setArrivalTimeAndCheckRequiredRefunds(
-                    dynamic_consecutive_segment_id, actual_arrival_time).transact({"from": self.web3.eth.defaultAccount})
-                logger.info(f"Transazione completata per il treno {train_id}")
-            except Exception as e:
-                logger.error(f"Errore nella transazione: {e}")
+            function_params = [dynamicConsecutiveSegmentId, consecutiveSegmentId, arrivalDay]
         else:
-            console.print(
-                f"Il treno {train_id} è arrivato in orario!", style="bold green")
-
-    def insert_sample_data(self):
-        console.print("Inserimento dati di esempio...", style="bold yellow")
-        try:
-            self.contract.functions.addTrain("T1", "Express", 300).transact(
-                {"from": self.web3.eth.defaultAccount})
-            self.contract.functions.addStation("S1").transact(
-                {"from": self.web3.eth.defaultAccount})
-            self.contract.functions.addStation("S2").transact(
-                {"from": self.web3.eth.defaultAccount})
-            self.contract.functions.addConsecutiveSegment("CS1", "T1", "S1", "S2", int(
-                time.time()) + 3600, 50).transact({"from": self.web3.eth.defaultAccount})
-            self.contract.functions.addDynamicConsecutiveSegment(
-                "DCS1", "CS1").transact({"from": self.web3.eth.defaultAccount})
-            self.contract.functions.addDynamicSegment("DS1").transact(
-                {"from": self.web3.eth.defaultAccount})
-            self.contract.functions.addDynamicConsecutiveSegmentToDynamicSegment(
-                "DS1", "DCS1", False).transact({"from": self.web3.eth.defaultAccount})
-            console.print("Dati di esempio inseriti.", style="bold green")
-        except Exception as e:
-            logger.error(f"Errore nell'inserimento dei dati di esempio: {e}")
-
-    def add_consecutive_segment(self):
-        segment_id = Prompt.ask("Enter the consecutive segment ID")
-        train_id = Prompt.ask("Enter the train ID")
-        starting_station_id = Prompt.ask("Enter the starting station ID")
-        arriving_station_id = Prompt.ask("Enter the arriving station ID")
-        arrival_time = Prompt.ask(
-            "Enter the arrival time (UNIX timestamp)", int)
-        price = Prompt.ask("Enter the price", int)
-
-        if Prompt.ask(f"Are you sure you want to add this consecutive segment {segment_id}? [yes/no]", choices=["yes", "no"]) == "yes":
+            skip_check = True
+        
+        if skip_check or Prompt.ask(f"Are you sure you want to add this dynamic consecutive segment? [yes/no]", choices=["yes", "no"]) == "yes":
             try:
-                self.contract.functions.addConsecutiveSegment(
-                    segment_id, train_id, starting_station_id, arriving_station_id, arrival_time, price).transact({"from": self.web3.eth.defaultAccount})
-                console.print(
-                    f"Consecutive Segment {segment_id} added successfully!", style="bold green")
-            except Exception as e:
-                logger.error(f"Failed to add consecutive segment: {e}")
-
-    def add_dynamic_consecutive_segment(self):
-        dynamic_consecutive_segment_id = Prompt.ask(
-            "Enter the dynamic consecutive segment ID")
-        consecutive_segment_id = Prompt.ask("Enter the consecutive segment ID")
-
-        if Prompt.ask(f"Are you sure you want to add this dynamic consecutive segment {dynamic_consecutive_segment_id}? [yes/no]", choices=["yes", "no"]) == "yes":
-            try:
-                self.contract.functions.addDynamicConsecutiveSegment(
-                    dynamic_consecutive_segment_id, consecutive_segment_id).transact({"from": self.web3.eth.defaultAccount})
-                console.print(
-                    f"Dynamic Consecutive Segment {dynamic_consecutive_segment_id} added successfully!", style="bold green")
+                self.call_contract_function("addDynamicConsecutiveSegment", function_params)
+                console.print(f"Dynamic Consecutive Segment {function_params[0]} added successfully!", style="bold green")
             except Exception as e:
                 logger.error(f"Failed to add dynamic consecutive segment: {e}")
-
-    def add_dynamic_segment(self):
-        dynamic_segment_id = Prompt.ask("Enter the dynamic segment ID")
-        if Prompt.ask("Are you sure you want to add this dynamic segment? [yes/no]", choices=["yes", "no"]) == "yes":
+        else:
+            console.print("Dynamic consecutive segment not added!", style="bold red")
+    
+    def add_dynamic_segment(self,function_params= None):
+        if function_params is None: 
+            dynamicSegmentId = Prompt.ask("Enter the dynamic segment ID")
+            
+            function_params = [dynamicSegmentId]
+        else:
+            skip_check = True
+        
+        if skip_check or Prompt.ask("Are you sure you want to add this dynamic segment? [yes/no]", choices=["yes", "no"]) == "yes":
             try:
-                self.contract.functions.addDynamicSegment(dynamic_segment_id).transact(
-                    {"from": self.web3.eth.defaultAccount})
-                console.print(
-                    f"Dynamic Segment {dynamic_segment_id} added successfully!", style="bold green")
+                self.call_contract_function("addDynamicSegment", function_params)
+                console.print(f"Dynamic Segment {function_params[0]} added successfully!", style="bold green")
             except Exception as e:
                 logger.error(f"Failed to add dynamic segment: {e}")
+    
+    def add_dynamic_consecutive_segment_to_dynamic_segment(self, function_params= None):
+        if function_params is None:
+            dynamicSegmentId = Prompt.ask("Enter the dynamic segment ID")
+            dynamicConsecutiveSegmentId = Prompt.ask("Enter the dynamic consecutive segment ID")
+            lastSegmentStop = Prompt.ask("Is this the last segment stop? [yes/no]", choices=["yes", "no"]) == "yes"
 
-    def add_dynamic_consecutive_segment_to_dynamic_segment(self):
-        dynamic_segment_id = Prompt.ask("Enter the dynamic segment ID")
-        dynamic_consecutive_segment_id = Prompt.ask(
-            "Enter the dynamic consecutive segment ID")
-        last_segment_stop = Prompt.ask(
-            "Is this the last segment stop? [yes/no]", choices=["yes", "no"]) == "yes"
-
-        if Prompt.ask(f"Are you sure you want to add dynamic consecutive segment {dynamic_consecutive_segment_id} to dynamic segment {dynamic_segment_id}? [yes/no]", choices=["yes", "no"]) == "yes":
+            function_params = [dynamicSegmentId, dynamicConsecutiveSegmentId, lastSegmentStop]
+        else:
+            skip_check = True
+        
+        if skip_check or Prompt.ask(f"Are you sure you want to add this dynamic consecutive segment to that dynamic segment? [yes/no]", choices=["yes", "no"]) == "yes":
             try:
-                self.contract.functions.addDynamicConsecutiveSegmentToDynamicSegment(
-                    dynamic_segment_id, dynamic_consecutive_segment_id, last_segment_stop).transact({"from": self.web3.eth.defaultAccount})
-                console.print(
-                    f"Dynamic Consecutive Segment {dynamic_consecutive_segment_id} added to Dynamic Segment {dynamic_segment_id} successfully!", style="bold green")
+                self.call_contract_function("addDynamicConsecutiveSegmentToDynamicSegment", function_params)
+                console.print(f"Dynamic Consecutive Segment {function_params[1]} added to Dynamic Segment {function_params[0]} successfully!", style="bold green")
             except Exception as e:
-                logger.error(
-                    f"Failed to add dynamic consecutive segment to dynamic segment: {e}")
+                logger.error(f"Failed to add dynamic consecutive segment to dynamic segment: {e}")
+        else:
+            console.print("Dynamic consecutive segment not added to dynamic segment!", style="bold red")
+    
+    def set_arrival_time_and_check_required_refunds(self, function_params= None):
+        if function_params is None:
+            dynamicConsecutiveSegmentId = Prompt.ask("Enter the dynamic consecutive segment ID")
+            actualArrivalTime = int(Prompt.ask("Enter the actual arrival timestamp"))
+            
+            function_params = [dynamicConsecutiveSegmentId, actualArrivalTime]
+        else:
+            skip_check = True
 
-    def list_all_users(self):
-        # For simplicity, let's assume the contract has a function to list all users (addresses)
-        try:
-            users = self.contract.functions.listAllUsers().call()
-            if len(users) == 0:
-                console.print("No users found!", style="bold red")
-            else:
-                console.print("List of all users:", style="bold green")
-                for user in users:
-                    console.print(user, style="bold blue")
-            return users
-        except Exception as e:
-            logger.error(f"Failed to list all users: {e}")
-            return []
-
-    def list_blacklisted_users(self):
-        # Assuming the contract has a function to list all blacklisted users (addresses)
-        try:
-            blacklisted_users = self.contract.functions.listBlacklistedUsers().call()
-            if len(blacklisted_users) == 0:
-                console.print("No blacklisted users found!", style="bold red")
-            else:
-                console.print("List of blacklisted users:", style="bold green")
-                for user in blacklisted_users:
-                    console.print(user, style="bold blue")
-            return blacklisted_users
-        except Exception as e:
-            logger.error(f"Failed to list blacklisted users: {e}")
-            return []
-
-    def add_user_to_blacklist(self):
-        users = self.list_all_users()
-        user_to_blacklist = Prompt.ask(
-            "Enter the address of the user you want to blacklist", choices=users)
-        if Prompt.ask(f"Are you sure you want to blacklist user {user_to_blacklist}? [yes/no]", choices=["yes", "no"]) == "yes":
+        if skip_check or Prompt.ask(f"Are you sure you want to set this arrival time for that dynamic consecutie segment and check for refunds? [yes/no]", choices=["yes", "no"]) == "yes":
             try:
-                self.contract.functions.addUserToBlacklist(user_to_blacklist).transact({
-                    "from": self.web3.eth.defaultAccount})
-                console.print(
-                    f"User {user_to_blacklist} added to blacklist successfully!", style="bold green")
+                self.call_contract_function("setArrivalTimeAndCheckRequiredRefunds", function_params)
+                console.print(f"Arrival time {function_params[1]} set for dynamic consecutive segment {function_params[0]} successfully and refund check completed!", style="bold green") 
+            except Exception as e:
+                logger.error(f"Failed to set arrival time and to check for refunds: {e}")
+        else:
+            console.print("Arrival time not set and refund check not completed!", style="bold red")
+    
+    def add_user_to_blacklist(self, function_params= None):
+        if function_params is None:
+            toBlackList = Prompt.ask("Enter the address of the user you want to blacklist")
+            
+            function_params = [toBlackList]
+        else:
+            skip_check = True
+        
+        if skip_check or Prompt.ask(f"Are you sure you want to blacklist user {function_params[0]}? [yes/no]", choices=["yes", "no"]) == "yes":
+            try:
+                self.call_contract_function("addToBlacklist", function_params)
+                console.print(f"User {function_params[0]} added to blacklist successfully!", style="bold green")
             except Exception as e:
                 logger.error(f"Failed to add user to blacklist: {e}")
+        else:
+            console.print("User not added to blacklist!", style="bold red")
 
-    def remove_user_from_blacklist(self):
-        blacklisted_users = self.list_blacklisted_users()
-        user_to_remove = Prompt.ask(
-            "Enter the address of the user you want to remove from blacklist", choices=blacklisted_users)
-        if Prompt.ask(f"Are you sure you want to remove user {user_to_remove} from the blacklist? [yes/no]", choices=["yes", "no"]) == "yes":
+    def remove_user_from_blacklist(self, function_params= None):
+        if function_params is None:
+            fromBlackList = Prompt.ask("Enter the address of the user you want to remore from blacklist")
+            
+            function_params = [fromBlackList]
+        else:
+            skip_check = True
+        
+        if skip_check or Prompt.ask(f"Are you sure you want to remove user {function_params[0]} from the blacklist? [yes/no]", choices=["yes", "no"]) == "yes":
             try:
-                self.contract.functions.removeUserFromBlacklist(user_to_remove).transact({
-                    "from": self.web3.eth.defaultAccount})
+                self.call_contract_function("removeFromBlacklist", function_params)
                 console.print(
-                    f"User {user_to_remove} removed from blacklist successfully!", style="bold green")
+                    f"User {function_params[0]} removed from blacklist successfully!", style="bold green")
             except Exception as e:
                 logger.error(f"Failed to remove user from blacklist: {e}")
-
-    # ... Other methods se necessari savageee ...
-"""
+        else:
+            console.print("User not removed from blacklist!", style="bold red")
+    
+    def set_new_admin(self,function_params= None):
+        if function_params is None:
+            newOwner = Prompt.ask("Enter the address of the user you want to promote to admin (you will be demoted to user)")
+            
+            function_params = [newOwner]
+        else:
+            skip_check = True
+        
+        if skip_check or Prompt.ask(f"Are you sure you want to promote user {function_params[0]} to admin? [yes/no]", choices=["yes", "no"]) == "yes":
+            try:
+                self.call_contract_function("setNewOwner", function_params)
+                console.print(f"User {function_params[0]} promoted to admin!", style="bold green")
+            except Exception as e:
+                logger.error(f"Failed to promote user to admin: {e}")
+        else:
+            console.print("User not promoted to admin!", style="bold red")
+    
+    def create_scenario (self) :
+        #Trains: T1, T2
+        self.add_train(["T1", "SlowTrain", 12])
+        self.add_train(["T2", "FastTrain", 12])
+        #Stations: S1, S2, S3, S4, S5
+        self.add_station(["S1"]) #S1 - S2 = 1km
+        self.add_station(["S2"]) #S2 - S3 = 2km
+        self.add_station(["S3"]) #S3 - S4 = 1km # S3 - S5 = 3km
+        self.add_station(["S4"])
+        self.add_station(["S5"])
+        #Consecutive Segments: CS1, CS2, CS3, CS4, CS5, CS6, CS7, CS8, CS9, CS10, CS11, CS12
+        #I consider that the slow train start from S1 at 64800 (18:00) and arrive at S4 at 64800 + 7200 (20:00)
+        self.add_consecutive_segment(["CS1", "T1", "S1", "S2", 66600, 1])
+        self.add_consecutive_segment(["CS2", "T1", "S2", "S3", 70200, 2])
+        self.add_consecutive_segment(["CS3", "T1", "S3", "S4", 72000, 1])
+        #I consider that the slow train return from S4 at 75600 (21:00) and arrive back at S1 at 72000 + 7200 (23:00)
+        self.add_consecutive_segment(["CS4", "T1", "S4", "S3", 77400, 1])
+        self.add_consecutive_segment(["CS5", "T1", "S3", "S2", 81000, 2])
+        self.add_consecutive_segment(["CS6", "T1", "S2", "S1", 82800, 1])
+        #I consider that the fast train start from S1 at 61200 (17:00) and arrive at S4 at 61200 + 5400 (18:30)
+        self.add_consecutive_segment(["CS7", "T2", "S1", "S2", 62100, 2])
+        self.add_consecutive_segment(["CS8", "T2", "S2", "S3", 63900, 4])
+        self.add_consecutive_segment(["CS9", "T2", "S3", "S5", 66600, 6])
+        # I consider that the fast train return from S5 at 72000 (20:00) and arrive back at S1 at 68400 + 5400 (20:30)
+        self.add_consecutive_segment(["CS10", "T2", "S5", "S3", 74700, 6])
+        self.add_consecutive_segment(["CS11", "T2", "S3", "S2", 76500, 4])
+        self.add_consecutive_segment(["CS12", "T2", "S2", "S1", 77400, 2])
+        #Dynamic Consecutive Segments: DCS1, DCS2, DCS3, DCS4, DCS5, DCS6, DCS7, DCS8, DCS9, DCS10, DCS11, DCS12
+        self.add_dynamic_consecutive_segment(["DCS1", "CS1", 1696118400]) #Arrival Day set to  1/10/2023 - 1st october 2023
+        self.add_dynamic_consecutive_segment(["DCS2", "CS2", 1696118400])
+        self.add_dynamic_consecutive_segment(["DCS3", "CS3", 1696118400])
+        self.add_dynamic_consecutive_segment(["DCS4", "CS4", 1696118400])
+        self.add_dynamic_consecutive_segment(["DCS5", "CS5", 1696118400])
+        self.add_dynamic_consecutive_segment(["DCS6", "CS6", 1696118400])
+        self.add_dynamic_consecutive_segment(["DCS7", "CS7", 1696118400])
+        self.add_dynamic_consecutive_segment(["DCS8", "CS8", 1696118400])
+        self.add_dynamic_consecutive_segment(["DCS9", "CS9", 1696118400])
+        self.add_dynamic_consecutive_segment(["DCS10", "CS10", 1696118400])
+        self.add_dynamic_consecutive_segment(["DCS11", "CS11", 1696118400])
+        self.add_dynamic_consecutive_segment(["DCS12", "CS12", 1696118400])
+        #Dynamic Segments: DS1, DS2, DS3, DS4
+        self.add_dynamic_segment(["DS1"]) #S1 - S2 - S3 - S4 -- SlowTrain
+        self.add_dynamic_segment(["DS2"]) #S4 - S3 - S2 - S1 -- SlowTrain
+        self.add_dynamic_segment(["DS3"]) #S1 - S2 - S3 - S5 -- FastTrain
+        self.add_dynamic_segment(["DS4"]) #S5 - S3 - S2 - S1 -- FastTrain
+        self.add_dynamic_segment(["DS5"]) #S1 - S2 - S3 -- SlowTrain
+        self.add_dynamic_segment(["DS6"]) #S3 - S2 - S1 -- SlowTrain
+        self.add_dynamic_segment(["DS7"]) #S3 - S4 -- SlowTrain
+        self.add_dynamic_segment(["DS8"]) #S4 - S3 -- SlowTrain
+        self.add_dynamic_segment(["DS9"]) #S3 - S5 -- FastTrain
+        self.add_dynamic_segment(["DS10"]) #S5 - S3 -- FastTrain
+        self.add_dynamic_segment(["DS11"]) #S1 - S2 - S3 -- FastTrain
+        self.add_dynamic_segment(["DS12"]) #S3 - S2 - S1 -- FastTrain
+        #Dynamic Consecutive Segments to Dynamic Segments
+        self.add_dynamic_consecutive_segment_to_dynamic_segment(["DS1", "DCS1", False])
+        self.add_dynamic_consecutive_segment_to_dynamic_segment(["DS1", "DCS2", False])
+        self.add_dynamic_consecutive_segment_to_dynamic_segment(["DS1", "DCS3", True])
+        self.add_dynamic_consecutive_segment_to_dynamic_segment(["DS2", "DCS4", False])
+        self.add_dynamic_consecutive_segment_to_dynamic_segment(["DS2", "DCS5", False])
+        self.add_dynamic_consecutive_segment_to_dynamic_segment(["DS2", "DCS6", True])
+        self.add_dynamic_consecutive_segment_to_dynamic_segment(["DS3", "DCS7", False])
+        self.add_dynamic_consecutive_segment_to_dynamic_segment(["DS3", "DCS8", False])
+        self.add_dynamic_consecutive_segment_to_dynamic_segment(["DS3", "DCS9", True])
+        self.add_dynamic_consecutive_segment_to_dynamic_segment(["DS4", "DCS10", False])
+        self.add_dynamic_consecutive_segment_to_dynamic_segment(["DS4", "DCS11", False])
+        self.add_dynamic_consecutive_segment_to_dynamic_segment(["DS4", "DCS12", True])
+        #Add users to blacklist
+        self.add_user_to_blacklist([os.getenv("ADDRESS9")])
 
 def main():
     logo = """
@@ -269,12 +315,13 @@ def main():
         "3": "Add Consecutive Segment",
         "4": "Add Dynamic Consecutive Segment",
         "5": "Add Dynamic Segment",
-        "6": "Aggiungi un segmento consecutivo dinamico a un segmento dinamico",
-        "7": "Conferma l'arrivo del treno",
-        "8": "Inserisci dati di esempio",
-        "9": "Aggiungi un utente alla blacklist",
-        "10": "Rimuovi un utente dalla blacklist",
-        "11": "Exit"
+        "6": "Add Dynamic Consecutive Segment To Dynamic Segment",
+        "7": "Set Arrival Time And Check Required Refunds",
+        "8": "Add User To Blacklist",
+        "9": "Remove User From Blacklist",
+        "10": "Set New Admin",
+        "11": "Create Scenario",
+        "12": "Exit"
     }
     company = Company()
 
@@ -304,14 +351,16 @@ def main():
         elif choice == "6":
             company.add_dynamic_consecutive_segment_to_dynamic_segment()
         elif choice == "7":
-            company.confirm_train_arrival()
+            company.set_arrival_time_and_check_required_refunds()
         elif choice == "8":
-            company.insert_sample_data()
-        elif choice == "9":
             company.add_user_to_blacklist()
-        elif choice == "10":
+        elif choice == "9":
             company.remove_user_from_blacklist()
+        elif choice == "10":
+            company.set_new_admin()
         elif choice == "11":
+            company.create_scenario()
+        elif choice == "12":
             console.print("Goodbye!", style="bold red")
             break
         
