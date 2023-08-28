@@ -270,23 +270,46 @@ class Company:
         self.add_dynamic_segment(["DS6"]) #S3 - S2 - S1 -- SlowTrain
         self.add_dynamic_segment(["DS7"]) #S3 - S4 -- SlowTrain
         self.add_dynamic_segment(["DS8"]) #S4 - S3 -- SlowTrain
-        self.add_dynamic_segment(["DS9"]) #S3 - S5 -- FastTrain
-        self.add_dynamic_segment(["DS10"]) #S5 - S3 -- FastTrain
-        self.add_dynamic_segment(["DS11"]) #S1 - S2 - S3 -- FastTrain
-        self.add_dynamic_segment(["DS12"]) #S3 - S2 - S1 -- FastTrain
+        self.add_dynamic_segment(["DS9"]) #S1 - S2 - S3 -- FastTrain
+        self.add_dynamic_segment(["DS10"]) #S3 - S2 - S1 -- FastTrain
+        self.add_dynamic_segment(["DS11"]) #S3 - S5 -- FastTrain
+        self.add_dynamic_segment(["DS12"]) #S5 - S3 -- FastTrain
         #Dynamic Consecutive Segments to Dynamic Segments
         self.add_dynamic_consecutive_segment_to_dynamic_segment(["DS1", "DCS1", False])
         self.add_dynamic_consecutive_segment_to_dynamic_segment(["DS1", "DCS2", False])
         self.add_dynamic_consecutive_segment_to_dynamic_segment(["DS1", "DCS3", True])
+        
         self.add_dynamic_consecutive_segment_to_dynamic_segment(["DS2", "DCS4", False])
         self.add_dynamic_consecutive_segment_to_dynamic_segment(["DS2", "DCS5", False])
         self.add_dynamic_consecutive_segment_to_dynamic_segment(["DS2", "DCS6", True])
+        
         self.add_dynamic_consecutive_segment_to_dynamic_segment(["DS3", "DCS7", False])
         self.add_dynamic_consecutive_segment_to_dynamic_segment(["DS3", "DCS8", False])
         self.add_dynamic_consecutive_segment_to_dynamic_segment(["DS3", "DCS9", True])
+        
         self.add_dynamic_consecutive_segment_to_dynamic_segment(["DS4", "DCS10", False])
         self.add_dynamic_consecutive_segment_to_dynamic_segment(["DS4", "DCS11", False])
         self.add_dynamic_consecutive_segment_to_dynamic_segment(["DS4", "DCS12", True])
+        
+        self.add_dynamic_consecutive_segment_to_dynamic_segment(["DS5", "DCS1", False])
+        self.add_dynamic_consecutive_segment_to_dynamic_segment(["DS5", "DCS2", True])
+        
+        self.add_dynamic_consecutive_segment_to_dynamic_segment(["DS6", "DCS5", False])
+        self.add_dynamic_consecutive_segment_to_dynamic_segment(["DS6", "DCS6", True])
+
+        self.add_dynamic_consecutive_segment_to_dynamic_segment(["DS7", "DCS3", True])
+
+        self.add_dynamic_consecutive_segment_to_dynamic_segment(["DS8", "DCS4", True])
+        
+        self.add_dynamic_consecutive_segment_to_dynamic_segment(["DS9", "DCS7", False])
+        self.add_dynamic_consecutive_segment_to_dynamic_segment(["DS9", "DCS8", True])
+        
+        self.add_dynamic_consecutive_segment_to_dynamic_segment(["DS10", "DCS11", False])
+        self.add_dynamic_consecutive_segment_to_dynamic_segment(["DS10", "DCS12", True])
+        
+        self.add_dynamic_consecutive_segment_to_dynamic_segment(["DS11", "DCS9", True])
+        
+        self.add_dynamic_consecutive_segment_to_dynamic_segment(["DS12", "DCS10", True])
         #Add users to blacklist
         self.add_user_to_blacklist([os.getenv("ADDRESS9")])
 
