@@ -470,11 +470,15 @@ contract Test1 {
         );
         //uint256 finalBalance = address(this).balance;
 
-        (, , , uint256 actualArrivalTime, , ) = trainsContract
+        (, , , uint256 arrivalTimeOffsetForRefund, , ) = trainsContract
             .consecutiveSegments("CS2");
+        (, , uint256 arrivalDayForRefund, , ) = trainsContract
+            .dynamicConsecutiveSegments("DCS2");
 
-        uint256 delay = simulatedArrivalTime > actualArrivalTime
-            ? simulatedArrivalTime - actualArrivalTime
+        uint256 delay = simulatedArrivalTime >
+            (arrivalTimeOffsetForRefund + arrivalDayForRefund)
+            ? simulatedArrivalTime -
+                (arrivalTimeOffsetForRefund + arrivalDayForRefund)
             : 0;
         uint32 refundPercentage;
         if (delay == 0) {

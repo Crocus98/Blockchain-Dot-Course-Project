@@ -264,15 +264,15 @@ contract TrainsOracle {
         dynamicConsecutiveSegments[dynamicConsecutiveSegmentId]
             ._actualArrivalTime = actualArrivalTime;
 
-        uint256 arrivalTime = consecutiveSegments[
+        uint256 expectedArrivalTime = consecutiveSegments[
             dynamicConsecutiveSegments[dynamicConsecutiveSegmentId]
                 ._consecutiveSegmentId
         ]._arrivalTimeOffset +
             dynamicConsecutiveSegments[dynamicConsecutiveSegmentId]._arrivalDay;
 
         uint256 delay = 0;
-        if (actualArrivalTime > arrivalTime) {
-            delay = actualArrivalTime - arrivalTime;
+        if (actualArrivalTime > expectedArrivalTime) {
+            delay = actualArrivalTime - expectedArrivalTime;
         }
 
         string[]
