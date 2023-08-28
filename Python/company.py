@@ -160,7 +160,7 @@ class Company:
         else:
             skip_check = True
 
-        if skip_check or Prompt.ask(f"Are you sure you want to set this arrival time for that dynamic consecutie segment and check for refunds? [yes/no]", choices=["yes", "no"]) == "yes":
+        if skip_check or Prompt.ask(f"Are you sure you want to set this arrival time for that dynamic consecutive segment and check for refunds? [yes/no]", choices=["yes", "no"]) == "yes":
             try:
                 self.call_contract_function("setArrivalTimeAndCheckRequiredRefunds", function_params)
                 console.print(f"Arrival time {function_params[1]} set for dynamic consecutive segment {function_params[0]} successfully and refund check completed!", style="bold green") 
@@ -233,21 +233,21 @@ class Company:
         self.add_station(["S5"])
         #Consecutive Segments: CS1, CS2, CS3, CS4, CS5, CS6, CS7, CS8, CS9, CS10, CS11, CS12
         #I consider that the slow train start from S1 at 64800 (18:00) and arrive at S4 at 64800 + 7200 (20:00)
-        self.add_consecutive_segment(["CS1", "T1", "S1", "S2", 66600, 3000000000000000])
-        self.add_consecutive_segment(["CS2", "T1", "S2", "S3", 70200, 6000000000000000])
-        self.add_consecutive_segment(["CS3", "T1", "S3", "S4", 72000, 3000000000000000])
+        self.add_consecutive_segment(["CS1", "T1", "S1", "S2", 66600, 1000000000000000])
+        self.add_consecutive_segment(["CS2", "T1", "S2", "S3", 70200, 2000000000000000])
+        self.add_consecutive_segment(["CS3", "T1", "S3", "S4", 72000, 1000000000000000])
         #I consider that the slow train return from S4 at 75600 (21:00) and arrive back at S1 at 72000 + 7200 (23:00)
-        self.add_consecutive_segment(["CS4", "T1", "S4", "S3", 77400, 3000000000000000])
-        self.add_consecutive_segment(["CS5", "T1", "S3", "S2", 81000, 6000000000000000])
-        self.add_consecutive_segment(["CS6", "T1", "S2", "S1", 82800, 3000000000000000])
+        self.add_consecutive_segment(["CS4", "T1", "S4", "S3", 77400, 1000000000000000])
+        self.add_consecutive_segment(["CS5", "T1", "S3", "S2", 81000, 2000000000000000])
+        self.add_consecutive_segment(["CS6", "T1", "S2", "S1", 82800, 1000000000000000])
         #I consider that the fast train start from S1 at 61200 (17:00) and arrive at S4 at 61200 + 5400 (18:30)
-        self.add_consecutive_segment(["CS7", "T2", "S1", "S2", 62100, 6000000000000000])
-        self.add_consecutive_segment(["CS8", "T2", "S2", "S3", 63900, 12000000000000000])
-        self.add_consecutive_segment(["CS9", "T2", "S3", "S5", 66600, 24000000000000000])
+        self.add_consecutive_segment(["CS7", "T2", "S1", "S2", 62100, 2000000000000000])
+        self.add_consecutive_segment(["CS8", "T2", "S2", "S3", 63900, 4000000000000000])
+        self.add_consecutive_segment(["CS9", "T2", "S3", "S5", 66600, 6000000000000000])
         # I consider that the fast train return from S5 at 72000 (20:00) and arrive back at S1 at 68400 + 5400 (20:30)
-        self.add_consecutive_segment(["CS10", "T2", "S5", "S3", 74700, 24000000000000000])
-        self.add_consecutive_segment(["CS11", "T2", "S3", "S2", 76500, 12000000000000000])
-        self.add_consecutive_segment(["CS12", "T2", "S2", "S1", 77400, 6000000000000000])
+        self.add_consecutive_segment(["CS10", "T2", "S5", "S3", 74700, 6000000000000000])
+        self.add_consecutive_segment(["CS11", "T2", "S3", "S2", 76500, 4000000000000000])
+        self.add_consecutive_segment(["CS12", "T2", "S2", "S1", 77400, 2000000000000000])
         #Dynamic Consecutive Segments: DCS1, DCS2, DCS3, DCS4, DCS5, DCS6, DCS7, DCS8, DCS9, DCS10, DCS11, DCS12
         self.add_dynamic_consecutive_segment(["DCS1", "CS1", 1696118400]) #Arrival Day set to  1/10/2023 - 1st october 2023
         self.add_dynamic_consecutive_segment(["DCS2", "CS2", 1696118400])
