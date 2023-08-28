@@ -139,7 +139,7 @@ contract TrainsOracle {
         );
         uint256 time = block.timestamp;
         require(
-            arrivalDay >= (time - (time % 1 days)) && arrivalDay % 1 days == 0,
+            (arrivalDay >= time % 1 days) && (arrivalDay % 1 days == 0),
             "Arrival day cannot be in the past and must be a multiple of 1 day"
         );
         dynamicConsecutiveSegments[
