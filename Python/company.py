@@ -37,10 +37,10 @@ class Company:
         self.contract = SmartContractUtility.get_contract_instance(self.web3, self.contract_address, self.contract_abi)
         console.print(f"Contract instance obtained for contract at address {self.contract_address}", style="bold green")
 
-    def call_contract_function(self, function_name, function_params):
-        SmartContractUtility.call_contract_function(self.web3, self.contract, function_name, function_params ,self.company_private_key)
+    def call_contract_function(self, function_name, function_params, value = None, gas_limit=None, gas_price=None):
+        SmartContractUtility.call_contract_function(self.web3, self.contract, function_name, function_params ,self.company_private_key, value, gas_limit, gas_price)
 
-    def add_train(self, function_params= None):
+    def add_train(self, function_params= None, skip_check=False):
         if function_params is None:
             trainId = Prompt.ask("Enter the train ID")
             trainName = Prompt.ask("Enter the train name")
@@ -59,7 +59,7 @@ class Company:
         else :
             console.print("Train not added!", style="bold red")
     
-    def add_station(self, function_params= None):
+    def add_station(self, function_params= None, skip_check=False):
         if function_params is None:
             stationId = Prompt.ask("Enter the station ID")
             
@@ -76,7 +76,7 @@ class Company:
         else :
             console.print("Station not added!", style="bold red")
         
-    def add_consecutive_segment(self, function_params= None):
+    def add_consecutive_segment(self, function_params= None, skip_check=False):
         if function_params is None:
             consecutiveSegmentId = Prompt.ask("Enter the consecutive segment ID")
             trainId = Prompt.ask("Enter the train ID")
@@ -98,7 +98,7 @@ class Company:
         else: 
             console.print("Consecutive segment not added!", style="bold red")
     
-    def add_dynamic_consecutive_segment(self, function_params= None):
+    def add_dynamic_consecutive_segment(self, function_params= None, skip_check=False):
         if function_params is None:
             dynamicConsecutiveSegmentId = Prompt.ask("Enter the dynamic consecutive segment ID")
             consecutiveSegmentId = Prompt.ask("Enter the consecutive segment ID")
@@ -117,7 +117,7 @@ class Company:
         else:
             console.print("Dynamic consecutive segment not added!", style="bold red")
     
-    def add_dynamic_segment(self,function_params= None):
+    def add_dynamic_segment(self,function_params= None, skip_check=False):
         if function_params is None: 
             dynamicSegmentId = Prompt.ask("Enter the dynamic segment ID")
             
@@ -132,7 +132,7 @@ class Company:
             except Exception as e:
                 logger.error(f"Failed to add dynamic segment: {e}")
     
-    def add_dynamic_consecutive_segment_to_dynamic_segment(self, function_params= None):
+    def add_dynamic_consecutive_segment_to_dynamic_segment(self, function_params= None, skip_check=False):
         if function_params is None:
             dynamicSegmentId = Prompt.ask("Enter the dynamic segment ID")
             dynamicConsecutiveSegmentId = Prompt.ask("Enter the dynamic consecutive segment ID")
@@ -151,7 +151,7 @@ class Company:
         else:
             console.print("Dynamic consecutive segment not added to dynamic segment!", style="bold red")
     
-    def set_arrival_time_and_check_required_refunds(self, function_params= None):
+    def set_arrival_time_and_check_required_refunds(self, function_params= None, skip_check=False):
         if function_params is None:
             dynamicConsecutiveSegmentId = Prompt.ask("Enter the dynamic consecutive segment ID")
             actualArrivalTime = int(Prompt.ask("Enter the actual arrival timestamp"))
@@ -169,7 +169,7 @@ class Company:
         else:
             console.print("Arrival time not set and refund check not completed!", style="bold red")
     
-    def add_user_to_blacklist(self, function_params= None):
+    def add_user_to_blacklist(self, function_params= None, skip_check=False):
         if function_params is None:
             toBlackList = Prompt.ask("Enter the address of the user you want to blacklist")
             
@@ -186,7 +186,7 @@ class Company:
         else:
             console.print("User not added to blacklist!", style="bold red")
 
-    def remove_user_from_blacklist(self, function_params= None):
+    def remove_user_from_blacklist(self, function_params= None, skip_check=False):
         if function_params is None:
             fromBlackList = Prompt.ask("Enter the address of the user you want to remore from blacklist")
             
@@ -204,7 +204,7 @@ class Company:
         else:
             console.print("User not removed from blacklist!", style="bold red")
     
-    def set_new_admin(self,function_params= None):
+    def set_new_admin(self,function_params= None, skip_check=False):
         if function_params is None:
             newOwner = Prompt.ask("Enter the address of the user you want to promote to admin (you will be demoted to user)")
             
@@ -233,21 +233,21 @@ class Company:
         self.add_station(["S5"])
         #Consecutive Segments: CS1, CS2, CS3, CS4, CS5, CS6, CS7, CS8, CS9, CS10, CS11, CS12
         #I consider that the slow train start from S1 at 64800 (18:00) and arrive at S4 at 64800 + 7200 (20:00)
-        self.add_consecutive_segment(["CS1", "T1", "S1", "S2", 66600, 1])
-        self.add_consecutive_segment(["CS2", "T1", "S2", "S3", 70200, 2])
-        self.add_consecutive_segment(["CS3", "T1", "S3", "S4", 72000, 1])
+        self.add_consecutive_segment(["CS1", "T1", "S1", "S2", 66600, 3000000000000000])
+        self.add_consecutive_segment(["CS2", "T1", "S2", "S3", 70200, 6000000000000000])
+        self.add_consecutive_segment(["CS3", "T1", "S3", "S4", 72000, 3000000000000000])
         #I consider that the slow train return from S4 at 75600 (21:00) and arrive back at S1 at 72000 + 7200 (23:00)
-        self.add_consecutive_segment(["CS4", "T1", "S4", "S3", 77400, 1])
-        self.add_consecutive_segment(["CS5", "T1", "S3", "S2", 81000, 2])
-        self.add_consecutive_segment(["CS6", "T1", "S2", "S1", 82800, 1])
+        self.add_consecutive_segment(["CS4", "T1", "S4", "S3", 77400, 3000000000000000])
+        self.add_consecutive_segment(["CS5", "T1", "S3", "S2", 81000, 6000000000000000])
+        self.add_consecutive_segment(["CS6", "T1", "S2", "S1", 82800, 3000000000000000])
         #I consider that the fast train start from S1 at 61200 (17:00) and arrive at S4 at 61200 + 5400 (18:30)
-        self.add_consecutive_segment(["CS7", "T2", "S1", "S2", 62100, 2])
-        self.add_consecutive_segment(["CS8", "T2", "S2", "S3", 63900, 4])
-        self.add_consecutive_segment(["CS9", "T2", "S3", "S5", 66600, 6])
+        self.add_consecutive_segment(["CS7", "T2", "S1", "S2", 62100, 6000000000000000])
+        self.add_consecutive_segment(["CS8", "T2", "S2", "S3", 63900, 12000000000000000])
+        self.add_consecutive_segment(["CS9", "T2", "S3", "S5", 66600, 24000000000000000])
         # I consider that the fast train return from S5 at 72000 (20:00) and arrive back at S1 at 68400 + 5400 (20:30)
-        self.add_consecutive_segment(["CS10", "T2", "S5", "S3", 74700, 6])
-        self.add_consecutive_segment(["CS11", "T2", "S3", "S2", 76500, 4])
-        self.add_consecutive_segment(["CS12", "T2", "S2", "S1", 77400, 2])
+        self.add_consecutive_segment(["CS10", "T2", "S5", "S3", 74700, 24000000000000000])
+        self.add_consecutive_segment(["CS11", "T2", "S3", "S2", 76500, 12000000000000000])
+        self.add_consecutive_segment(["CS12", "T2", "S2", "S1", 77400, 6000000000000000])
         #Dynamic Consecutive Segments: DCS1, DCS2, DCS3, DCS4, DCS5, DCS6, DCS7, DCS8, DCS9, DCS10, DCS11, DCS12
         self.add_dynamic_consecutive_segment(["DCS1", "CS1", 1696118400]) #Arrival Day set to  1/10/2023 - 1st october 2023
         self.add_dynamic_consecutive_segment(["DCS2", "CS2", 1696118400])
