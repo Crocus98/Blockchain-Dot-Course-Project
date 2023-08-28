@@ -41,15 +41,46 @@ class Company:
         trainId = Prompt.ask("Enter the train ID")
         trainName = Prompt.ask("Enter the train name")
         maxPassengersNumber = int(Prompt.ask("Enter the max passengers number"))
+        function_params = [trainId, trainName, maxPassengersNumber]
         if Prompt.ask("Are you sure you want to add this train? [yes/no]", choices=["yes", "no"]) == "yes":
             try:
-                function_params = [trainId, trainName, maxPassengersNumber]
                 SmartContractUtility.call_contract_function(self.web3, self.contract, "addTrain", function_params ,self.company_private_key)
                 console.print(f"Train {trainName} added successfully!", style="bold green")
             except Exception as e:
                 logger.error(f"Failed to add train: {e}")
         else :
             console.print("Train not added!", style="bold red")
+    
+    def add_station(self):
+        stationId = Prompt.ask("Enter the station ID")
+        function_params = [stationId]
+        if Prompt.ask("Are you sure you want to add this station? [yes/no]", choices=["yes", "no"]) == "yes":
+            try:
+                SmartContractUtility.call_contract_function(self.web3, self.contract, "addStation", function_params ,self.company_private_key)
+                console.print(f"Station {stationId} added successfully!", style="bold green")
+            except Exception as e:
+                logger.error(f"Failed to add station: {e}")
+        else :
+            console.print("Station not added!", style="bold red")
+        
+    def add_consecutive_segment(self):
+        consecutiveSegmentId = Prompt.ask("Enter the consecutive segment ID")
+        trainId = Prompt.ask("Enter the train ID")
+        startingStationId = Prompt.ask("Enter the starting station ID")
+        arrivingStationId = Prompt.ask("Enter the arriving station ID")
+        arrivalTimeOffset = int(Prompt.ask("Enter the arrival timestamp offset (Timestamp is in seconds: 1 hour = 3600s.\n E.g. train arrives at 2:00 am, offset should be 7200. Train arrives at 2 pm, offset should be 50400.)"))
+        price = int(Prompt.ask("Enter the price of the consecutive segment"))
+        
+        function_params = [consecutiveSegmentId, trainId, startingStationId, arrivingStationId, arrivalTimeOffset, price]
+
+        if Prompt.ask(f"Are you sure you want to add this consecutive segment {consecutiveSegmentId}? [yes/no]", choices=["yes", "no"]) == "yes":
+            try:
+                SmartContractUtility.call_contract_function(self.web3, self.contract, "addConsecutiveSegment", function_params ,self.company_private_key)
+                console.print(f"Consecutive Segment {consecutiveSegmentId} added successfully!", style="bold green")
+            except Exception as e:
+                logger.error(f"Failed to add consecutive segment: {e}")
+        else: 
+            console.print("Consecutive segment not added!", style="bold red")
 """"
     def confirm_train_arrival(self):
         train_id = Prompt.ask("Inserisci l'ID del treno")
@@ -93,18 +124,6 @@ class Company:
             console.print("Dati di esempio inseriti.", style="bold green")
         except Exception as e:
             logger.error(f"Errore nell'inserimento dei dati di esempio: {e}")
-
-
-    def add_station(self):
-        station_id = Prompt.ask("Enter the station ID")
-        if Prompt.ask("Are you sure you want to add this station? [yes/no]", choices=["yes", "no"]) == "yes":
-            try:
-                self.contract.functions.addStation(station_id).transact(
-                    {"from": self.web3.eth.defaultAccount})
-                console.print(
-                    f"Station {station_id} added successfully!", style="bold green")
-            except Exception as e:
-                logger.error(f"Failed to add station: {e}")
 
     def add_consecutive_segment(self):
         segment_id = Prompt.ask("Enter the consecutive segment ID")
@@ -296,6 +315,7 @@ def main():
             console.print("Goodbye!", style="bold red")
             break
         
+        console.print("Press [bold blue]ENTER[/bold blue] to continue...", style="bold")
         input()
         console.clear()
         
