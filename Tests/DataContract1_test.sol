@@ -60,7 +60,7 @@ contract Test1 {
         Assert.equal(success, true, "Owner should be able to add a station");
 
         uint256 arrivalTimeOffset1 = (arrivalTimeOffsetTestValue + 1800) %
-            86400;
+            1 days;
         uint256 arrivalTimeDay1 = (arrivalTimeOffsetTestValue + 1800) -
             arrivalTimeOffset1;
         try
@@ -84,7 +84,7 @@ contract Test1 {
         );
 
         uint256 arrivalTimeOffset2 = (arrivalTimeOffsetTestValue + 1800) %
-            86400;
+            1 days;
         uint256 arrivalTimeDay2 = (arrivalTimeOffsetTestValue + 1800) -
             arrivalTimeOffset2;
         try
@@ -196,7 +196,7 @@ contract Test1 {
                 "T2",
                 "S1",
                 "S2",
-                arrivalTimeOffsetTestValue + 20,
+                10 hours,
                 10000000000000000000
             )
         {
@@ -216,7 +216,7 @@ contract Test1 {
                 "T1",
                 "S3",
                 "S4",
-                arrivalTimeOffsetTestValue + 20,
+                10 hours,
                 200000000000000000
             )
         {
@@ -236,7 +236,7 @@ contract Test1 {
                 "T1",
                 "S4",
                 "S3",
-                arrivalTimeOffsetTestValue + 20,
+                10 hours,
                 10000000000000000000
             )
         {
@@ -256,7 +256,7 @@ contract Test1 {
                 "T1",
                 "S2",
                 "S2",
-                arrivalTimeOffsetTestValue + 20,
+                10 hours,
                 10000000000000000000
             )
         {
@@ -268,26 +268,6 @@ contract Test1 {
             success,
             false,
             "Should not have been able to add a consecutive segment with a trip from a station to the same station."
-        );
-
-        try
-            trainsContract.addConsecutiveSegment(
-                "CS1",
-                "T1",
-                "S1",
-                "S2",
-                block.timestamp - 10,
-                10000000000000000000
-            )
-        {
-            success = true;
-        } catch {
-            success = false;
-        }
-        Assert.equal(
-            success,
-            false,
-            "Should not have been able to add a consecutive segment with an arrival time in the past"
         );
 
         try
@@ -313,7 +293,8 @@ contract Test1 {
 
     function testCannotAddDynamicConsecutiveSegmenWithWrongParams() public {
         bool success = false;
-        uint256 arrivalTimeOffset = (arrivalTimeOffsetTestValue + 1800) % 86400;
+        uint256 arrivalTimeOffset = (arrivalTimeOffsetTestValue + 1800) %
+            1 days;
         uint256 arrivalTimeDay = (arrivalTimeOffsetTestValue + 1800) -
             arrivalTimeOffset;
         try
@@ -347,7 +328,7 @@ contract Test1 {
         Assert.equal(
             success,
             false,
-            "Should not have been able to add a dynamic consecutive segment with an arrival time that is not a multiple of 86400 seconds"
+            "Should not have been able to add a dynamic consecutive segment with an arrival time that is not a multiple of 1 day"
         );
 
         try

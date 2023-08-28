@@ -61,7 +61,7 @@ contract TestUser1 {
                 "T2",
                 "S3",
                 "S4",
-                block.timestamp + 1 hours,
+                5 hours,
                 100
             )
         {
@@ -75,7 +75,14 @@ contract TestUser1 {
             "Non-owner should not be able to add a consecutive segment"
         );
 
-        try trainsContract.addDynamicConsecutiveSegment("DCS2", "CS2") {
+        uint256 arrivalTimeDay = (block.timestamp + 2 hours) % 1 days;
+        try
+            trainsContract.addDynamicConsecutiveSegment(
+                "DCS2",
+                "CS2",
+                arrivalTimeDay
+            )
+        {
             success = true;
         } catch {
             success = false;

@@ -118,10 +118,6 @@ contract TrainsOracle {
             "Starting station and arriving station cannot be the same"
         );
         require(price > 0, "Price cannot be negative or null");
-        require(
-            arrivalTime > block.timestamp,
-            "Arrival time cannot be in the past"
-        );
         consecutiveSegments[consecutiveSegmentId] = ConsecutiveSegment(
             trainId,
             startingStationId,
