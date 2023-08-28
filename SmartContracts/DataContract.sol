@@ -137,10 +137,10 @@ contract TrainsOracle {
             consecutiveSegments[consecutiveSegmentId]._isSet,
             "Consecutive segment does not exist"
         );
+        uint256 time = block.timestamp;
         require(
-            arrivalDay > (block.timestamp - (block.timestamp % 86400)) &&
-                arrivalDay % 86400 == 0,
-            "Arrival day cannot be in the past and must be a multiple of 86400"
+            arrivalDay >= (time - (time % 1 days)) && arrivalDay % 1 days == 0,
+            "Arrival day cannot be in the past and must be a multiple of 1 day"
         );
         dynamicConsecutiveSegments[
             dynamicConsecutiveSegmentId

@@ -59,6 +59,26 @@ contract Test2 {
         );
     }
 
+    function testCannotSetActualArrivalTimeOfNonExistentSegment() public {
+        bool success = true;
+        uint256 simulatedArrivalTime = block.timestamp + 5 hours;
+        try
+            trainsContract.setArrivalTimeAndCheckRequiredRefunds(
+                "DCS3",
+                simulatedArrivalTime - 2000
+            )
+        {
+            success = true;
+        } catch {
+            success = false;
+        }
+        Assert.equal(
+            success,
+            false,
+            "Should not be able to set the actual arrival time for a non existent CS"
+        );
+    }
+
     function testOwnershipTransfer() public {
         address newOwner = TestsAccounts.getAccount(10);
         trainsContract.setNewOwner(newOwner);

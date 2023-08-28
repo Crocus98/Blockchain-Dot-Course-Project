@@ -17,6 +17,12 @@ contract Test1 {
     TrainsOracle trainsContract;
 
     uint256 arrivalTimeOffsetTestValue = 1704067200;
+    uint256 arrivalTimeOffset1 = (arrivalTimeOffsetTestValue + 1800) % 1 days;
+    uint256 arrivalTimeDay1 =
+        (arrivalTimeOffsetTestValue + 1800) - arrivalTimeOffset1;
+    uint256 arrivalTimeOffset2 = (arrivalTimeOffsetTestValue + 3600) % 1 days;
+    uint256 arrivalTimeDay2 =
+        (arrivalTimeOffsetTestValue + 3600) - arrivalTimeOffset1;
 
     function beforeAll() public {
         owner = address(this);
@@ -59,10 +65,6 @@ contract Test1 {
         }
         Assert.equal(success, true, "Owner should be able to add a station");
 
-        uint256 arrivalTimeOffset1 = (arrivalTimeOffsetTestValue + 1800) %
-            1 days;
-        uint256 arrivalTimeDay1 = (arrivalTimeOffsetTestValue + 1800) -
-            arrivalTimeOffset1;
         try
             trainsContract.addConsecutiveSegment(
                 "CS1",
@@ -83,10 +85,6 @@ contract Test1 {
             "Owner should be able to add a consecutive segment"
         );
 
-        uint256 arrivalTimeOffset2 = (arrivalTimeOffsetTestValue + 1800) %
-            1 days;
-        uint256 arrivalTimeDay2 = (arrivalTimeOffsetTestValue + 1800) -
-            arrivalTimeOffset2;
         try
             trainsContract.addConsecutiveSegment(
                 "CS2",
@@ -465,26 +463,6 @@ contract Test1 {
             success,
             false,
             "User should not be able to buy a ticket that already has been already sold"
-        );
-    }
-
-    function testCannotSetActualArrivalTimeOfNonExistentSegment() public {
-        bool success = true;
-        uint256 simulatedArrivalTime = arrivalTimeOffsetTestValue + 3000;
-        try
-            trainsContract.setArrivalTimeAndCheckRequiredRefunds(
-                "DCS3",
-                simulatedArrivalTime - 2000
-            )
-        {
-            success = true;
-        } catch {
-            success = false;
-        }
-        Assert.equal(
-            success,
-            false,
-            "Should not be able to set the actual arrival time for a non existent CS"
         );
     }
 
