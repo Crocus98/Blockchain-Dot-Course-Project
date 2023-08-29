@@ -12,7 +12,7 @@ console = Console()
 
 class User:
     def __init__(self, selected_account):
-        if any(var == "" for var in [os.getenv("RPCPROVIDERHOST"), os.getenv("RPCPROVIDERHOST"), find_dotenv(), os.getenv("CONTRACTABIPATH"), os.getenv(f"PRIVATEKEY"+str(selected_account))]):
+        if any(var == "" for var in [os.getenv("RPCPROVIDERHOST"), os.getenv("RPCPROVIDERPORT"), os.getenv("CONTRACTABIPATH"), os.getenv(f"PRIVATEKEY"+str(selected_account))]):
             raise Exception(
                 "One or more environment variables are not set. Please complete .env file information before proceeding.")
 
@@ -128,7 +128,7 @@ def main():
             elif choice == "2":
                 user.collect_refunds_money()
             elif choice == "3":
-                console.print("Goodbye!", style="bold red")
+                console.print("Goodbye!", style="bold blue")
                 break
         except Exception as e:
             console.print(f"Failed to execute action: {e}", style="bold red")

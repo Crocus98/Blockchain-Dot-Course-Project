@@ -12,7 +12,7 @@ console = Console()
 class Company:
 
     def __init__(self):
-        if any(var == "" for var in [os.getenv("RPCPROVIDERHOST"), os.getenv("RPCPROVIDERHOST"), find_dotenv(), os.getenv("CONTRACTABIPATH"), os.getenv("CONTRACTBYTECODEPATH"), os.getenv("CONTRACTSOURCEPATH"), os.getenv("PRIVATEKEY0"), os.getenv("CONTRACTNAME")]):
+        if any(var == "" for var in [os.getenv("RPCPROVIDERHOST"), os.getenv("RPCPROVIDERPORT"), find_dotenv(), os.getenv("CONTRACTABIPATH"), os.getenv("CONTRACTBYTECODEPATH"), os.getenv("CONTRACTSOURCEPATH"), os.getenv("PRIVATEKEY0"), os.getenv("CONTRACTNAME")]):
             raise Exception(
                 "One or more environment variables are not set. Please complete .env file information before proceeding.")
 
@@ -494,7 +494,7 @@ def main():
             elif choice == "11":
                 company.create_scenario()
             elif choice == "12":
-                console.print("Goodbye!", style="bold red")
+                console.print("Goodbye!", style="bold blue")
                 break
         except Exception as e:
             console.print(f"Failed to execute action: {e}", style="bold red")
