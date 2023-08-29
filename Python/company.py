@@ -1,13 +1,9 @@
-import logging
 from rich.console import Console
 from rich.prompt import Prompt
 from rich.logging import RichHandler
 from dotenv import load_dotenv, find_dotenv
 import os
 from Utility.SmartContractUtility import SmartContractUtility
-
-logging.basicConfig(level=logging.INFO, handlers=[RichHandler()])
-logger = logging.getLogger("Company")
 
 load_dotenv()
 console = Console()
