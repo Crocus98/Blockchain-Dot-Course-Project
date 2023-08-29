@@ -16,8 +16,12 @@ console = Console()
 class Company:
 
     def __init__(self):
+        if any(var == "" for var in [os.getenv("RPCPROVIDERHOST"), os.getenv("RPCPROVIDERHOST"), find_dotenv(), os.getenv("CONTRACTABIPATH"), os.getenv("CONTRACTBYTECODEPATH"), os.getenv("CONTRACTSOURCEPATH"), os.getenv("PRIVATEKEY0"), os.getenv("CONTRACTNAME")]):
+            raise Exception(
+                "One or more environment variables are not set. Please complete .env file information before proceeding.")
+
         self.web3 = SmartContractUtility.web3_instance(
-            os.getenv("RPCPROVIDERHOST") + ":" + os.getenv("RPCPROVIDERPORT"))
+            os.getenv("RPCPROVIDERHOST") + ":" + os.getenv("RPCPROVIDERHOST"))
         self.dot_env_path = find_dotenv()
         self.contract_address = os.getenv("CONTRACTADDRESS")
         self.contract_abi_path = os.getenv("CONTRACTABIPATH")
@@ -69,7 +73,8 @@ class Company:
                 console.print(
                     f"Train {function_params[0]} - {function_params[1]} added successfully!", style="bold green")
             except Exception as e:
-                logger.error(f"Failed to add train: {e}")
+                raise Exception(f"Failed to add train: {e}")
+                return
         else:
             console.print("Train not added!", style="bold red")
 
@@ -87,7 +92,8 @@ class Company:
                 console.print(
                     f"Station {function_params[0]} added successfully!", style="bold green")
             except Exception as e:
-                logger.error(f"Failed to add station: {e}")
+                raise Exception(f"Failed to add station: {e}")
+                return
         else:
             console.print("Station not added!", style="bold red")
 
@@ -115,7 +121,8 @@ class Company:
                 console.print(
                     f"Consecutive Segment {function_params[0]} added successfully!", style="bold green")
             except Exception as e:
-                logger.error(f"Failed to add consecutive segment: {e}")
+                raise Exception(f"Failed to add consecutive segment: {e}")
+                return
         else:
             console.print("Consecutive segment not added!", style="bold red")
 
@@ -140,7 +147,9 @@ class Company:
                 console.print(
                     f"Dynamic Consecutive Segment {function_params[0]} added successfully!", style="bold green")
             except Exception as e:
-                logger.error(f"Failed to add dynamic consecutive segment: {e}")
+                raise Exception(
+                    f"Failed to add dynamic consecutive segment: {e}")
+                return
         else:
             console.print(
                 "Dynamic consecutive segment not added!", style="bold red")
@@ -160,7 +169,10 @@ class Company:
                 console.print(
                     f"Dynamic Segment {function_params[0]} added successfully!", style="bold green")
             except Exception as e:
-                logger.error(f"Failed to add dynamic segment: {e}")
+                raise Exception(f"Failed to add dynamic segment: {e}")
+                return
+        else:
+            console.print("Dynamic segment not added!", style="bold red")
 
     def add_dynamic_consecutive_segment_to_dynamic_segment(self, function_params=None, skip_check=False):
         if function_params is None:
@@ -182,8 +194,9 @@ class Company:
                 console.print(
                     f"Dynamic Consecutive Segment {function_params[1]} added to Dynamic Segment {function_params[0]} successfully!", style="bold green")
             except Exception as e:
-                logger.error(
+                raise Exception(
                     f"Failed to add dynamic consecutive segment to dynamic segment: {e}")
+                return
         else:
             console.print(
                 "Dynamic consecutive segment not added to dynamic segment!", style="bold red")
@@ -206,8 +219,9 @@ class Company:
                 console.print(
                     f"Arrival time {function_params[1]} set for dynamic consecutive segment {function_params[0]} successfully and refund check completed!", style="bold green")
             except Exception as e:
-                logger.error(
+                raise Exception(
                     f"Failed to set arrival time and to check for refunds: {e}")
+                return
         else:
             console.print(
                 "Arrival time not set and refund check not completed!", style="bold red")
@@ -227,7 +241,8 @@ class Company:
                 console.print(
                     f"User {function_params[0]} added to blacklist successfully!", style="bold green")
             except Exception as e:
-                logger.error(f"Failed to add user to blacklist: {e}")
+                raise Exception(f"Failed to add user to blacklist: {e}")
+                return
         else:
             console.print("User not added to blacklist!", style="bold red")
 
@@ -247,7 +262,8 @@ class Company:
                 console.print(
                     f"User {function_params[0]} removed from blacklist successfully!", style="bold green")
             except Exception as e:
-                logger.error(f"Failed to remove user from blacklist: {e}")
+                raise Exception(f"Failed to remove user from blacklist: {e}")
+                return
         else:
             console.print("User not removed from blacklist!", style="bold red")
 
@@ -266,7 +282,8 @@ class Company:
                 console.print(
                     f"User {function_params[0]} promoted to admin!", style="bold green")
             except Exception as e:
-                logger.error(f"Failed to promote user to admin: {e}")
+                raise Exception(f"Failed to promote user to admin: {e}")
+                return
         else:
             console.print("User not promoted to admin!", style="bold red")
 
@@ -337,63 +354,64 @@ class Company:
         self.add_dynamic_segment(["DS11"])  # S3 - S5 -- FastTrain
         self.add_dynamic_segment(["DS12"])  # S5 - S3 -- FastTrain
         # Dynamic Consecutive Segments to Dynamic Segments
+        # S1 - S2 - S3 - S4 -- SlowTrain
         self.add_dynamic_consecutive_segment_to_dynamic_segment(
             ["DS1", "DCS1", False])
         self.add_dynamic_consecutive_segment_to_dynamic_segment(
             ["DS1", "DCS2", False])
         self.add_dynamic_consecutive_segment_to_dynamic_segment(
             ["DS1", "DCS3", True])
-
+        # S4 - S3 - S2 - S1 -- SlowTrain
         self.add_dynamic_consecutive_segment_to_dynamic_segment(
             ["DS2", "DCS4", False])
         self.add_dynamic_consecutive_segment_to_dynamic_segment(
             ["DS2", "DCS5", False])
         self.add_dynamic_consecutive_segment_to_dynamic_segment(
             ["DS2", "DCS6", True])
-
+        # S1 - S2 - S3 - S5 -- FastTrain
         self.add_dynamic_consecutive_segment_to_dynamic_segment(
             ["DS3", "DCS7", False])
         self.add_dynamic_consecutive_segment_to_dynamic_segment(
             ["DS3", "DCS8", False])
         self.add_dynamic_consecutive_segment_to_dynamic_segment(
             ["DS3", "DCS9", True])
-
+        # S5 - S3 - S2 - S1 -- FastTrain
         self.add_dynamic_consecutive_segment_to_dynamic_segment(
             ["DS4", "DCS10", False])
         self.add_dynamic_consecutive_segment_to_dynamic_segment(
             ["DS4", "DCS11", False])
         self.add_dynamic_consecutive_segment_to_dynamic_segment(
             ["DS4", "DCS12", True])
-
+        # S1 - S2 - S3 -- SlowTrain
         self.add_dynamic_consecutive_segment_to_dynamic_segment(
             ["DS5", "DCS1", False])
         self.add_dynamic_consecutive_segment_to_dynamic_segment(
             ["DS5", "DCS2", True])
-
+        # S3 - S2 - S1 -- SlowTrain
         self.add_dynamic_consecutive_segment_to_dynamic_segment(
             ["DS6", "DCS5", False])
         self.add_dynamic_consecutive_segment_to_dynamic_segment(
             ["DS6", "DCS6", True])
-
+        # S3 - S4 -- SlowTrain
         self.add_dynamic_consecutive_segment_to_dynamic_segment(
             ["DS7", "DCS3", True])
-
+        # S4 - S3 -- SlowTrain
         self.add_dynamic_consecutive_segment_to_dynamic_segment(
             ["DS8", "DCS4", True])
-
+        # S1 - S2 - S3 -- FastTrain
         self.add_dynamic_consecutive_segment_to_dynamic_segment(
             ["DS9", "DCS7", False])
         self.add_dynamic_consecutive_segment_to_dynamic_segment(
             ["DS9", "DCS8", True])
-
+        # S3 - S2 - S1 -- FastTrain
         self.add_dynamic_consecutive_segment_to_dynamic_segment(
             ["DS10", "DCS11", False])
         self.add_dynamic_consecutive_segment_to_dynamic_segment(
             ["DS10", "DCS12", True])
-
+        # S3 - S5 -- FastTrain
         self.add_dynamic_consecutive_segment_to_dynamic_segment(
             ["DS11", "DCS9", True])
-
+        # S5 - S3 -- FastTrain
         self.add_dynamic_consecutive_segment_to_dynamic_segment(
             ["DS12", "DCS10", True])
         # Add users to blacklist
@@ -433,7 +451,13 @@ def main():
         "11": "Create Scenario",
         "12": "Exit"
     }
-    company = Company()
+
+    try:
+        company = Company()
+    except Exception as e:
+        console.print(
+            f"Failed to inizialize program: {e}", style="bold red")
+        return
 
     while True:
         console.print(logo, style="bold blue")
@@ -450,31 +474,34 @@ def main():
             console.print("Invalid choice!", style="bold red")
             continue
 
-        if choice == "1":
-            company.add_train()
-        elif choice == "2":
-            company.add_station()
-        elif choice == "3":
-            company.add_consecutive_segment()
-        elif choice == "4":
-            company.add_dynamic_consecutive_segment()
-        elif choice == "5":
-            company.add_dynamic_segment()
-        elif choice == "6":
-            company.add_dynamic_consecutive_segment_to_dynamic_segment()
-        elif choice == "7":
-            company.set_arrival_time_and_check_required_refunds()
-        elif choice == "8":
-            company.add_user_to_blacklist()
-        elif choice == "9":
-            company.remove_user_from_blacklist()
-        elif choice == "10":
-            company.set_new_admin()
-        elif choice == "11":
-            company.create_scenario()
-        elif choice == "12":
-            console.print("Goodbye!", style="bold red")
-            break
+        try:
+            if choice == "1":
+                company.add_train()
+            elif choice == "2":
+                company.add_station()
+            elif choice == "3":
+                company.add_consecutive_segment()
+            elif choice == "4":
+                company.add_dynamic_consecutive_segment()
+            elif choice == "5":
+                company.add_dynamic_segment()
+            elif choice == "6":
+                company.add_dynamic_consecutive_segment_to_dynamic_segment()
+            elif choice == "7":
+                company.set_arrival_time_and_check_required_refunds()
+            elif choice == "8":
+                company.add_user_to_blacklist()
+            elif choice == "9":
+                company.remove_user_from_blacklist()
+            elif choice == "10":
+                company.set_new_admin()
+            elif choice == "11":
+                company.create_scenario()
+            elif choice == "12":
+                console.print("Goodbye!", style="bold red")
+                break
+        except Exception as e:
+            console.print(f"Failed to execute action: {e}", style="bold red")
 
         console.print(
             "Press [bold blue]ENTER[/bold blue] to continue...", style="bold")
