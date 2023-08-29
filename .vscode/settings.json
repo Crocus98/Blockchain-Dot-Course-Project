@@ -1,4 +1,11 @@
 {
   "solidity.defaultCompiler": "localFile",
-  "solidity.remappings": ["@accounts=.deps/remix-tests/remix_accounts.sol", "@tests=.deps/remix-tests/remix_tests.sol"]
+  "solidity.remappings": ["@accounts=.deps/remix-tests/remix_accounts.sol", "@tests=.deps/remix-tests/remix_tests.sol"],
+  "[python]": {
+    "editor.defaultFormatter": "ms-python.autopep8"
+  },
+  "editor.defaultFormatter": "esbenp.prettier-vscode",
+  "editor.formatOnPaste": true,
+  "editor.formatOnSave": true,
+  "prettier.printWidth": 120
 }

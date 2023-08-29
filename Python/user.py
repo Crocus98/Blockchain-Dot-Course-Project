@@ -47,7 +47,7 @@ class User:
     def collect_refunds_money (self) :
         if Prompt.ask(f"Are you sure you want to collect all your refunds moeny? [yes/no]", choices=["yes", "no"]) == "yes":
             try:
-                self.call_contract_function("getRefund", [])
+                self.call_contract_function("getRefund", [], gas_limit=500000)
                 console.print(f"Refunds collected successfully from you account!", style="bold green")
             except Exception as e:
                 logger.error(f"Failed to collect refunds: {e}")
