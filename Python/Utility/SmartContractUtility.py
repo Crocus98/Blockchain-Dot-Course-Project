@@ -100,7 +100,6 @@ class SmartContractUtility:
         tx_hash = contract_constructor.transact(tx_params)
         tx_receipt = web3.eth.wait_for_transaction_receipt(tx_hash)
 
-        print("Contract address: " + tx_receipt.contractAddress)
         return tx_receipt.contractAddress
 
     @staticmethod
