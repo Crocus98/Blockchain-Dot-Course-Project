@@ -116,12 +116,16 @@ class SmartContractUtility:
         sender_account = web3.eth.account.from_key(str(sender_private_key))
         function = contract.get_function_by_name(function_name)
 
-        if gas_price is None:
-            gas_price = web3.eth.gas_price
-
         if gas_limit is None:
-            gas_limit = contract.functions[function_name](
-                *function_params).estimate_gas({'from': sender_account.address})
+            if value is None:
+                gas_limit = int(contract.functions[function_name](
+                    *function_params).estimate_gas({"from": sender_account.address}) * 1.1)
+            else:
+                gas_limit = int(contract.functions[function_name](
+                    *function_params).estimate_gas({"from": sender_account.address, "value": value}) * 1.1)
+
+        if gas_price is None:
+            gas_price = int(web3.eth.gas_price * 1.1)
 
         nonce = web3.eth.get_transaction_count(sender_account.address)
 
@@ -130,6 +134,8 @@ class SmartContractUtility:
             'gas': gas_limit,
             'gasPrice': gas_price,
         }
+
+        fee = gas_limit * gas_price
 
         if value is not None:
             transaction_data['value'] = value
@@ -140,4 +146,4 @@ class SmartContractUtility:
         signed_txn = sender_account.sign_transaction(transaction_data)
         tx_hash = web3.eth.send_raw_transaction(signed_txn.rawTransaction)
 
-        return tx_hash
+        return tx_hash, fee

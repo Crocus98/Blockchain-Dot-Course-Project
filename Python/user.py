@@ -29,8 +29,9 @@ class User:
             f"Contract instance obtained for contract at address {self.contract_address}", style="bold green")
 
     def call_contract_function(self, function_name, function_params, value=None, gas_limit=None, gas_price=None):
-        SmartContractUtility.call_contract_function(
+        tx_hash, fee = SmartContractUtility.call_contract_function(
             self.web3, self.contract, function_name, function_params, self.user_private_key, value, gas_limit, gas_price)
+        return tx_hash, fee
 
     def buy_ticket(self, function_params=None, value=0, skip_check=False):
         if function_params is None:
@@ -40,16 +41,16 @@ class User:
                 "Enter a dynamic segment ID (or type 'done' to finish)"), 'done')
             function_params = [ticketId, list(dynamicSegmentsIds)]
             value = int(Prompt.ask(
-                "Enter the value you want to pay for the ticket (in wei)", default=12000000000000000))
+                "Enter the value you want to pay for the ticket (in wei) [fees will be taken additionally]", default=1000000000000000000))
         else:
             skip_check = True
 
         if skip_check or Prompt.ask(f"Are you sure you want to buy this ticket? [yes/no]", choices=["yes", "no"]) == "yes":
             try:
-                self.call_contract_function(
-                    "buyDynamicTicket", function_params, value=value, gas_limit=1000000)
+                _, fee = self.call_contract_function(
+                    "buyDynamicTicket", function_params, value=value)
                 console.print(
-                    f"Ticket {function_params[0]} bought successfully!", style="bold green")
+                    f"Ticket {function_params[0]} bought successfully! Paid fee: {fee}.", style="bold green")
             except Exception as e:
                 raise Exception(f"Failed to buy ticket: {e}")
         else:
@@ -58,10 +59,10 @@ class User:
     def collect_refunds_money(self):
         if Prompt.ask(f"Are you sure you want to collect all your refunds moeny? [yes/no]", choices=["yes", "no"]) == "yes":
             try:
-                self.call_contract_function(
-                    "getRefund", [], gas_limit=1000000)
+                _, fee = self.call_contract_function(
+                    "getRefund", [])
                 console.print(
-                    f"Refunds collected successfully from you account!", style="bold green")
+                    f"Refunds collected successfully from you account! Paid fee: {fee}.", style="bold green")
             except Exception as e:
                 raise Exception(f"Failed to collect refunds: {e}")
         else:
