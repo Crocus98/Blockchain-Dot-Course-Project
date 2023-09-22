@@ -67,7 +67,7 @@ class Company:
             try:
                 self.call_contract_function("addTrain", function_params)
                 console.print(
-                    f"Train {function_params[0]} - {function_params[1]} added successfully!", style="bold green")
+                    f"Train {function_params[0]} - {function_params[1]} added successfully! Max passengers: {function_params[2]}", style="bold green")
             except Exception as e:
                 raise Exception(f"Failed to add train: {e}")
                 return
@@ -115,7 +115,7 @@ class Company:
                 self.call_contract_function(
                     "addConsecutiveSegment", function_params)
                 console.print(
-                    f"Consecutive Segment {function_params[0]} added successfully!", style="bold green")
+                    f"Consecutive Segment {function_params[0]} added successfully with train {function_params[1]}! Starting station is {function_params[2]} and arriving station is {function_params[3]}. The segment cost {function_params[5]} and require {function_params[4]} seconds.", style="bold green")
             except Exception as e:
                 raise Exception(f"Failed to add consecutive segment: {e}")
                 return
@@ -141,7 +141,7 @@ class Company:
                 self.call_contract_function(
                     "addDynamicConsecutiveSegment", function_params)
                 console.print(
-                    f"Dynamic Consecutive Segment {function_params[0]} added successfully!", style="bold green")
+                    f"Dynamic Consecutive Segment {function_params[0]} added successfully from Consecutive Segment {function_params[1]}! It's Arrival day is {function_params[2]}.", style="bold green")
             except Exception as e:
                 raise Exception(
                     f"Failed to add dynamic consecutive segment: {e}")
@@ -188,7 +188,7 @@ class Company:
                 self.call_contract_function(
                     "addDynamicConsecutiveSegmentToDynamicSegment", function_params)
                 console.print(
-                    f"Dynamic Consecutive Segment {function_params[1]} added to Dynamic Segment {function_params[0]} successfully!", style="bold green")
+                    f"Dynamic Consecutive Segment {function_params[1]} added to Dynamic Segment {function_params[0]} successfully! Last station is {function_params[2]}.", style="bold green")
             except Exception as e:
                 raise Exception(
                     f"Failed to add dynamic consecutive segment to dynamic segment: {e}")
