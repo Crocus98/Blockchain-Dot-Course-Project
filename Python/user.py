@@ -47,7 +47,7 @@ class User:
         if skip_check or Prompt.ask(f"Are you sure you want to buy this ticket? [yes/no]", choices=["yes", "no"]) == "yes":
             try:
                 self.call_contract_function(
-                    "buyDynamicTicket", function_params, value=value, gas_limit=1000000)
+                    "buyDynamicTicket", function_params, value=value, gas_limit=3000000)
                 console.print(
                     f"Ticket {function_params[0]} bought successfully!", style="bold green")
             except Exception as e:
@@ -58,7 +58,8 @@ class User:
     def collect_refunds_money(self):
         if Prompt.ask(f"Are you sure you want to collect all your refunds moeny? [yes/no]", choices=["yes", "no"]) == "yes":
             try:
-                self.call_contract_function("getRefund", [], gas_limit=1000000)
+                self.call_contract_function(
+                    "getRefund", [], gas_limit=3000000)
                 console.print(
                     f"Refunds collected successfully from you account!", style="bold green")
             except Exception as e:
