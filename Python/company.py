@@ -349,6 +349,7 @@ class Company:
         self.add_dynamic_segment(["DS10"])  # S3 - S2 - S1 -- FastTrain
         self.add_dynamic_segment(["DS11"])  # S3 - S5 -- FastTrain
         self.add_dynamic_segment(["DS12"])  # S5 - S3 -- FastTrain
+
         # Dynamic Consecutive Segments to Dynamic Segments
         # S1 - S2 - S3 - S4 -- SlowTrain
         self.add_dynamic_consecutive_segment_to_dynamic_segment(
@@ -410,6 +411,11 @@ class Company:
         # S5 - S3 -- FastTrain
         self.add_dynamic_consecutive_segment_to_dynamic_segment(
             ["DS12", "DCS10", True])
+
+        # Show the stations in every CS and the corresponding train
+        console.print(
+            f"[bold blue]DS1:[/bold blue] S1 - S2 - S3 - S4 -- SlowTrain\n[bold blue]DS2:[/bold blue] S4 - S3 - S2 - S1 -- SlowTrain\n[bold blue]DS3:[/bold blue] S1 - S2 - S3 - S5 -- FastTrain\n[bold blue]DS4:[/bold blue] S5 - S3 - S2 - S1 -- FastTrain\n[bold blue]DS5:[/bold blue] S1 - S2 - S3 -- SlowTrain\n[bold blue]DS6:[/bold blue] S3 - S2 - S1 -- SlowTrain\n[bold blue]DS7:[/bold blue] S3 - S4 -- SlowTrain\n[bold blue]DS8:[/bold blue] S4 - S3 -- SlowTrain\n[bold blue]DS9:[/bold blue] S1 - S2 - S3 -- FastTrain\n[bold blue]DS10:[/bold blue] S3 - S2 - S1 -- FastTrain\n[bold blue]DS11:[/bold blue] S3 - S5 -- FastTrain\n[bold blue]DS12:[/bold blue] S5 - S3 -- FastTrain", style="bold green")
+
         # Add users to blacklist
         self.add_user_to_blacklist([os.getenv("ADDRESS9")])
 
