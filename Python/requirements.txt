@@ -1,0 +1,22 @@
+# Requirements
+solc-select
+python-dotenv
+web3
+rich
+py-solc-x==1.1.1
+
+# Requirements to be run manually:
+# solc-select list-remote
+# solc-select install 0.8.19
+# solc-select use 0.8.19
+# solc --version #Used to check correct installation of solc version
+
+# Command necessary to install the requirements from this file
+# pip install -r requirements.txt #
+
+ 
+
+
+
+
+
