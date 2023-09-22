@@ -296,32 +296,32 @@ class Company:
         # Consecutive Segments: CS1, CS2, CS3, CS4, CS5, CS6, CS7, CS8, CS9, CS10, CS11, CS12
         # I consider that the slow train start from S1 at 64800 (18:00) and arrive at S4 at 64800 + 7200 (20:00)
         self.add_consecutive_segment(
-            ["CS1", "T1", "S1", "S2", 66600, 1000000000000000])
+            ["CS1", "T1", "S1", "S2", 66600, 10000000000000000])
         self.add_consecutive_segment(
-            ["CS2", "T1", "S2", "S3", 70200, 2000000000000000])
+            ["CS2", "T1", "S2", "S3", 70200, 20000000000000000])
         self.add_consecutive_segment(
-            ["CS3", "T1", "S3", "S4", 72000, 1000000000000000])
+            ["CS3", "T1", "S3", "S4", 72000, 10000000000000000])
         # I consider that the slow train return from S4 at 75600 (21:00) and arrive back at S1 at 72000 + 7200 (23:00)
         self.add_consecutive_segment(
-            ["CS4", "T1", "S4", "S3", 77400, 1000000000000000])
+            ["CS4", "T1", "S4", "S3", 77400, 10000000000000000])
         self.add_consecutive_segment(
-            ["CS5", "T1", "S3", "S2", 81000, 2000000000000000])
+            ["CS5", "T1", "S3", "S2", 81000, 20000000000000000])
         self.add_consecutive_segment(
-            ["CS6", "T1", "S2", "S1", 82800, 1000000000000000])
+            ["CS6", "T1", "S2", "S1", 82800, 10000000000000000])
         # I consider that the fast train start from S1 at 61200 (17:00) and arrive at S4 at 61200 + 5400 (18:30)
         self.add_consecutive_segment(
-            ["CS7", "T2", "S1", "S2", 62100, 2000000000000000])
+            ["CS7", "T2", "S1", "S2", 62100, 20000000000000000])
         self.add_consecutive_segment(
-            ["CS8", "T2", "S2", "S3", 63900, 4000000000000000])
+            ["CS8", "T2", "S2", "S3", 63900, 40000000000000000])
         self.add_consecutive_segment(
-            ["CS9", "T2", "S3", "S5", 66600, 6000000000000000])
+            ["CS9", "T2", "S3", "S5", 66600, 60000000000000000])
         # I consider that the fast train return from S5 at 72000 (20:00) and arrive back at S1 at 68400 + 5400 (20:30)
         self.add_consecutive_segment(
-            ["CS10", "T2", "S5", "S3", 74700, 6000000000000000])
+            ["CS10", "T2", "S5", "S3", 74700, 60000000000000000])
         self.add_consecutive_segment(
-            ["CS11", "T2", "S3", "S2", 76500, 4000000000000000])
+            ["CS11", "T2", "S3", "S2", 76500, 40000000000000000])
         self.add_consecutive_segment(
-            ["CS12", "T2", "S2", "S1", 77400, 2000000000000000])
+            ["CS12", "T2", "S2", "S1", 77400, 20000000000000000])
         # Dynamic Consecutive Segments: DCS1, DCS2, DCS3, DCS4, DCS5, DCS6, DCS7, DCS8, DCS9, DCS10, DCS11, DCS12
         # Arrival Day set to  1/10/2023 - 1st october 2023
         self.add_dynamic_consecutive_segment(["DCS1", "CS1", 1696118400])
@@ -414,7 +414,7 @@ class Company:
 
         # Show the stations in every CS and the corresponding train
         console.print(
-            f"[bold blue]DS1:[/bold blue] S1 - S2 - S3 - S4 -- SlowTrain\n[bold blue]DS2:[/bold blue] S4 - S3 - S2 - S1 -- SlowTrain\n[bold blue]DS3:[/bold blue] S1 - S2 - S3 - S5 -- FastTrain\n[bold blue]DS4:[/bold blue] S5 - S3 - S2 - S1 -- FastTrain\n[bold blue]DS5:[/bold blue] S1 - S2 - S3 -- SlowTrain\n[bold blue]DS6:[/bold blue] S3 - S2 - S1 -- SlowTrain\n[bold blue]DS7:[/bold blue] S3 - S4 -- SlowTrain\n[bold blue]DS8:[/bold blue] S4 - S3 -- SlowTrain\n[bold blue]DS9:[/bold blue] S1 - S2 - S3 -- FastTrain\n[bold blue]DS10:[/bold blue] S3 - S2 - S1 -- FastTrain\n[bold blue]DS11:[/bold blue] S3 - S5 -- FastTrain\n[bold blue]DS12:[/bold blue] S5 - S3 -- FastTrain", style="bold green")
+            f"[bold blue]DS1:[/bold blue] S1 - S2 - S3 - S4 -- SlowTrain -- 0\n[bold blue]DS2:[/bold blue] S4 - S3 - S2 - S1 -- SlowTrain -- 0\n[bold blue]DS3:[/bold blue] S1 - S2 - S3 - S5 -- FastTrain -- 0\n[bold blue]DS4:[/bold blue] S5 - S3 - S2 - S1 -- FastTrain -- 0\n[bold blue]DS5:[/bold blue] S1 - S2 - S3 -- SlowTrain -- 0\n[bold blue]DS6:[/bold blue] S3 - S2 - S1 -- SlowTrain -- 0\n[bold blue]DS7:[/bold blue] S3 - S4 -- SlowTrain -- 0\n[bold blue]DS8:[/bold blue] S4 - S3 -- SlowTrain -- 0\n[bold blue]DS9:[/bold blue] S1 - S2 - S3 -- FastTrain -- 0\n[bold blue]DS10:[/bold blue] S3 - S2 - S1 -- FastTrain -- 0\n[bold blue]DS11:[/bold blue] S3 - S5 -- FastTrain -- 0\n[bold blue]DS12:[/bold blue] S5 - S3 -- FastTrain -- 0", style="bold green")
 
         # Add users to blacklist
         self.add_user_to_blacklist([os.getenv("ADDRESS9")])
