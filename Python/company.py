@@ -188,7 +188,7 @@ class Company:
                 self.call_contract_function(
                     "addDynamicConsecutiveSegmentToDynamicSegment", function_params)
                 console.print(
-                    f"Dynamic Consecutive Segment {function_params[1]} added to Dynamic Segment {function_params[0]} successfully! Last station is {function_params[2]}.", style="bold green")
+                    f"Dynamic Consecutive Segment {function_params[1]} added to Dynamic Segment {function_params[0]} successfully! This is last consecutive segment: {function_params[2]}.", style="bold green")
             except Exception as e:
                 raise Exception(
                     f"Failed to add dynamic consecutive segment to dynamic segment: {e}")
