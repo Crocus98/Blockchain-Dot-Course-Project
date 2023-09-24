@@ -6,7 +6,6 @@ import threading
 import time
 
 load_dotenv()
-
 console = Console()
 
 
@@ -15,7 +14,6 @@ class EventListener:
         if any(var == "" for var in [os.getenv("RPCPROVIDERHOST"), os.getenv("RPCPROVIDERPORT"), os.getenv("CONTRACTABIPATH")]):
             raise Exception(
                 "One or more environment variables are not set. Please complete .env file information before proceeding.")
-
         self.web3 = SmartContractUtility.web3_instance(
             os.getenv("RPCPROVIDERHOST") + ":" + os.getenv("RPCPROVIDERPORT"))
         self.contract_address = os.getenv("CONTRACTADDRESS")
@@ -47,7 +45,6 @@ class EventListener:
             t.start()
 
 
-# Create an instance of the EventListener class and start listening for events
 listener = EventListener()
-# Here you can add any other events you want to listen to.
+# Here you can add any other events you want to listen to
 listener.start_listening(["RefundAdded", "RefundTaken"])
