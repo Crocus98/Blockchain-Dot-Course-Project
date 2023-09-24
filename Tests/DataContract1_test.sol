@@ -338,6 +338,23 @@ contract Test1 {
         try
             trainsContract.addDynamicConsecutiveSegmentToDynamicSegment(
                 "DS1",
+                "DCS1",
+                false
+            )
+        {
+            success = true;
+        } catch {
+            success = false;
+        }
+        Assert.equal(
+            success,
+            false,
+            "Should not be able to add a dynamic consecutive segment to a dynamic segment twice"
+        );
+
+        try
+            trainsContract.addDynamicConsecutiveSegmentToDynamicSegment(
+                "DS1",
                 "DCS3",
                 false
             )

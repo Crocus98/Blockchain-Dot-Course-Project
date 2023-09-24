@@ -177,6 +177,24 @@ contract TrainsOracle {
             dynamicConsecutiveSegments[dynamicConsecutiveSegmentId]._isSet,
             "Dynamic consecutive segment does not exist"
         );
+        for (
+            uint i = 0;
+            i <
+            dynamicSegments[dynamicSegmentId]
+                ._dynamicConsecutiveSegmentIds
+                .length;
+            i++
+        ) {
+            require(
+                keccak256(
+                    bytes(
+                        dynamicSegments[dynamicSegmentId]
+                            ._dynamicConsecutiveSegmentIds[i]
+                    )
+                ) != keccak256(bytes(dynamicConsecutiveSegmentId)),
+                "Dynamic Consecutive Segment already contained in this Dynamic Segment"
+            );
+        }
         dynamicSegments[dynamicSegmentId]._dynamicConsecutiveSegmentIds.push(
             dynamicConsecutiveSegmentId
         );
