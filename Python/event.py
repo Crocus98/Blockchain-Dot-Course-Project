@@ -3,7 +3,6 @@ from dotenv import load_dotenv
 from Utility.SmartContractUtility import SmartContractUtility
 import os
 
-# Load environment variables from .env file
 load_dotenv()
 
 console = Console()
@@ -27,7 +26,7 @@ class EventListener:
             f"Listening for events from contract at address {self.contract_address}", style="bold green")
 
     def listen_for_refund_added(self):
-        event_filter = self.contract.events.RefundAdded.createFilter(
+        event_filter = self.contract.events.RefundAdded.create_filter(
             fromBlock='latest')
         console.print(
             "[bold yellow]Listening for RefundAdded events...[/bold yellow]")
@@ -37,6 +36,6 @@ class EventListener:
                     f"[bold blue]Event Received:[/bold blue] {event['event']} with data: {event['args']}", style="bold green")
 
 
-# Create an instance of the EventListener class and start listening for events
+# instance of EventListener class and start listening for events
 listener = EventListener()
 listener.listen_for_refund_added()
