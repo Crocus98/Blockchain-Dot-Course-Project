@@ -14,8 +14,8 @@ console = Console()
 
 class Company:
 
-    def __init__(self):
-        if any(var == "" for var in [os.getenv("RPCPROVIDERHOST"), os.getenv("RPCPROVIDERPORT"), find_dotenv(), os.getenv("CONTRACTABIPATH"), os.getenv("CONTRACTBYTECODEPATH"), os.getenv("CONTRACTSOURCEPATH"), os.getenv("PRIVATEKEY0"), os.getenv("CONTRACTNAME")]):
+    def __init__(self, owner_account=0):
+        if any(var == "" for var in [os.getenv("RPCPROVIDERHOST"), os.getenv("RPCPROVIDERPORT"), find_dotenv(), os.getenv("CONTRACTABIPATH"), os.getenv("CONTRACTBYTECODEPATH"), os.getenv("CONTRACTSOURCEPATH"), os.getenv("PRIVATEKEY"+str(owner_account)), os.getenv("CONTRACTNAME")]):
             raise Exception(
                 "One or more environment variables are not set. Please complete .env file information before proceeding.")
 
@@ -26,7 +26,7 @@ class Company:
         self.contract_abi_path = os.getenv("CONTRACTABIPATH")
         self.contract_bytecode_path = os.getenv("CONTRACTBYTECODEPATH")
         self.contract_source_path = os.getenv("CONTRACTSOURCEPATH")
-        self.company_private_key = os.getenv("PRIVATEKEY0")
+        self.company_private_key = os.getenv("PRIVATEKEY"+str(owner_account))
         self.contract_name = os.getenv("CONTRACTNAME")
 
         if self.contract_address:
