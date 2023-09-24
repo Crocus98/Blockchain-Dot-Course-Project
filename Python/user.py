@@ -70,8 +70,9 @@ class User:
             try:
                 _, fee = self.call_contract_function(
                     "getRefund", [])
+                fee_in_eth = self.web3.from_wei(fee, 'ether')
                 console.print(
-                    f"Refunds collected successfully from you account! Paid fee: {fee}.", style="bold green")
+                    f"Refunds collected successfully from you account! Paid fee: {fee_in_eth} ETH.", style="bold green")
             except Exception as e:
                 raise Exception(f"Failed to collect refunds: {e}")
         else:
