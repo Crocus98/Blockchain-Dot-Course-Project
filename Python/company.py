@@ -124,7 +124,7 @@ class Company:
                     function_params[5], 'ether')
 
                 console.print(
-                    f"Consecutive Segment {function_params[0]} added successfully with train {function_params[1]}! Starting station is {function_params[2]} and arriving station is {function_params[3]}. The segment cost {price_in_eth_display} ETH and require {function_params[4]} seconds.", style="bold green")
+                    f"Consecutive Segment {function_params[0]} added successfully with train {function_params[1]}! Starting station is {function_params[2]} and arriving station is {function_params[3]}. The segment cost {price_in_eth_display} ETH at timestamp {function_params[4]}.", style="bold green")
             except Exception as e:
                 raise Exception(f"Failed to add consecutive segment: {e}")
                 return
