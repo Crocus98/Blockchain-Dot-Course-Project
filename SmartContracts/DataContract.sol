@@ -69,6 +69,13 @@ contract TrainsOracle {
         _;
     }
 
+    event RefundAdded(
+        address indexed recipient,
+        string dynamicSegmentId,
+        uint256 amount,
+        uint256 totalRefundToCollect
+    );
+
     constructor() payable {
         trainCompanyAddress = msg.sender;
     }
@@ -327,8 +334,13 @@ contract TrainsOracle {
 
                 uint256 refundAmount = (originalSegmentPrice *
                     refundPercentage) / 100;
-                //payable(passenger).transfer(refundAmount);
                 refunds[passenger] += refundAmount;
+                emit RefundAdded(
+                    passenger,
+                    affectedDynamicSegmentIds[i],
+                    refundAmount,
+                    refunds[passenger]
+                );
             }
         }
     }
