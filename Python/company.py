@@ -4,8 +4,8 @@ from dotenv import load_dotenv, find_dotenv
 from rich.logging import RichHandler
 from rich.prompt import Prompt
 from rich.console import Console
-from rich.traceback import install
-install()
+# from rich.traceback import install
+# install()
 
 load_dotenv()
 console = Console()

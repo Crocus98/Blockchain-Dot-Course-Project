@@ -120,7 +120,7 @@ def main():
         for i in range(1, 10):
             account_options[i] = os.getenv(f"ADDRESS"+str(i))
             console.print(
-                f"{i} - {account_options[i]} - Balance: {SmartContractUtility.get_balance_from_address(web3_temp, account_options[i])} ETH \n")
+                f"{i} - {account_options[i]} - Balance: {SmartContractUtility.get_balance_from_address(web3_temp, account_options[i])} ETH")
         web3_temp = None
         selected_account = Prompt.ask("Choose your account", choices=[
             str(i) for i in range(1, 10)])
@@ -164,7 +164,7 @@ def main():
         except Exception as e:
             console.print(f"Failed to execute action: {e}", style="bold red")
         console.print(
-            f"Updated Balance for {selected_account}: {user.get_balance()} ETH", style="bold cyan")
+            f"Updated Balance for {account_options[int(selected_account)]}: {user.get_balance()} ETH", style="bold cyan")
         console.print(
             "Press [bold blue]ENTER[/bold blue] to continue...", style="bold")
         input()
