@@ -2,8 +2,10 @@ from rich.console import Console
 from dotenv import load_dotenv
 from Utility.SmartContractUtility import SmartContractUtility
 import os
+import threading
 
 load_dotenv()
+
 console = Console()
 
 
@@ -24,17 +26,26 @@ class EventListener:
         console.print(
             f"Listening for events from contract at address {self.contract_address}", style="bold green")
 
-    def listen_for_refund_added(self):
-        event_filter = self.contract.events.RefundAdded.create_filter(
-            fromBlock='latest')
+    def listen_for_event(self, event_name):
+        event_filter = getattr(self.contract.events,
+                               event_name).create_filter(fromBlock='latest')
         console.print(
-            "[bold yellow]Listening for RefundAdded events...[/bold yellow]")
+            f"[bold yellow]Listening for {event_name} events...[/bold yellow]")
         while True:
             for event in event_filter.get_new_entries():
                 console.print(
                     f"[bold blue]Event Received:[/bold blue] {event['event']} with data: {event['args']}", style="bold green")
 
+    def start_listening(self, event_names):
+        threads = []
+        for event_name in event_names:
+            t = threading.Thread(
+                target=self.listen_for_event, args=(event_name,))
+            threads.append(t)
+            t.start()
 
-# instance of EventListener class and start listening for events
+
+# Create an instance of the EventListener class and start listening for events
 listener = EventListener()
-listener.listen_for_refund_added()
+# Here you can add any other events you want to listen to.
+listener.start_listening(["RefundAdded", "RefundTaken"])
