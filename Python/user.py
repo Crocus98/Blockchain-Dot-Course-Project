@@ -1,13 +1,15 @@
+from dotenv import load_dotenv
+import os
+from Utility.SmartContractUtility import SmartContractUtility
 from rich.prompt import Prompt
 from rich.console import Console
 from rich.table import Table
 from rich.logging import RichHandler
-from Utility.SmartContractUtility import SmartContractUtility
-import os
-from dotenv import load_dotenv
+from rich.traceback import install
 
 load_dotenv()
 console = Console()
+install()
 
 
 class User:
@@ -24,7 +26,7 @@ class User:
             self.contract_abi_path)
         self.contract = SmartContractUtility.get_contract_instance(
             self.web3, self.contract_address, self.contract_abi)
-        self.user_public_key = selected_account
+        self.user_public_key = os.getenv("ADDRESS"+str(selected_account))
         self.user_private_key = os.getenv(f"PRIVATEKEY"+str(selected_account))
         console.print(
             f"Contract instance obtained for contract at address {self.contract_address}", style="bold green")
@@ -70,7 +72,10 @@ class User:
             console.print("Refunds not collected!", style="bold red")
 
     def get_balance(self):
-        return SmartContractUtility.get_balance_from_address(self.web3, self.user_public_key)
+        try:
+            return SmartContractUtility.get_balance_from_address(self.web3, self.user_public_key)
+        except Exception as e:
+            raise Exception(f"Could not find balance: {e}")
 
 
 def main():
@@ -110,7 +115,8 @@ def main():
         web3_temp = None
         selected_account = Prompt.ask("Choose your account", choices=[
             str(i) for i in range(1, 10)])
-        print(f"Selected Address: {account_options[int(selected_account)]}")
+        console.print(
+            f"Selected Address: [bold blue]{account_options[int(selected_account)]}[/bold blue]")
         console.print(
             "Press [bold blue]ENTER[/bold blue] to continue...", style="bold")
         input()
