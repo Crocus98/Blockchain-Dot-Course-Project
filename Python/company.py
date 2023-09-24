@@ -3,6 +3,7 @@ from dotenv import load_dotenv, find_dotenv
 from rich.logging import RichHandler
 from rich.console import Console
 from rich.prompt import Prompt
+import sys
 import os
 
 # from rich.traceback import install
@@ -465,7 +466,10 @@ def main():
     }
 
     try:
-        company = Company()
+        if len(sys.argv) < 2:
+            company = Company()
+        else:
+            company = Company(int(sys.argv[1]))
     except Exception as e:
         console.print(
             f"Failed to inizialize program: {e}", style="bold red")
