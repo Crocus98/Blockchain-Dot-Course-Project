@@ -1,9 +1,11 @@
-from rich.console import Console
-from rich.prompt import Prompt
-from rich.logging import RichHandler
-from dotenv import load_dotenv, find_dotenv
-import os
 from Utility.SmartContractUtility import SmartContractUtility
+import os
+from dotenv import load_dotenv, find_dotenv
+from rich.logging import RichHandler
+from rich.prompt import Prompt
+from rich.console import Console
+from rich.traceback import install
+install()
 
 load_dotenv()
 console = Console()
@@ -102,11 +104,14 @@ class Company:
             arrivingStationId = Prompt.ask("Enter the arriving station ID")
             arrivalTimeOffset = int(Prompt.ask(
                 "Enter the arrival timestamp offset (Timestamp is in seconds: 1 hour = 3600s.\n E.g. train arrives at 2:00 am, offset should be 7200. Train arrives at 2 pm, offset should be 50400.)"))
-            price = int(Prompt.ask(
-                "Enter the price of the consecutive segment"))
+
+            value_in_eth = float(Prompt.ask(
+                "Enter the price of the consecutive segment in ETH"))
+
+            value_in_wei = int(self.web3.to_wei(value_in_eth, 'ether'))
 
             function_params = [consecutiveSegmentId, trainId,
-                               startingStationId, arrivingStationId, arrivalTimeOffset, price]
+                               startingStationId, arrivingStationId, arrivalTimeOffset, value_in_wei]
         else:
             skip_check = True
 
@@ -114,8 +119,12 @@ class Company:
             try:
                 self.call_contract_function(
                     "addConsecutiveSegment", function_params)
+
+                price_in_eth_display = self.web3.from_wei(
+                    function_params[5], 'ether')
+
                 console.print(
-                    f"Consecutive Segment {function_params[0]} added successfully with train {function_params[1]}! Starting station is {function_params[2]} and arriving station is {function_params[3]}. The segment cost {function_params[5]} and require {function_params[4]} seconds.", style="bold green")
+                    f"Consecutive Segment {function_params[0]} added successfully with train {function_params[1]}! Starting station is {function_params[2]} and arriving station is {function_params[3]}. The segment cost {price_in_eth_display} ETH and require {function_params[4]} seconds.", style="bold green")
             except Exception as e:
                 raise Exception(f"Failed to add consecutive segment: {e}")
                 return
@@ -414,7 +423,7 @@ class Company:
 
         # Show the stations in every CS and the corresponding train
         console.print(
-            f"[bold blue]DS1:[/bold blue] S1 - S2 - S3 - S4 -- SlowTrain -- 40000000000000000\n[bold blue]DS2:[/bold blue] S4 - S3 - S2 - S1 -- SlowTrain -- 40000000000000000\n[bold blue]DS3:[/bold blue] S1 - S2 - S3 - S5 -- FastTrain -- 120000000000000000\n[bold blue]DS4:[/bold blue] S5 - S3 - S2 - S1 -- FastTrain -- 120000000000000000\n[bold blue]DS5:[/bold blue] S1 - S2 - S3 -- SlowTrain -- 30000000000000000\n[bold blue]DS6:[/bold blue] S3 - S2 - S1 -- SlowTrain -- 30000000000000000\n[bold blue]DS7:[/bold blue] S3 - S4 -- SlowTrain -- 10000000000000000\n[bold blue]DS8:[/bold blue] S4 - S3 -- SlowTrain -- 10000000000000000\n[bold blue]DS9:[/bold blue] S1 - S2 - S3 -- FastTrain -- 60000000000000000\n[bold blue]DS10:[/bold blue] S3 - S2 - S1 -- FastTrain -- 60000000000000000\n[bold blue]DS11:[/bold blue] S3 - S5 -- FastTrain -- 60000000000000000\n[bold blue]DS12:[/bold blue] S5 - S3 -- FastTrain -- 60000000000000000", style="bold green")
+            f"[bold blue]DS1:[/bold blue] S1 - S2 - S3 - S4 -- SlowTrain -- 0.04 ETH \n[bold blue]DS2:[/bold blue] S4 - S3 - S2 - S1 -- SlowTrain -- 0.04 ETH\n[bold blue]DS3:[/bold blue] S1 - S2 - S3 - S5 -- FastTrain -- 0.12 ETH\n[bold blue]DS4:[/bold blue] S5 - S3 - S2 - S1 -- FastTrain -- 0.12 ETH\n[bold blue]DS5:[/bold blue] S1 - S2 - S3 -- SlowTrain -- 0.03 ETH\n[bold blue]DS6:[/bold blue] S3 - S2 - S1 -- SlowTrain -- 0.03 ETH\n[bold blue]DS7:[/bold blue] S3 - S4 -- SlowTrain -- 0.01 ETH\n[bold blue]DS8:[/bold blue] S4 - S3 -- SlowTrain -- 0.01 ETH\n[bold blue]DS9:[/bold blue] S1 - S2 - S3 -- FastTrain -- 0.06 ETH\n[bold blue]DS10:[/bold blue] S3 - S2 - S1 -- FastTrain -- 0.06 ETH\n[bold blue]DS11:[/bold blue] S3 - S5 -- FastTrain -- 0.06 ETH\n[bold blue]DS12:[/bold blue] S5 - S3 -- FastTrain -- 0.06 ETH", style="bold green")
 
         # Add users to blacklist
         self.add_user_to_blacklist([os.getenv("ADDRESS9")])

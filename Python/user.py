@@ -43,17 +43,26 @@ class User:
             dynamicSegmentsIds = iter(lambda: Prompt.ask(
                 "Enter a dynamic segment ID (or type 'done' to finish)"), 'done')
             function_params = [ticketId, list(dynamicSegmentsIds)]
-            value = int(Prompt.ask(
-                "Enter the value you want to pay for the ticket (in wei) [fees will be taken additionally]", default=1000000000000000000))
+            # Step 1: Ask the user for the value in ETH
+            value_in_eth = float(Prompt.ask(
+                "Enter the value you want to pay for the ticket (in ETH) [fees will be taken additionally]", default=1))
+
+            # Step 2: Convert the value from ETH to Wei
+            value_in_wei = int(self.web3.to_wei(value_in_eth, 'ether'))
+            # value = int(Prompt.ask(
+            #     "Enter the value you want to pay for the ticket (in wei) [fees will be taken additionally]", default=1000000000000000000))
         else:
             skip_check = True
 
         if skip_check or Prompt.ask(f"Are you sure you want to buy this ticket? [yes/no]", choices=["yes", "no"]) == "yes":
             try:
                 _, fee = self.call_contract_function(
-                    "buyDynamicTicket", function_params, value=value)
+                    "buyDynamicTicket", function_params, value=value_in_wei)
+
+                fee_in_eth = self.web3.from_wei(fee, 'ether')
+
                 console.print(
-                    f"Ticket {function_params[0]} bought successfully! Paid fee: {fee}.", style="bold green")
+                    f"Ticket {function_params[0]} bought successfully! Paid fee: {fee_in_eth} ETH.", style="bold green")
             except Exception as e:
                 raise Exception(f"Failed to buy ticket: {e}")
         else:
@@ -111,7 +120,7 @@ def main():
         for i in range(1, 10):
             account_options[i] = os.getenv(f"ADDRESS"+str(i))
             console.print(
-                f"{i} - {account_options[i]} - Balance: {SmartContractUtility.get_balance_from_address(web3_temp, account_options[i])} ETH")
+                f"{i} - {account_options[i]} - Balance: {SmartContractUtility.get_balance_from_address(web3_temp, account_options[i])} ETH \n")
         web3_temp = None
         selected_account = Prompt.ask("Choose your account", choices=[
             str(i) for i in range(1, 10)])
