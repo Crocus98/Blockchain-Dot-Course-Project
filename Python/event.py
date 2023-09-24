@@ -3,6 +3,7 @@ from dotenv import load_dotenv
 from Utility.SmartContractUtility import SmartContractUtility
 import os
 import threading
+import time
 
 load_dotenv()
 
@@ -35,6 +36,7 @@ class EventListener:
             for event in event_filter.get_new_entries():
                 console.print(
                     f"[bold blue]Event Received:[/bold blue] {event['event']} with data: {event['args']}", style="bold green")
+            time.sleep(2)
 
     def start_listening(self, event_names):
         threads = []
