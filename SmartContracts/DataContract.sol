@@ -351,9 +351,12 @@ contract TrainsOracle {
         uint256 refundAmount = refunds[msg.sender];
         refunds[msg.sender] = 0;
         require(refundAmount > 0, "No refund available");
-        //payable(msg.sender).transfer(refundAmount);
-        (bool success, ) = payable(msg.sender).call{value: refundAmount}("");
-        require(success, "Transfer failed");
         emit RefundTaken(msg.sender, refundAmount);
+        (bool success, ) = payable(msg.sender).call{value: refundAmount}("");
+        if (success == false) {
+            refunds[msg.sender] = refundAmount;
+        }
+        require(success, "Transfer failed");
+        //payable(msg.sender).transfer(refundAmount);
     }
 }
