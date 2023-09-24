@@ -70,11 +70,13 @@ contract TrainsOracle {
     }
 
     event RefundAdded(
-        address indexed recipient,
+        address indexed passenger,
         string dynamicSegmentId,
         uint256 amount,
         uint256 totalRefundToCollect
     );
+
+    event RefundTaken(address passenger, uint256 refundAmount);
 
     constructor() payable {
         trainCompanyAddress = msg.sender;
@@ -352,5 +354,6 @@ contract TrainsOracle {
         //payable(msg.sender).transfer(refundAmount);
         (bool success, ) = payable(msg.sender).call{value: refundAmount}("");
         require(success, "Transfer failed");
+        emit RefundTaken(msg.sender, refundAmount);
     }
 }
