@@ -1,15 +1,16 @@
-from dotenv import load_dotenv
-import os
 from Utility.SmartContractUtility import SmartContractUtility
 from rich.prompt import Prompt
 from rich.console import Console
 from rich.table import Table
 from rich.logging import RichHandler
-from rich.traceback import install
+from dotenv import load_dotenv
+import os
+
+# from rich.traceback import install
+# install()
 
 load_dotenv()
 console = Console()
-install()
 
 
 class User:
@@ -43,14 +44,10 @@ class User:
             dynamicSegmentsIds = iter(lambda: Prompt.ask(
                 "Enter a dynamic segment ID (or type 'done' to finish)"), 'done')
             function_params = [ticketId, list(dynamicSegmentsIds)]
-            # Step 1: Ask the user for the value in ETH
             value_in_eth = float(Prompt.ask(
-                "Enter the value you want to pay for the ticket (in ETH) [fees will be taken additionally]", default=1))
+                "Enter the value you want to pay for the ticket (in ETH) [fees will be taken additionally]", default=0.1))
 
-            # Step 2: Convert the value from ETH to Wei
             value_in_wei = int(self.web3.to_wei(value_in_eth, 'ether'))
-            # value = int(Prompt.ask(
-            #     "Enter the value you want to pay for the ticket (in wei) [fees will be taken additionally]", default=1000000000000000000))
         else:
             skip_check = True
 
