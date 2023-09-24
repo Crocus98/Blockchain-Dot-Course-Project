@@ -68,6 +68,14 @@ class User:
         else:
             console.print("Refunds not collected!", style="bold red")
 
+    def get_balance_of_address(self, address):
+        balance = self.web3.eth.get_balance(address)
+        return self.web3.from_wei(balance, 'ether')
+
+    def get_balance(self):
+        balance = self.web3.eth.get_balance(self.web3.eth.default_account)
+        return self.web3.from_wei(balance, 'ether')
+
 
 def main():
     logo = """
@@ -95,15 +103,26 @@ def main():
     }
 
     account_options = {}
+
+    user_temp = User("1")
+
     try:
         for i in range(1, 10):
-            account_options[i] = os.getenv(f"ADDRESS"+str(i))
-            console.print(f"{i} - {account_options[i]}")
+            address = os.getenv(f"ADDRESS"+str(i))
+            print(address)
+            balance = user_temp.get_balance_of_address(address)
+            account_options[i] = address
+            console.print(f"{i} - {address} - Balance: {balance} ETH")
         selected_account = Prompt.ask("Choose your account", choices=[
             str(i) for i in range(1, 10)])
+        # Get the address from the dictionary
+        selected_address = account_options[int(selected_account)]
+        print(f"Selected Address: {selected_address}")
         console.clear()
 
         user = User(selected_account)
+        print(user)
+
     except Exception as e:
         console.print(
             f"Failed to inizialize program: {e}", style="bold red")
@@ -113,6 +132,9 @@ def main():
         console.print(logo, style="bold blue")
         console.print(
             "Welcome to [bold blue]User CLI[/bold blue]!", style="bold yellow")
+        balance = user.get_balance_of_address(selected_address)
+        console.print(
+            f"Current Balance for selected account: {balance} ETH", style="bold cyan")
         console.print("\n[bold green]Please choose an action:[/bold green]")
         for key, value in options.items():
             console.print(f"{key}. {value}")
@@ -127,8 +149,16 @@ def main():
         try:
             if choice == "1":
                 user.buy_ticket()
+                balance = user.get_balance_of_address(
+                    selected_address)
+                console.print(
+                    f"Updated Balance for {selected_address}: {balance} ETH", style="bold cyan")
             elif choice == "2":
                 user.collect_refunds_money()
+                balance = user.get_balance_of_address(
+                    selected_address)
+                console.print(
+                    f"Updated Balance for {selected_address}: {balance} ETH", style="bold cyan")
             elif choice == "3":
                 console.print("Goodbye!", style="bold blue")
                 break
