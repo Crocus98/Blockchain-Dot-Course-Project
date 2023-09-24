@@ -161,6 +161,7 @@ contract TrainsOracle {
             new address[](0),
             true
         );
+        dynamicSegmentPrices[dynamicSegmentId] = 0;
     }
 
     function addDynamicConsecutiveSegmentToDynamicSegment(
