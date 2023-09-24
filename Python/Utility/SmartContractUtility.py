@@ -147,3 +147,7 @@ class SmartContractUtility:
         tx_hash = web3.eth.send_raw_transaction(signed_txn.rawTransaction)
 
         return tx_hash, fee
+
+    @staticmethod
+    def get_balance_from_address(web3, address):
+        return web3.from_wei(web3.eth.get_balance(address), 'ether')
