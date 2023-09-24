@@ -349,8 +349,8 @@ contract TrainsOracle {
 
     function getRefund() public notBlacklisted {
         uint256 refundAmount = refunds[msg.sender];
-        refunds[msg.sender] = 0;
         require(refundAmount > 0, "No refund available");
+        refunds[msg.sender] = 0;
         emit RefundTaken(msg.sender, refundAmount);
         (bool success, ) = payable(msg.sender).call{value: refundAmount}("");
         if (success == false) {

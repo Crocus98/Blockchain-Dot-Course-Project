@@ -4,7 +4,6 @@ from Utility.SmartContractUtility import SmartContractUtility
 import os
 
 load_dotenv()
-
 console = Console()
 
 
