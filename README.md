@@ -11,9 +11,11 @@ How to Run the CLI Application
     <li>Follow the instructions included in the `requirements.txt` file.</li>
     <li>Compile the `.env` file (refer to `.envexample` for guidance).</li>
     <li>Run the following commands:</li>
-    <li>python company.py 0 (argument is used to choose the owner account -> default is 0)</li>
-    <li>python user.py</li>
-    <li>python event.py</li>
+    <ul>
+      <li>python company.py 0 (argument is used to choose the owner account -> default is 0)</li>
+      <li>python user.py</li>
+      <li>python event.py</li>
+    </ul>
   </ol>
 </div>
 
