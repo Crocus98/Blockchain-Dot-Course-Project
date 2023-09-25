@@ -9,7 +9,7 @@ How to Run the CLI Application
     <li>Install Python and Pip.</li>
     <li>Install and run Ganache</li>
     <li>Follow the instructions included in the `requirements.txt` file.</li>
-    <li>Compile the `.env` file (refer to `.envexample` for guidance).</li>
+    <li>Fill the `.env` file (refer to `.envexample` for guidance).</li>
     <li>Run the following commands:</li>
     <ul>
       <li>python company.py 0 (argument is used to choose the owner account -> default is 0)</li>
