@@ -21,7 +21,7 @@ class Company:
                 "One or more environment variables are not set. Please complete .env file information before proceeding.")
 
         self.web3 = SmartContractUtility.web3_instance(
-            "http://"+os.getenv("RPCPROVIDERHOST") + ":" + os.getenv("RPCPROVIDERPORT"))
+            os.getenv("RPCPROVIDERHOST") + ":" + os.getenv("RPCPROVIDERPORT"))
         self.dot_env_path = find_dotenv()
         self.contract_address = os.getenv("CONTRACTADDRESS")
         self.contract_abi_path = os.getenv("CONTRACTABIPATH")
