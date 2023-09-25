@@ -66,7 +66,7 @@ class User:
             console.print("Ticket not bought!", style="bold red")
 
     def collect_refunds_money(self):
-        if Prompt.ask(f"Are you sure you want to collect all your refunds moeny? [yes/no]", choices=["yes", "no"]) == "yes":
+        if Prompt.ask(f"Are you sure you want to collect all your refunds money? [yes/no]", choices=["yes", "no"]) == "yes":
             try:
                 _, fee = self.call_contract_function(
                     "getRefund", [])
