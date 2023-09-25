@@ -19,10 +19,6 @@ How to Run the CLI Application
   </ol>
 </div>
 
-<p>How to run the cli application? First install python and pip and then follow instructions included in requirements.txt file. Compile the .env file (look .envexample). Then just run:
-
-</p>
-
 <div align="justify">
   <p>To run tests on Remix, you'll need to:</p>
   <ol>
