@@ -15,7 +15,7 @@ class EventListener:
             raise Exception(
                 "One or more environment variables are not set. Please complete .env file information before proceeding.")
         self.web3 = SmartContractUtility.web3_instance(
-            os.getenv("RPCPROVIDERHOST") + ":" + os.getenv("RPCPROVIDERPORT"))
+            "http://"+os.getenv("RPCPROVIDERHOST") + ":" + os.getenv("RPCPROVIDERPORT"))
         self.contract_address = os.getenv("CONTRACTADDRESS")
         self.contract_abi_path = os.getenv("CONTRACTABIPATH")
         self.contract_abi = SmartContractUtility.get_contract_abi(
@@ -26,15 +26,18 @@ class EventListener:
             f"Listening for events from contract at address {self.contract_address}", style="bold green")
 
     def listen_for_event(self, event_name):
-        event_filter = getattr(self.contract.events,
-                               event_name).create_filter(fromBlock='latest')
-        console.print(
-            f"[bold yellow]Listening for {event_name} events...[/bold yellow]")
-        while True:
-            for event in event_filter.get_new_entries():
-                console.print(
-                    f"[bold blue]Event Received:[/bold blue] {event['event']} with data: {event['args']}", style="bold green")
-            time.sleep(2)
+        try:
+            event_filter = getattr(self.contract.events,
+                                event_name).create_filter(fromBlock='latest')
+            console.print(
+                f"[bold yellow]Listening for {event_name} events...[/bold yellow]")
+            while True:
+                for event in event_filter.get_new_entries():
+                    console.print(
+                        f"[bold blue]Event Received:[/bold blue] {event['event']} with data: {event['args']}", style="bold green")
+                time.sleep(2)
+        except Exception as e:
+            console.print(f"Failed while listening to blockchain event [bold blue]{event_name}[/bold blue]: {e}", style="bold red")  
 
     def start_listening(self, event_names):
         threads = []
@@ -44,7 +47,11 @@ class EventListener:
             threads.append(t)
             t.start()
 
+try:
+    listener = EventListener()
+except Exception as e:
+    console.print(f"Failed to inizialize program: {e}", style="bold red")
 
-listener = EventListener()
-# Here you can add any other events you want to listen to
 listener.start_listening(["RefundAdded", "RefundTaken"])
+
+
