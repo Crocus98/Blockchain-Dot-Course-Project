@@ -1,23 +1,41 @@
 # Blockchain-Dot-Course-Project
-
-<p>This repository will contain the project for the DOT course of BLOCKCHAIN AND DISTRIBUTED LEDGER TECHNOLOGIES: PRINCIPLES, APPLICATIONS, AND RESEARCH CHALLENGES at Polimi</p>
+<div align="justify">
+  <p>This repository contains the project for the DOT course on Blockchain and Distributed Ledger Technologies: Principles, Applications, and Research Challenges at Polimi.</p>
+</div>
+How to Run the CLI Application
+<div align="justify">
+  <p>To run the CLI application, follow these steps:</p>
+  <ol>
+    <li>Install Python and Pip.</li>
+    <li>Install and run Ganache</li>
+    <li>Follow the instructions included in the `requirements.txt` file.</li>
+    <li>Compile the `.env` file (refer to `.envexample` for guidance).</li>
+    <li>Run the following commands:</li>
+    <li>python company.py 0 (argument is used to choose the owner account -> default is 0)</li>
+    <li>python user.py</li>
+    <li>python event.py</li>
+  </ol>
+</div>
 
 <p>How to run the cli application? First install python and pip and then follow instructions included in requirements.txt file. Compile the .env file (look .envexample). Then just run:
--python company.py 0 (in case of change of admin put the account number in front to run it with the account)
--python user.py
--python event.py
+
 </p>
 
-<p>
-How to run tests on remix? Install on remix the Solidity Unit Testing library and change the imports inside the testing files (correct ones for testing are commented).
+<div align="justify">
+  <p>To run tests on Remix, you'll need to:</p>
+  <ol>
+    <li>Install the Solidity Unit Testing library in Remix.</li>
+    <li>Make import changes inside the testing files (use the commented ones for testing and comment the others).</li>
+  </ol>
+</div>
+
 </p>
-
-<p>
-TIME to use for the DEMO:
-1696192200 --> 30 min delay (50% refund)
-
-1696190900 --> around 8 minutes and 20 seconds delay (20% refund)
-
-1696334900 --> 2 hours delay (100% refund)
-</p>
+<div align="justify">
+  <p>Here are the predefined time settings for the DEMO:</p>
+  <ul>
+    <li>1696192200 - 30 minutes delay (50% refund)</li>
+    <li>1696190900 - approximately 8 minutes and 20 seconds delay (20% refund)</li>
+    <li>1696334900 - 2 hours delay (100% refund)</li>
+  </ul>
+</div>
 
