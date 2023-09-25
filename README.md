@@ -22,14 +22,16 @@ How to Run the CLI Application
 <div align="justify">
   <p>To run tests on Remix, you'll need to:</p>
   <ol>
+    <li>Import the code</li>
     <li>Install the Solidity Unit Testing library in Remix.</li>
     <li>Make import changes inside the testing files (use the commented ones for testing and comment the others).</li>
+    <li>Run the tests from the extension section. (Out test folder is "Tests" with capital "T" and not the library default "tests")</li>
   </ol>
 </div>
 
 </p>
 <div align="justify">
-  <p>Here are the predefined time settings for the DEMO:</p>
+  <p>Here are some timestamps useful for the DEMO:</p>
   <ul>
     <li>1696192200 - 30 minutes delay (50% refund)</li>
     <li>1696190900 - approximately 8 minutes and 20 seconds delay (20% refund)</li>
