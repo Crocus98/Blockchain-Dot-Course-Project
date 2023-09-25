@@ -15,7 +15,7 @@ class EventListener:
             raise Exception(
                 "One or more environment variables are not set. Please complete .env file information before proceeding.")
         self.web3 = SmartContractUtility.web3_instance(
-            "http://"+os.getenv("RPCPROVIDERHOST") + ":" + os.getenv("RPCPROVIDERPORT"))
+            os.getenv("RPCPROVIDERHOST") + ":" + os.getenv("RPCPROVIDERPORT"))
         self.contract_address = os.getenv("CONTRACTADDRESS")
         self.contract_abi_path = os.getenv("CONTRACTABIPATH")
         self.contract_abi = SmartContractUtility.get_contract_abi(
